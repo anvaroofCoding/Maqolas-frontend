@@ -1,10 +1,11 @@
 import type { Metadata, Viewport } from "next";
-import { Inter } from "next/font/google";
+import { Poppins } from "next/font/google";
 import { AppShell } from "@/components/layout/app-shell";
 import { SiteNavbar } from "@/components/layout/site-navbar";
 import { AuthProvider } from "@/components/providers/auth-provider";
 import { StoreProvider } from "@/components/providers/store-provider";
 import { ThemeProvider } from "@/components/providers/theme-provider";
+import { ToastProvider } from "@/components/providers/toast-provider";
 import { JsonLdScript } from "@/components/seo/json-ld-script";
 import { siteConfig } from "@/config/site";
 import { defaultMetadata } from "@/lib/seo/metadata";
@@ -15,16 +16,18 @@ import {
 import { cn } from "@/lib/utils";
 import "./globals.css";
 
-const inter = Inter({
+const poppins = Poppins({
   subsets: ["latin"],
+  weight: ["400", "500", "600", "700"],
   variable: "--font-sans",
+  display: "swap",
 });
 
 export const metadata: Metadata = defaultMetadata;
 
 export const viewport: Viewport = {
   themeColor: [
-    { media: "(prefers-color-scheme: light)", color: "#ffffff" },
+    { media: "(prefers-color-scheme: light)", color: "#f3f4f6" },
     { media: "(prefers-color-scheme: dark)", color: "#1a1a1f" },
   ],
   width: "device-width",
@@ -40,7 +43,7 @@ export default function RootLayout({
     <html
       lang={siteConfig.locale}
       suppressHydrationWarning
-      className={cn("bg-background font-sans text-foreground", inter.variable)}
+      className={cn("bg-background font-sans text-foreground", poppins.variable)}
     >
       <body
         suppressHydrationWarning
@@ -51,12 +54,14 @@ export default function RootLayout({
         />
         <ThemeProvider>
           <StoreProvider>
-            <AuthProvider>
-              <SiteNavbar />
-              <div className="bg-background pt-14">
-                <AppShell>{children}</AppShell>
-              </div>
-            </AuthProvider>
+            <ToastProvider>
+              <AuthProvider>
+                <SiteNavbar />
+                <div className="bg-background pt-14">
+                  <AppShell>{children}</AppShell>
+                </div>
+              </AuthProvider>
+            </ToastProvider>
           </StoreProvider>
         </ThemeProvider>
       </body>

@@ -3,7 +3,7 @@
 import type { LucideIcon } from "lucide-react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { mainNavItems, topicNavItems } from "@/config/navigation";
+import { isMainNavActive, mainNavItems, topicNavItems } from "@/config/navigation";
 import { Button } from "@/components/ui/button";
 import { sidebarWidthClass } from "@/lib/layout";
 import { cn } from "@/lib/utils";
@@ -49,18 +49,22 @@ function SidebarNavItem({
 export function SiteSidebar() {
   const pathname = usePathname();
 
-  const isActive = (href: string) =>
-    href === "/" ? pathname === "/" : pathname === href || pathname.startsWith(`${href}/`);
+  const isActive = (href: string) => {
+    if (href.startsWith("/mavzu/")) {
+      return pathname === href || pathname.startsWith(`${href}/`);
+    }
+    return isMainNavActive(pathname, href);
+  };
 
   return (
     <aside
       className={cn(
-        "sticky top-14 z-40 hidden h-[calc(100vh-3.5rem)] shrink-0 bg-transparent lg:block",
+        "sticky top-14 z-40 w-full shrink-0 self-start bg-transparent",
         sidebarWidthClass,
       )}
       aria-label="Yon menyu"
     >
-      <nav className="flex h-full flex-col gap-1 overflow-y-auto py-4 pr-3">
+      <nav className="flex max-h-[calc(100vh-3.5rem)] flex-col gap-1 overflow-y-auto pb-4 pr-2">
         {mainNavItems.map((item) => (
           <SidebarNavItem
             key={item.href}

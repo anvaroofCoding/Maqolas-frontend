@@ -1,30 +1,49 @@
-import { createApi, fetchBaseQuery } from "@reduxjs/toolkit/query/react";
+import { createApi } from "@reduxjs/toolkit/query/react";
 import {
   clearCredentials,
-  getAccessToken,
   setCredentials,
+  setUser,
 } from "@/features/auth/slice/auth-slice";
-import type { AuthTokensResponse, AuthUser } from "@/features/auth/types";
+import type {
+  AuthTokensResponse,
+  MeResponse,
+  UpdateProfilePayload,
+} from "@/features/auth/types";
 import { env } from "@/config/env";
+import { baseQueryWithReauth } from "@/lib/store/api/base-query-with-reauth";
 
 export const authApi = createApi({
   reducerPath: "authApi",
-  baseQuery: fetchBaseQuery({
-    baseUrl: env.NEXT_PUBLIC_API_URL,
-    credentials: "include",
-    prepareHeaders: (headers) => {
-      const token = getAccessToken();
-      if (token) {
-        headers.set("Authorization", `Bearer ${token}`);
-      }
-      return headers;
-    },
-  }),
+  baseQuery: baseQueryWithReauth,
   tagTypes: ["AuthUser"],
   endpoints: (builder) => ({
-    getMe: builder.query<{ user: AuthUser }, void>({
+    getMe: builder.query<MeResponse, void>({
       query: () => "/auth/me",
       providesTags: ["AuthUser"],
+    }),
+    uploadAvatar: builder.mutation<MeResponse, FormData>({
+      query: (body) => ({
+        url: "/auth/me/avatar",
+        method: "POST",
+        body,
+      }),
+      async onQueryStarted(_arg, { dispatch, queryFulfilled }) {
+        const { data } = await queryFulfilled;
+        dispatch(setUser(data.user));
+      },
+      invalidatesTags: ["AuthUser"],
+    }),
+    updateProfile: builder.mutation<MeResponse, UpdateProfilePayload>({
+      query: (body) => ({
+        url: "/auth/me",
+        method: "PATCH",
+        body,
+      }),
+      async onQueryStarted(_arg, { dispatch, queryFulfilled }) {
+        const { data } = await queryFulfilled;
+        dispatch(setUser(data.user));
+      },
+      invalidatesTags: ["AuthUser"],
     }),
     googleTokenLogin: builder.mutation<AuthTokensResponse, { idToken: string }>(
       {
@@ -71,6 +90,8 @@ export const {
   useLazyGetMeQuery,
   useGoogleTokenLoginMutation,
   useLogoutMutation,
+  useUpdateProfileMutation,
+  useUploadAvatarMutation,
 } = authApi;
 
 export function getGoogleOAuthUrl() {

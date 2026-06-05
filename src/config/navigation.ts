@@ -21,10 +21,18 @@ export type NavItem = {
   icon: LucideIcon;
 };
 
+export function isMainNavActive(pathname: string, href: string): boolean {
+  if (href === "/") {
+    return pathname === "/";
+  }
+
+  return pathname === href || pathname.startsWith(`${href}/`);
+}
+
 export const mainNavItems: NavItem[] = [
-  { label: "Ommabop", href: "/", icon: ThumbsUpIcon },
+  { label: "Siz uchun", href: "/", icon: ThumbsUpIcon },
   { label: "Yangi", href: "/yangi", icon: ClockIcon },
-  { label: "Mening lentam", href: "/lenta", icon: NewspaperIcon },
+  { label: "Mening lentalarim", href: "/lenta", icon: NewspaperIcon },
 ];
 
 export const topicNavItems: NavItem[] = [

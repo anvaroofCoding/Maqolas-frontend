@@ -1,7 +1,8 @@
 "use client";
 
-import { BellIcon, PenLineIcon } from "lucide-react";
+import { PenLineIcon } from "lucide-react";
 import Link from "next/link";
+import { NotificationPopover } from "@/components/notifications/notification-popover";
 import { ProfileMenu } from "@/components/layout/profile-menu";
 import { ThemeToggle } from "@/components/layout/theme-toggle";
 import { Badge } from "@/components/ui/badge";
@@ -24,7 +25,7 @@ export function SiteNavbar() {
         "shadow-[0_1px_0_0_var(--navbar-shadow)]",
       )}
     >
-      <SiteContainer className="flex h-14 items-center justify-between gap-4">
+      <SiteContainer className="flex h-14 w-full max-w-none items-center justify-between gap-3 px-4 md:gap-4 md:px-4 xl:px-6">
         <Link
           href="/"
           className="group rounded-lg outline-none ring-offset-background transition-opacity hover:opacity-90 focus-visible:ring-3 focus-visible:ring-ring/50"
@@ -51,29 +52,26 @@ export function SiteNavbar() {
             variant="default"
             size="sm"
             className={cn("ml-1 hidden sm:inline-flex", writeButtonClass)}
+            asChild
           >
-            <PenLineIcon data-icon="inline-start" />
-            Yozish
+            <Link href="/yozish">
+              <PenLineIcon data-icon="inline-start" />
+              Yozish
+            </Link>
           </Button>
           <Button
-            variant="default"
-            size="icon-sm"
-            className={cn("ml-1 sm:hidden", writeButtonClass)}
-            aria-label="Yozish"
-          >
-            <PenLineIcon />
-          </Button>
-
-          <Button
-            type="button"
             variant="ghost"
             size="icon"
-            className={cn("relative", navIconButtonClass)}
-            aria-label="Bildirishnomalar"
+            className={cn("sm:hidden", navIconButtonClass)}
+            aria-label="Yozish"
+            asChild
           >
-            <BellIcon />
-            <span className="absolute top-1.5 right-1.5 size-2 rounded-full bg-nav-active ring-2 ring-background" />
+            <Link href="/yozish">
+              <PenLineIcon />
+            </Link>
           </Button>
+
+          <NotificationPopover />
 
           <ProfileMenu />
         </nav>

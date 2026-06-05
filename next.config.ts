@@ -10,8 +10,8 @@ const nextConfig: NextConfig = {
   images: {
     formats: ["image/avif", "image/webp"],
     remotePatterns: [
-      // Backend/media CDN URL qo‘shilganda:
-      // { protocol: "https", hostname: "cdn.example.com" },
+      { protocol: "http", hostname: "localhost", port: "8000" },
+      { protocol: "https", hostname: "**.googleusercontent.com" },
     ],
   },
   experimental: {

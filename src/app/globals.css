@@ -4,6 +4,10 @@
 
 @custom-variant dark (&:where(.dark, .dark *));
 
+html {
+  scrollbar-gutter: stable;
+}
+
 :root {
   --card: oklch(1 0 0);
   --card-foreground: oklch(0.145 0 0);
@@ -23,7 +27,7 @@
   --input: oklch(0.922 0 0);
   --ring: oklch(0.708 0 0);
   --radius: 0.625rem;
-  --background: oklch(1 0 0);
+  --background: #f3f4f6;
   --foreground: oklch(0.145 0 0);
   --chart-1: oklch(0.87 0 0);
   --chart-2: oklch(0.556 0 0);
@@ -41,9 +45,12 @@
   --nav-active: rgb(132, 2, 63);
   --nav-active-hover: rgb(112, 2, 54);
   --nav-active-foreground: #ffffff;
-  --navbar: oklch(1 0 0 / 72%);
+  --navbar: rgb(243 244 246 / 88%);
   --navbar-border: oklch(0.922 0 0 / 50%);
   --navbar-shadow: oklch(0 0 0 / 8%);
+  --article-code-bg: oklch(0.91 0.012 286);
+  --article-inline-code-bg: oklch(0.94 0.008 286);
+  --article-code-border: oklch(0.84 0.014 286);
 }
 
 html.dark {
@@ -86,13 +93,30 @@ html.dark {
   --navbar: oklch(0.21 0.006 286 / 88%);
   --navbar-border: oklch(1 0 0 / 12%);
   --navbar-shadow: oklch(1 0 0 / 6%);
+  --toast-bg-color: oklch(0.26 0.008 286);
+  --toast-text-color: oklch(0.985 0 0);
+  --toast-close-color: oklch(0.985 0 0);
+  --toast-box-shadow: 0 0.25rem 1.125rem 0 oklch(0 0 0 / 45%);
+  --article-code-bg: oklch(0.24 0.01 286);
+  --article-inline-code-bg: oklch(0.28 0.01 286);
+  --article-code-border: oklch(1 0 0 / 12%);
 }
 
 html:not(.dark) {
   color-scheme: light;
 }
 
+@keyframes skeleton-shimmer {
+  0% {
+    transform: translateX(-100%);
+  }
+  100% {
+    transform: translateX(100%);
+  }
+}
+
 @theme inline {
+  --animate-skeleton-shimmer: skeleton-shimmer 1.8s ease-in-out infinite;
   --color-background: var(--background);
   --color-foreground: var(--foreground);
   --color-card: var(--card);
@@ -153,6 +177,285 @@ html:not(.dark) {
 
   body {
     @apply min-h-screen antialiased bg-background text-foreground;
-    font-family: var(--font-sans), system-ui, sans-serif;
+    font-family: var(--font-sans), ui-sans-serif, system-ui, sans-serif;
   }
+}
+
+/* Maqola editor — WYSIWYG ko'rinishi */
+.article-editor-content {
+  @apply text-foreground;
+}
+
+.article-editor-content p {
+  @apply my-3 leading-7;
+}
+
+.article-editor-content h1 {
+  @apply mt-8 mb-4 text-3xl font-bold tracking-tight;
+}
+
+.article-editor-content h2 {
+  @apply mt-6 mb-3 text-2xl font-semibold tracking-tight;
+}
+
+.article-editor-content h3 {
+  @apply mt-5 mb-2 text-xl font-semibold;
+}
+
+.article-editor-content ul {
+  @apply my-3 list-disc pl-6;
+}
+
+.article-editor-content ol {
+  @apply my-3 list-decimal pl-6;
+}
+
+.article-editor-content li {
+  @apply my-1;
+}
+
+.article-editor-content blockquote {
+  @apply my-4 rounded-r-lg border border-l-4 border-border border-l-border bg-[var(--article-inline-code-bg)] py-3 pl-4 text-muted-foreground italic;
+}
+
+.code-block-shell {
+  @apply relative my-4;
+}
+
+.code-block-shell pre {
+  @apply my-0 overflow-x-auto rounded-lg border p-4 pr-12 text-sm;
+  background-color: var(--article-code-bg);
+  border-color: var(--article-code-border);
+}
+
+.article-editor-content pre {
+  @apply my-4 overflow-x-auto rounded-lg border p-4 text-sm;
+  background-color: var(--article-code-bg);
+  border-color: var(--article-code-border);
+}
+
+.code-block-copy-btn {
+  @apply absolute top-3 right-3 z-10 flex size-8 items-center justify-center rounded-md border-0 bg-transparent p-0 text-muted-foreground opacity-0 shadow-none transition-colors duration-200;
+  @apply hover:bg-transparent hover:text-foreground focus-visible:opacity-100 focus-visible:outline-none;
+}
+
+.code-block-shell:hover .code-block-copy-btn,
+.code-block-copy-btn--copied {
+  @apply opacity-100;
+}
+
+.code-block-copy-btn--copied {
+  @apply bg-transparent text-emerald-600 dark:text-emerald-400;
+}
+
+.article-editor-content :not(pre) > code {
+  @apply rounded border px-1.5 py-0.5 text-sm;
+  background-color: var(--article-inline-code-bg);
+  border-color: var(--article-code-border);
+}
+
+.article-editor-content pre code {
+  @apply border-0 bg-transparent p-0;
+}
+
+.article-editor-content hr {
+  @apply my-8 border-border;
+}
+
+.article-editor-content img {
+  @apply my-4 max-w-full rounded-lg border border-border;
+}
+
+.article-editor-content a {
+  @apply text-primary underline underline-offset-2;
+}
+
+.article-editor-content p.is-editor-empty:first-child::before {
+  @apply pointer-events-none float-left h-0 text-muted-foreground;
+  content: attr(data-placeholder);
+}
+
+/* Fokus o'qish rejimi — kattaroq va qulayroq tipografiya */
+.article-focus-content p {
+  @apply my-5 text-lg leading-8 sm:text-xl sm:leading-9;
+}
+
+.article-focus-content h1 {
+  @apply mt-10 mb-5 text-3xl font-bold tracking-tight sm:text-4xl;
+}
+
+.article-focus-content h2 {
+  @apply mt-8 mb-4 text-2xl font-semibold tracking-tight sm:text-3xl;
+}
+
+.article-focus-content h3 {
+  @apply mt-7 mb-3 text-xl font-semibold sm:text-2xl;
+}
+
+.article-focus-content ul,
+.article-focus-content ol {
+  @apply my-5 text-lg leading-8 sm:text-xl sm:leading-9;
+}
+
+.article-focus-content blockquote {
+  @apply my-6 rounded-r-lg border border-l-4 border-border border-l-border bg-[var(--article-inline-code-bg)] py-3 pl-5 text-lg italic sm:text-xl;
+}
+
+/* Inline style bilan kelgan oq fonlarni light modeda bekor qilish */
+html:not(.dark) .article-editor-content pre,
+html:not(.dark) .code-block-shell pre {
+  background-color: var(--article-code-bg) !important;
+}
+
+.article-focus-content pre {
+  @apply my-6 text-base;
+  background-color: var(--article-code-bg);
+  border-color: var(--article-code-border);
+}
+
+.article-focus-content img {
+  @apply my-6 rounded-xl border border-border;
+}
+
+@keyframes like-heart-fly-in {
+  0% {
+    transform: translate3d(0, -50%, 0) scale(0.42);
+    opacity: 0;
+  }
+
+  10% {
+    opacity: 1;
+  }
+
+  72% {
+    transform: translate3d(calc(var(--like-dx) * 0.93), calc(-50% + var(--like-arc)), 0)
+      scale(1.14);
+    opacity: 1;
+  }
+
+  100% {
+    transform: translate3d(var(--like-dx), -50%, 0) scale(1);
+    opacity: 0;
+  }
+}
+
+@keyframes like-heart-settle {
+  0% {
+    transform: scale(0.78);
+  }
+
+  55% {
+    transform: scale(1.16);
+  }
+
+  100% {
+    transform: scale(1);
+  }
+}
+
+.like-heart-fly {
+  animation: like-heart-fly-in 0.68s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+  will-change: transform, opacity;
+}
+
+.like-heart-settle {
+  animation: like-heart-settle 0.36s cubic-bezier(0.34, 1.45, 0.64, 1);
+}
+
+@keyframes notification-pop {
+  0% {
+    opacity: 0;
+    transform: scale(0.72) translateY(-10px);
+  }
+
+  65% {
+    transform: scale(1.04) translateY(0);
+  }
+
+  100% {
+    opacity: 1;
+    transform: scale(1) translateY(0);
+  }
+}
+
+@keyframes notification-empty-pop {
+  0% {
+    opacity: 0;
+    transform: scale(0.9);
+  }
+
+  100% {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+.notification-bubble {
+  animation: notification-pop 0.42s cubic-bezier(0.34, 1.45, 0.64, 1) both;
+}
+
+.notification-bubble__body {
+  --bubble-bg: color-mix(in oklch, var(--muted) 40%, var(--popover));
+  --bubble-border: color-mix(in oklch, var(--border) 70%, transparent);
+  background-color: var(--bubble-bg);
+  border-color: var(--bubble-border);
+  transition:
+    background-color 0.15s ease,
+    border-color 0.15s ease;
+}
+
+.notification-bubble.group:hover .notification-bubble__body {
+  --bubble-bg: color-mix(in oklch, var(--muted) 70%, var(--popover));
+}
+
+.notification-bubble--unread .notification-bubble__body {
+  --bubble-bg: color-mix(in oklch, var(--nav-active) 8%, var(--popover));
+  --bubble-border: color-mix(in oklch, var(--nav-active) 25%, transparent);
+}
+
+.notification-bubble--unread.group:hover .notification-bubble__body {
+  --bubble-bg: color-mix(in oklch, var(--nav-active) 12%, var(--popover));
+}
+
+.notification-bubble__body::before {
+  content: "";
+  position: absolute;
+  left: -9px;
+  top: 12px;
+  width: 0;
+  height: 0;
+  border-style: solid;
+  border-width: 7px 9px 7px 0;
+  border-color: transparent var(--bubble-border) transparent transparent;
+  pointer-events: none;
+}
+
+.notification-bubble__body::after {
+  content: "";
+  position: absolute;
+  left: -7px;
+  top: 13px;
+  width: 0;
+  height: 0;
+  border-style: solid;
+  border-width: 6px 8px 6px 0;
+  border-color: transparent var(--bubble-bg) transparent transparent;
+  pointer-events: none;
+  transition: border-color 0.15s ease;
+}
+
+.notification-empty-bubble {
+  animation: notification-empty-pop 0.35s cubic-bezier(0.34, 1.45, 0.64, 1) both;
+}
+
+.notification-scroll {
+  scroll-behavior: smooth;
+  scrollbar-width: none; /* Firefox */
+  -ms-overflow-style: none; /* IE/old Edge */
+}
+
+.notification-scroll::-webkit-scrollbar {
+  width: 0;
+  height: 0;
+  display: none; /* Chrome/Safari */
 }

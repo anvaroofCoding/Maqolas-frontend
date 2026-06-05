@@ -3,7 +3,10 @@
 import { useRouter, useSearchParams } from "next/navigation";
 import { Suspense, useEffect, useRef } from "react";
 import { useLazyGetMeQuery } from "@/features/auth/api/auth-api";
-import { setCredentials } from "@/features/auth/slice/auth-slice";
+import {
+  setCredentials,
+  setSessionTokens,
+} from "@/features/auth/slice/auth-slice";
 import { useAppDispatch } from "@/lib/store/hooks";
 
 function AuthCallbackHandler() {
@@ -17,24 +20,29 @@ function AuthCallbackHandler() {
     if (handled.current) return;
     handled.current = true;
 
-    const accessToken = searchParams.get("accessToken");
-    const refreshToken = searchParams.get("refreshToken") ?? "";
+    async function finishLogin() {
+      const error = searchParams.get("error");
+      const errorMessage = searchParams.get("message");
 
-    if (!accessToken) {
-      router.replace("/");
-      return;
-    }
-
-    if (typeof window !== "undefined") {
-      localStorage.setItem("maqolas_access_token", accessToken);
-      if (refreshToken) {
-        localStorage.setItem("maqolas_refresh_token", refreshToken);
+      if (error) {
+        const params = new URLSearchParams({ auth_error: error });
+        if (errorMessage) params.set("auth_message", errorMessage);
+        router.replace(`/?${params.toString()}`);
+        return;
       }
-    }
 
-    void fetchMe()
-      .unwrap()
-      .then((data) => {
+      const accessToken = searchParams.get("accessToken");
+      const refreshToken = searchParams.get("refreshToken") ?? "";
+
+      if (!accessToken) {
+        router.replace("/?auth_error=missing_token");
+        return;
+      }
+
+      dispatch(setSessionTokens({ accessToken, refreshToken }));
+
+      try {
+        const data = await fetchMe().unwrap();
         dispatch(
           setCredentials({
             user: data.user,
@@ -42,18 +50,14 @@ function AuthCallbackHandler() {
             refreshToken,
           }),
         );
-      })
-      .catch(() => {
-        if (typeof window !== "undefined") {
-          localStorage.setItem("maqolas_access_token", accessToken);
-          if (refreshToken) {
-            localStorage.setItem("maqolas_refresh_token", refreshToken);
-          }
-        }
-      })
-      .finally(() => {
-        router.replace("/");
-      });
+      } catch {
+        /* token saqlangan; AuthProvider getMe qayta urinadi */
+      }
+
+      router.replace("/");
+    }
+
+    void finishLogin();
   }, [dispatch, fetchMe, router, searchParams]);
 
   return (
