@@ -354,7 +354,7 @@ html:not(.dark) {
 
 .article-editor-content .article-youtube-embed,
 .article-editor-content div[data-youtube-video] {
-  @apply my-4 aspect-video w-full overflow-hidden rounded-xl border border-border;
+  @apply my-4 aspect-video w-full overflow-hidden rounded-xl;
 }
 
 .article-editor-content .article-youtube-embed iframe,
