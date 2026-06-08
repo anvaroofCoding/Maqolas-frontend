@@ -1,6 +1,14 @@
 "use client";
 
-import { FileTextIcon, LogOutIcon, ShieldCheckIcon, UserIcon } from "lucide-react";
+import {
+  FileTextIcon,
+  InfoIcon,
+  LogOutIcon,
+  ScrollTextIcon,
+  ShieldCheckIcon,
+  ShieldIcon,
+  UserIcon,
+} from "lucide-react";
 import { useRouter } from "next/navigation";
 import { forwardRef, useEffect, useState } from "react";
 import { AuthLoginModal } from "@/components/auth/auth-login-modal";
@@ -123,7 +131,7 @@ export function ProfileMenu() {
           displayName={activeUser?.displayName}
         />
       </DropdownMenuTrigger>
-      <DropdownMenuContent align="end" className="w-52">
+      <DropdownMenuContent align="end" className="w-60">
         <DropdownMenuLabel className="font-normal">
           <p className="truncate text-sm font-medium">
             {activeUser?.displayName ?? "Foydalanuvchi"}
@@ -156,6 +164,28 @@ export function ProfileMenu() {
             Admin panel
           </DropdownMenuItem>
         ) : null}
+        <DropdownMenuSeparator />
+        <DropdownMenuItem
+          className="cursor-pointer"
+          onSelect={() => router.push("/dastur-haqida")}
+        >
+          <InfoIcon />
+          Dastur haqida
+        </DropdownMenuItem>
+        <DropdownMenuItem
+          className="cursor-pointer"
+          onSelect={() => router.push("/foydalanish-shartlari")}
+        >
+          <ScrollTextIcon />
+          Foydalanish shartlari
+        </DropdownMenuItem>
+        <DropdownMenuItem
+          className="cursor-pointer"
+          onSelect={() => router.push("/maxfiylik-siyosati")}
+        >
+          <ShieldIcon />
+          Maxfiylik siyosati
+        </DropdownMenuItem>
         <DropdownMenuSeparator />
         <DropdownMenuItem
           variant="destructive"

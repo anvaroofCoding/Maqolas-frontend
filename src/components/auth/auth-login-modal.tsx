@@ -1,5 +1,6 @@
 "use client";
 
+import Link from "next/link";
 import { useCallback } from "react";
 import {
   Dialog,
@@ -77,7 +78,21 @@ export function AuthLoginModal({ open, onOpenChange }: AuthLoginModalProps) {
           </Button>
 
           <p className="text-center text-xs text-muted-foreground">
-            Davom etish orqali foydalanish shartlariga rozilik bildirasiz.
+            Davom etish orqali{" "}
+            <Link
+              href="/foydalanish-shartlari"
+              className="font-medium text-primary underline-offset-2 hover:underline"
+            >
+              foydalanish shartlari
+            </Link>{" "}
+            va{" "}
+            <Link
+              href="/maxfiylik-siyosati"
+              className="font-medium text-primary underline-offset-2 hover:underline"
+            >
+              maxfiylik siyosatiga
+            </Link>{" "}
+            rozilik bildirasiz.
           </p>
         </div>
       </DialogContent>

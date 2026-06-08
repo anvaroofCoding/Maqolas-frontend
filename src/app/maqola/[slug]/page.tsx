@@ -6,8 +6,15 @@ import { ArticleEngagement } from "@/components/articles/article-engagement";
 import { JsonLdScript } from "@/components/seo/json-ld-script";
 import { stripArticleLeadFromHtml } from "@/lib/articles/content";
 import { fetchArticleBySlug } from "@/lib/articles/server";
-import { buildArticleJsonLd } from "@/lib/seo/json-ld";
+import { buildArticleDescription } from "@/lib/seo/description";
+import {
+  buildArticleJsonLd,
+  buildBreadcrumbJsonLd,
+  estimateWordCount,
+} from "@/lib/seo/json-ld";
+import { buildArticleKeywords } from "@/lib/seo/keywords";
 import { buildPageMetadata } from "@/lib/seo/metadata";
+import { absoluteUrl } from "@/lib/seo/urls";
 
 type ArticlePageProps = {
   params: Promise<{ slug: string }>;
@@ -17,7 +24,7 @@ export async function generateMetadata({
   params,
 }: ArticlePageProps): Promise<Metadata> {
   const { slug } = await params;
-  const article = await fetchArticleBySlug(slug);
+  const article = await fetchArticleBySlug(slug, { meta: true });
 
   if (!article) {
     return buildPageMetadata({
@@ -27,12 +34,30 @@ export async function generateMetadata({
     });
   }
 
+  const authorName = article.author?.displayName ?? "Noma'lum muallif";
+  const description = buildArticleDescription({
+    title: article.title,
+    excerpt: article.excerpt,
+    categories: article.categories,
+    authorName,
+  });
+
   return buildPageMetadata({
     title: article.title,
-    description: article.excerpt ?? article.title,
+    titleFormat: "article",
+    description,
     path: `/maqola/${article.slug}`,
     image: article.coverImageUrl,
-    keywords: [article.title, article.author?.displayName ?? "maqola"],
+    keywords: buildArticleKeywords(
+      article.title,
+      article.categories,
+      authorName,
+    ),
+    type: "article",
+    publishedTime: article.publishedAt ?? article.createdAt,
+    modifiedTime: article.updatedAt ?? article.publishedAt ?? article.createdAt,
+    authors: [authorName],
+    tags: article.categories?.map((category) => category.name),
   });
 }
 
@@ -46,19 +71,46 @@ export default async function ArticleDetailPage({ params }: ArticlePageProps) {
 
   const authorName = article.author?.displayName ?? "Noma'lum muallif";
   const articleBodyHtml = stripArticleLeadFromHtml(article.contentHtml);
+  const description = buildArticleDescription({
+    title: article.title,
+    excerpt: article.excerpt,
+    categories: article.categories,
+    authorName,
+  });
+  const primaryCategory = article.categories?.[0];
+  const breadcrumbItems = [
+    { name: "Bosh sahifa", path: "/" },
+    ...(primaryCategory
+      ? [
+          {
+            name: primaryCategory.name,
+            path: `/mavzu/${primaryCategory.slug}`,
+          },
+        ]
+      : []),
+    { name: article.title, path: `/maqola/${article.slug}` },
+  ];
 
   return (
     <main className="mx-auto w-full max-w-3xl px-4 py-6 sm:px-6 sm:py-8 lg:px-8">
       <JsonLdScript
-        data={buildArticleJsonLd({
-          title: article.title,
-          description: article.excerpt ?? article.title,
-          slug: article.slug,
-          coverImageUrl: article.coverImageUrl,
-          authorName,
-          publishedAt: article.createdAt,
-          updatedAt: article.updatedAt,
-        })}
+        data={[
+          buildArticleJsonLd({
+            title: article.title,
+            description,
+            slug: article.slug,
+            coverImageUrl: article.coverImageUrl
+              ? absoluteUrl(article.coverImageUrl)
+              : undefined,
+            authorName,
+            authorUsername: article.author?.username,
+            publishedAt: article.publishedAt ?? article.createdAt,
+            updatedAt: article.updatedAt ?? article.publishedAt ?? article.createdAt,
+            categories: article.categories,
+            wordCount: estimateWordCount(article.contentHtml),
+          }),
+          buildBreadcrumbJsonLd(breadcrumbItems),
+        ]}
       />
 
       <article itemScope itemType="https://schema.org/Article">
@@ -69,7 +121,7 @@ export default async function ArticleDetailPage({ params }: ArticlePageProps) {
           authorName={authorName}
           authorUsername={article.author?.username}
           authorAvatarUrl={article.author?.avatarUrl}
-          createdAt={article.createdAt}
+          createdAt={article.publishedAt ?? article.createdAt}
           categories={article.categories}
         />
 

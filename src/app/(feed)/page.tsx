@@ -1,14 +1,23 @@
 import { connection } from "next/server";
 import { ArticleFeedWithPagination } from "@/components/articles/article-feed-with-pagination";
-import { buildPageMetadata } from "@/lib/seo/metadata";
+import { JsonLdScript } from "@/components/seo/json-ld-script";
 import { fetchArticleFeed } from "@/lib/articles/server";
+import { buildItemListJsonLd } from "@/lib/seo/json-ld";
+import { buildPageMetadata } from "@/lib/seo/metadata";
 import { feedMainClassName } from "@/lib/layout";
 
 export const metadata = buildPageMetadata({
-  title: "Siz uchun",
+  titleFormat: "site",
   description:
-    "Qiziqishingizga mos va ommabop maqolalar — texnologiya, startaplar, AI va boshqa mavzularda.",
+    "Maqolas — o'zbekcha maqolalar o'qish va yozish platformasi. Texnologiya, startaplar, AI, marketing va boshqa mavzularda sifatli maqolalar.",
   path: "/",
+  keywords: [
+    "maqola",
+    "maqolalar",
+    "o'zbekcha maqolalar",
+    "maqola o'qish",
+    "eng yaxshi maqolalar",
+  ],
 });
 
 export default async function HomePage() {
@@ -17,6 +26,13 @@ export default async function HomePage() {
 
   return (
     <main className={feedMainClassName}>
+      <JsonLdScript
+        data={buildItemListJsonLd(
+          "Ommabop o'zbekcha maqolalar",
+          "/",
+          feed.articles,
+        )}
+      />
       <ArticleFeedWithPagination
         feed={feed}
         sort="popular"

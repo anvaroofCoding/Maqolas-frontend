@@ -2,12 +2,12 @@ const W = 1080;
 const H = 1920;
 
 const BRAND = {
-  light: "#b80452",
-  mid: "#84023f",
-  deep: "#5c0230",
-  dark: "#1a0610",
-  glow: "#ff4d8d",
-  soft: "#d41472",
+  light: "#6366f1",
+  mid: "#4f46e5",
+  deep: "#4338ca",
+  dark: "#1e1b4b",
+  glow: "#818cf8",
+  soft: "#a5b4fc",
 } as const;
 
 export type StoryTemplateId =
@@ -77,7 +77,7 @@ function drawAurora(ctx: CanvasRenderingContext2D, width: number, height: number
   const bands = [
     { y: 0.15, c1: "rgba(184, 4, 82, 0.55)", c2: "rgba(184, 4, 82, 0)" },
     { y: 0.35, c1: "rgba(255, 77, 141, 0.35)", c2: "rgba(255, 77, 141, 0)" },
-    { y: 0.55, c1: "rgba(132, 2, 63, 0.45)", c2: "rgba(132, 2, 63, 0)" },
+    { y: 0.55, c1: "rgba(79, 70, 229, 0.45)", c2: "rgba(79, 70, 229, 0)" },
     { y: 0.75, c1: "rgba(212, 20, 114, 0.3)", c2: "rgba(212, 20, 114, 0)" },
   ];
 
@@ -268,7 +268,7 @@ function drawWaves(ctx: CanvasRenderingContext2D, width: number, height: number)
 
   const layers = [
     { y: 0.35, amp: 0.08, color: "rgba(184, 4, 82, 0.55)" },
-    { y: 0.5, amp: 0.1, color: "rgba(132, 2, 63, 0.45)" },
+    { y: 0.5, amp: 0.1, color: "rgba(79, 70, 229, 0.45)" },
     { y: 0.68, amp: 0.12, color: "rgba(92, 2, 48, 0.55)" },
     { y: 0.85, amp: 0.09, color: "rgba(26, 6, 16, 0.85)" },
   ];
@@ -360,8 +360,8 @@ function drawSpotlight(ctx: CanvasRenderingContext2D, width: number, height: num
   ctx.restore();
 
   const floor = ctx.createLinearGradient(0, height * 0.7, 0, height);
-  floor.addColorStop(0, "rgba(132, 2, 63, 0)");
-  floor.addColorStop(1, "rgba(132, 2, 63, 0.35)");
+  floor.addColorStop(0, "rgba(79, 70, 229, 0)");
+  floor.addColorStop(1, "rgba(79, 70, 229, 0.35)");
   ctx.fillStyle = floor;
   ctx.fillRect(0, height * 0.7, width, height * 0.3);
 }

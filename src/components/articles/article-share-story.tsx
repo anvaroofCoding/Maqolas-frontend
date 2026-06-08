@@ -64,6 +64,7 @@ export function ArticleShareStory({
   >({});
   const blobRef = useRef<Blob | null>(null);
   const previewUrlRef = useRef<string | null>(null);
+  const templateButtonRefs = useRef<Partial<Record<StoryTemplateId, HTMLButtonElement>>>({});
 
   const clearPreview = useCallback(() => {
     if (previewUrlRef.current) {
@@ -141,6 +142,16 @@ export function ArticleShareStory({
     if (!open) return;
     void generatePreview(selectedTemplate);
   }, [open, selectedTemplate, generatePreview]);
+
+  useEffect(() => {
+    if (!open) return;
+    const button = templateButtonRefs.current[selectedTemplate];
+    button?.scrollIntoView({
+      behavior: "smooth",
+      block: "nearest",
+      inline: "center",
+    });
+  }, [open, selectedTemplate]);
 
   const handleShare = async (platform: StorySharePlatform) => {
     if (!blobRef.current) return;
@@ -239,45 +250,58 @@ export function ArticleShareStory({
       {trigger}
 
       <Dialog open={open} onOpenChange={handleOpenChange}>
-        <DialogContent className="max-w-md gap-0 overflow-hidden p-0 sm:max-w-2xl">
-          <DialogHeader className="space-y-1 border-b px-5 py-4 text-left">
+        <DialogContent className="flex max-h-[92dvh] max-w-md flex-col gap-0 overflow-hidden p-0 max-sm:fixed max-sm:inset-x-0 max-sm:top-auto max-sm:bottom-0 max-sm:max-h-[94dvh] max-sm:translate-x-0 max-sm:translate-y-0 max-sm:rounded-b-none max-sm:rounded-t-2xl sm:max-w-2xl">
+          <DialogHeader className="shrink-0 space-y-1 border-b px-4 py-3 text-left sm:px-5 sm:py-4">
             <DialogTitle>Story&apos;ga ulashish</DialogTitle>
-            <DialogDescription>
+            <DialogDescription className="text-xs sm:text-sm">
               Maqola reklama rasmini Instagram yoki Telegram story&apos;siga
               yuboring yoki saqlab oling.
             </DialogDescription>
           </DialogHeader>
 
-          <div className="flex flex-col gap-4 bg-muted/40 p-5 sm:flex-row sm:items-start">
-            <div className="relative mx-auto aspect-[9/16] w-full max-w-[220px] shrink-0 overflow-hidden rounded-2xl border bg-background shadow-lg sm:mx-0">
-              {generating ? (
-                <Skeleton className="absolute inset-0 rounded-none" />
-              ) : previewUrl ? (
-                <Image
-                  src={previewUrl}
-                  alt="Story ko'rinishi"
-                  fill
-                  unoptimized
-                  className="object-cover"
-                />
-              ) : (
-                <div className="flex h-full items-center justify-center px-6 text-center text-sm text-muted-foreground">
-                  Ko&apos;rinish yaratilmadi
-                </div>
-              )}
+          <div className="flex min-h-0 flex-1 flex-col overflow-y-auto bg-muted/40 sm:flex-row sm:items-start sm:overflow-visible sm:p-5 sm:gap-4">
+            <div className="order-2 flex shrink-0 justify-center px-4 py-3 sm:order-1 sm:p-0">
+              <div className="relative aspect-[9/16] w-[130px] shrink-0 overflow-hidden rounded-2xl border bg-background shadow-lg sm:w-[220px]">
+                {generating ? (
+                  <Skeleton className="absolute inset-0 rounded-none" />
+                ) : previewUrl ? (
+                  <Image
+                    src={previewUrl}
+                    alt="Story ko'rinishi"
+                    fill
+                    unoptimized
+                    className="object-cover"
+                  />
+                ) : (
+                  <div className="flex h-full items-center justify-center px-4 text-center text-xs text-muted-foreground">
+                    Ko&apos;rinish yaratilmadi
+                  </div>
+                )}
 
-              {generating ? (
-                <div className="absolute inset-0 flex items-center justify-center bg-background/50 backdrop-blur-[1px]">
-                  <Loader2 className="size-8 animate-spin text-nav-active" />
-                </div>
-              ) : null}
+                {generating ? (
+                  <div className="absolute inset-0 flex items-center justify-center bg-background/50 backdrop-blur-[1px]">
+                    <Loader2 className="size-6 animate-spin text-nav-active sm:size-8" />
+                  </div>
+                ) : null}
+              </div>
             </div>
 
-            <div className="flex min-h-0 min-w-0 flex-1 flex-col sm:max-h-[391px]">
-              <p className="mb-2 text-xs font-medium text-muted-foreground">
-                Fon shabloni
-              </p>
-              <div className="scrollbar-hidden flex max-h-48 flex-col gap-2 overflow-y-auto p-1 sm:max-h-none sm:flex-1">
+            <div className="order-1 flex min-h-0 min-w-0 flex-1 flex-col px-4 pt-3 sm:order-2 sm:max-h-[391px] sm:p-0 sm:pt-0">
+              <div className="mb-2 flex items-center justify-between gap-2">
+                <p className="text-xs font-medium text-muted-foreground">
+                  Fon shabloni
+                </p>
+                <p className="text-[11px] text-muted-foreground sm:hidden">
+                  Chapga suring
+                </p>
+              </div>
+              <div
+                className={cn(
+                  "scrollbar-hidden flex gap-2 overflow-x-auto px-1 pb-3",
+                  "snap-x snap-mandatory [-webkit-overflow-scrolling:touch]",
+                  "sm:max-h-none sm:flex-col sm:overflow-y-auto sm:overflow-x-hidden sm:px-0 sm:pb-1 sm:snap-none",
+                )}
+              >
                 {STORY_TEMPLATES.map((template) => {
                   const isActive = selectedTemplate === template.id;
                   const thumb = templateThumbs[template.id];
@@ -285,19 +309,23 @@ export function ArticleShareStory({
                   return (
                     <button
                       key={template.id}
+                      ref={(node) => {
+                        if (node) templateButtonRefs.current[template.id] = node;
+                      }}
                       type="button"
                       aria-label={`${template.label} shabloni`}
                       aria-pressed={isActive}
                       disabled={generating}
                       onClick={() => handleTemplateSelect(template.id)}
                       className={cn(
-                        "flex w-full items-center gap-3 rounded-xl p-2 text-left transition-all",
+                        "flex shrink-0 snap-start flex-col items-center gap-1.5 rounded-xl p-2 transition-all",
+                        "w-[72px] sm:w-full sm:flex-row sm:items-center sm:gap-3 sm:p-2 sm:text-left",
                         isActive
                           ? "bg-nav-active/15 ring-2 ring-nav-active"
                           : "bg-background/80 ring-1 ring-border hover:ring-nav-active/40",
                       )}
                     >
-                      <div className="relative h-14 w-8 shrink-0 overflow-hidden rounded-md">
+                      <div className="relative h-[88px] w-[52px] shrink-0 overflow-hidden rounded-lg sm:h-14 sm:w-8 sm:rounded-md">
                         {thumb ? (
                           <Image
                             src={thumb}
@@ -312,7 +340,7 @@ export function ArticleShareStory({
                       </div>
                       <span
                         className={cn(
-                          "text-sm",
+                          "w-full truncate text-center text-[11px] leading-tight sm:text-left sm:text-sm",
                           isActive
                             ? "font-semibold text-nav-active"
                             : "text-foreground",
@@ -327,11 +355,11 @@ export function ArticleShareStory({
             </div>
           </div>
 
-          <div className="grid grid-cols-1 gap-2 border-t p-5 sm:grid-cols-3">
+          <div className="grid shrink-0 grid-cols-3 gap-2 border-t p-3 sm:grid-cols-3 sm:p-5">
             <Button
               type="button"
               variant="outline"
-              className="h-11 justify-start gap-2 rounded-xl"
+              className="h-10 flex-col gap-1 rounded-xl px-1 text-[11px] sm:h-11 sm:flex-row sm:justify-start sm:gap-2 sm:px-4 sm:text-sm"
               disabled={generating || !previewUrl || sharing !== null}
               onClick={() => void handleShare("instagram")}
             >
@@ -340,13 +368,13 @@ export function ArticleShareStory({
               ) : (
                 <Instagram className="size-4" />
               )}
-              Instagram
+              <span className="truncate">Instagram</span>
             </Button>
 
             <Button
               type="button"
               variant="outline"
-              className="h-11 justify-start gap-2 rounded-xl"
+              className="h-10 flex-col gap-1 rounded-xl px-1 text-[11px] sm:h-11 sm:flex-row sm:justify-start sm:gap-2 sm:px-4 sm:text-sm"
               disabled={generating || !previewUrl || sharing !== null}
               onClick={() => void handleShare("telegram")}
             >
@@ -355,12 +383,12 @@ export function ArticleShareStory({
               ) : (
                 <TelegramIcon className="size-4" />
               )}
-              Telegram
+              <span className="truncate">Telegram</span>
             </Button>
 
             <Button
               type="button"
-              className="h-11 justify-start gap-2 rounded-xl"
+              className="h-10 flex-col gap-1 rounded-xl px-1 text-[11px] sm:h-11 sm:flex-row sm:justify-start sm:gap-2 sm:px-4 sm:text-sm"
               disabled={generating || !previewUrl || sharing !== null}
               onClick={() => void handleSave()}
             >
@@ -369,7 +397,7 @@ export function ArticleShareStory({
               ) : (
                 <Download className="size-4" />
               )}
-              Saqlash
+              <span className="truncate">Saqlash</span>
             </Button>
           </div>
         </DialogContent>

@@ -65,7 +65,7 @@ function ShareStatsPreview({ stats }: { stats: PlatformStats }) {
 
   return (
     <div className="relative aspect-square w-full max-w-sm overflow-hidden rounded-3xl border border-white/20 shadow-2xl">
-      <div className="absolute inset-0 bg-linear-to-br from-[#b80452] via-[#84023f] to-[#1a0610]" />
+      <div className="absolute inset-0 bg-linear-to-br from-[#6366f1] via-[#4f46e5] to-[#1e1b4b]" />
       <div className="pointer-events-none absolute -right-10 -top-10 size-40 rounded-full bg-white/10 blur-3xl" />
       <div className="pointer-events-none absolute -bottom-12 -left-12 size-48 rounded-full bg-white/10 blur-3xl" />
 
@@ -148,7 +148,7 @@ export function PlatformStatsDashboard() {
   return (
     <div className="mb-6 space-y-4">
       <Card className="overflow-hidden border-0 bg-transparent p-0 shadow-none">
-        <div className="relative overflow-hidden rounded-2xl border bg-linear-to-r from-[#b80452] via-[#84023f] to-[#5c0230] p-5 text-white sm:p-6">
+        <div className="relative overflow-hidden rounded-2xl border bg-linear-to-r from-[#6366f1] via-[#4f46e5] to-[#4338ca] p-5 text-white sm:p-6">
           <div className="pointer-events-none absolute -right-8 -top-8 size-36 rounded-full bg-white/10 blur-3xl" />
           <div className="pointer-events-none absolute -bottom-10 left-1/3 size-44 rounded-full bg-white/10 blur-3xl" />
 

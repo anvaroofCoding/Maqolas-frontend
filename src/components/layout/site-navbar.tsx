@@ -34,10 +34,8 @@ export function SiteNavbar() {
             <span className="text-lg font-semibold tracking-tight text-foreground">
               {siteConfig.name}
             </span>
-            <Badge
-              className="-mt-2 ml-0.5 h-4 shrink-0 border-transparent bg-nav-active px-1.5 text-[10px] font-normal uppercase text-nav-active-foreground hover:bg-nav-active-hover"
-            >
-              beta
+            <Badge className="-mt-2 ml-0.5 h-4 shrink-0 border-transparent bg-nav-active px-1.5 text-[10px] font-medium text-nav-active-foreground hover:bg-nav-active-hover">
+              New
             </Badge>
           </span>
         </Link>

@@ -3,10 +3,17 @@ import { feedMainClassName } from "@/lib/layout";
 import { buildPageMetadata } from "@/lib/seo/metadata";
 
 export const metadata = buildPageMetadata({
-  title: "Ko'p so'ralgan mavzular",
+  title: "Mavzular",
   description:
-    "Qiziq mavzularni taklif qiling yoki mavjudlariga ovoz bering.",
+    "Maqolas platformasidagi mavzular: texnologiya, startaplar, AI, marketing va boshqalar. O'zingizga mos maqola mavzusini toping yoki yangisini taklif qiling.",
   path: "/mavzular",
+  keywords: [
+    "maqola mavzulari",
+    "maqola mavzusi",
+    "texnologiya maqolalari",
+    "startap maqolalari",
+    "maqola",
+  ],
 });
 
 export default function TopicSuggestionsRoutePage() {

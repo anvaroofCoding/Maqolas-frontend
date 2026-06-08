@@ -14,6 +14,15 @@ import {
 } from "@/lib/layout";
 import { cn } from "@/lib/utils";
 
+function isLegalInfoRoute(pathname: string | null) {
+  if (!pathname) return false;
+  return (
+    pathname === "/dastur-haqida" ||
+    pathname === "/foydalanish-shartlari" ||
+    pathname === "/maxfiylik-siyosati"
+  );
+}
+
 function shouldShowMobileNav(pathname: string | null) {
   if (!pathname) return false;
   return (
@@ -21,7 +30,8 @@ function shouldShowMobileNav(pathname: string | null) {
     !pathname.startsWith("/admin") &&
     !pathname.startsWith("/profil") &&
     !pathname.startsWith("/maqola") &&
-    !pathname.startsWith("/auth")
+    !pathname.startsWith("/auth") &&
+    !isLegalInfoRoute(pathname)
   );
 }
 
@@ -43,6 +53,7 @@ export function AppShell({ children }: { children: React.ReactNode }) {
   const showMobileNav = shouldShowMobileNav(pathname);
   const showRightSidebar = shouldShowRightSidebar(pathname);
   const isFeedLayout = showMobileNav;
+  const useFeedTopPadding = isFeedLayout || isLegalInfoRoute(pathname);
 
   if (isAdminRoute) {
     return (
@@ -85,7 +96,7 @@ export function AppShell({ children }: { children: React.ReactNode }) {
         </div>
 
         <div className={feedColumnScrollClassName}>
-          <div className={cn(isFeedLayout && feedColumnTopPaddingClass)}>
+          <div className={cn(useFeedTopPadding && feedColumnTopPaddingClass)}>
             {showMobileNav ? (
               <div className="md:hidden">
                 <SiteMobileNav />

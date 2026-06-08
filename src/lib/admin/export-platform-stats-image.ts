@@ -69,9 +69,9 @@ export async function exportPlatformStatsImage(stats: PlatformStats) {
   if (!ctx) return;
 
   const gradient = ctx.createLinearGradient(0, 0, size, size);
-  gradient.addColorStop(0, "#b80452");
-  gradient.addColorStop(0.45, "#84023f");
-  gradient.addColorStop(1, "#1a0610");
+  gradient.addColorStop(0, "#6366f1");
+  gradient.addColorStop(0.45, "#4f46e5");
+  gradient.addColorStop(1, "#1e1b4b");
   ctx.fillStyle = gradient;
   ctx.fillRect(0, 0, size, size);
 
