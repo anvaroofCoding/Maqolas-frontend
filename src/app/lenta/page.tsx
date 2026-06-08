@@ -29,25 +29,25 @@ export default function SavedFeedPage() {
   if (!mounted || !accessToken) {
     return (
       <main className={feedMainClassName}>
-        <ArticleFeedSkeleton title="Mening lentalarim yuklanmoqda" />
+        <ArticleFeedSkeleton title="Mening maqolam yuklanmoqda" />
       </main>
     );
   }
 
   return (
     <main className={feedMainClassName}>
-      <section aria-label="Mening lentalarim">
-        <h1 className="sr-only">Mening lentalarim</h1>
+      <section aria-label="Mening maqolam">
+        <h1 className="sr-only">Mening maqolam</h1>
         <ArticleFeedInfinite
           variant="saved"
-          title="Mening lentalarim"
-          emptyMessage="Lentangiz hozircha bo'sh."
+          title="Mening maqolam"
+          emptyMessage="Maqolangiz hozircha bo'sh."
           emptyFallback={
             <div className="flex min-h-[50vh] flex-col items-center justify-center gap-4 px-6 py-16 text-center">
               <Bookmark className="size-10 text-muted-foreground/60" aria-hidden />
               <div className="space-y-2">
                 <p className="text-sm font-medium text-foreground">
-                  Lentangiz hozircha bo&apos;sh
+                  Maqolangiz hozircha bo&apos;sh
                 </p>
                 <p className="max-w-sm text-sm text-muted-foreground">
                   Maqolalarni saqlash uchun maqola sahifasidagi belgi tugmasini

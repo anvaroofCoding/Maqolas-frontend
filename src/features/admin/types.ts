@@ -136,3 +136,65 @@ export interface UpdateCategoryPayload {
   sortOrder?: number;
   isActive?: boolean;
 }
+
+export type CommentModerationStatus = "pending" | "approved" | "rejected";
+
+export interface ModerationCommentItem {
+  id: string;
+  content: string;
+  status: CommentModerationStatus;
+  parentId?: string;
+  rejectReason?: string;
+  createdAt?: string;
+  reviewedAt?: string;
+  author?: ArticleAuthor & { email?: string };
+  article?: ReportedArticleRef;
+}
+
+export interface CommentModerationResponse {
+  comments: ModerationCommentItem[];
+  pagination: ReviewQueueResponse["pagination"];
+}
+
+export type ArticleRequestModerationStatus =
+  | "pending"
+  | "approved"
+  | "rejected";
+
+export interface ModerationArticleRequestItem {
+  id: string;
+  title: string;
+  description: string;
+  moderationStatus: ArticleRequestModerationStatus;
+  rejectionReason?: string;
+  reviewedAt?: string;
+  likeCount: number;
+  createdAt?: string;
+  requester?: {
+    id: string;
+    displayName?: string;
+    username?: string;
+    avatarUrl?: string;
+  };
+  author?: {
+    id: string;
+    displayName?: string;
+    username?: string;
+    avatarUrl?: string;
+  };
+}
+
+export interface ArticleRequestModerationResponse {
+  requests: ModerationArticleRequestItem[];
+  pagination: ReviewQueueResponse["pagination"];
+}
+
+export interface PlatformStats {
+  totalUsers: number;
+  totalFollows: number;
+  publishedArticles: number;
+  approvedComments: number;
+  newUsersLast7Days: number;
+  newFollowsLast7Days: number;
+  generatedAt: string;
+}

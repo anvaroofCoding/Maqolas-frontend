@@ -60,30 +60,30 @@ export function ProfileHeader({ user, stats }: ProfileHeaderProps) {
 
   return (
     <>
-      <header className="flex flex-col gap-4 border-b border-border pb-6 sm:flex-row sm:items-start sm:gap-6">
-        <ProfileAvatarUpload user={user} className="mb-6 sm:mb-0" />
+      <header className="flex items-start gap-4 border-b border-border pb-5 sm:gap-6 sm:pb-6">
+        <ProfileAvatarUpload user={user} />
 
-        <div className="min-w-0 flex-1 space-y-3">
-          <div className="flex flex-wrap items-center gap-2">
-            <h1 className="text-xl font-semibold tracking-tight text-foreground sm:text-2xl">
+        <div className="min-w-0 flex-1 space-y-2 sm:space-y-3">
+          <div className="flex min-w-0 items-center gap-1.5">
+            <h1 className="min-w-0 truncate text-lg font-semibold tracking-tight text-foreground sm:text-2xl">
               {user.displayName}
             </h1>
             <Button
               type="button"
               variant="ghost"
-              size="icon-sm"
-              className="text-muted-foreground"
+              size="icon"
+              className="size-9 shrink-0 text-muted-foreground sm:size-8"
               aria-label="Profilni tahrirlash"
               onClick={() => setEditOpen(true)}
             >
-              <PencilIcon />
+              <PencilIcon className="size-4" />
             </Button>
           </div>
 
-          <p className="text-sm text-muted-foreground">{user.email}</p>
+          <p className="truncate text-sm text-muted-foreground">{user.email}</p>
 
           {user.bio ? (
-            <p className="max-w-xl text-sm text-foreground/80">{user.bio}</p>
+            <p className="text-sm break-words text-foreground/80">{user.bio}</p>
           ) : null}
 
           <div className="flex flex-wrap items-center gap-2">

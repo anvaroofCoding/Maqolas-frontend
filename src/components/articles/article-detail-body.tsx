@@ -4,6 +4,7 @@ import Image from "next/image";
 import { useCallback, useEffect, useRef, useState } from "react";
 import { ZoomInIcon } from "lucide-react";
 import { ArticleContent } from "@/components/articles/article-content";
+import { ArticleShareStory } from "@/components/articles/article-share-story";
 import {
   ImageLightbox,
   type LightboxImage,
@@ -11,20 +12,39 @@ import {
 import { cn } from "@/lib/utils";
 
 type ArticleDetailBodyProps = {
+  slug: string;
   coverImageUrl?: string;
   title: string;
+  excerpt?: string;
+  authorName: string;
+  authorAvatarUrl?: string;
+  categoryName?: string;
   contentHtml: string;
   contentClassName?: string;
   itemProp?: string;
 };
 
 export function ArticleDetailBody({
+  slug,
   coverImageUrl,
   title,
+  excerpt,
+  authorName,
+  authorAvatarUrl,
+  categoryName,
   contentHtml,
   contentClassName,
   itemProp,
 }: ArticleDetailBodyProps) {
+  const storyData = {
+    slug,
+    title,
+    excerpt,
+    coverImageUrl,
+    authorName,
+    authorAvatarUrl,
+    categoryName,
+  };
   const contentRef = useRef<HTMLDivElement>(null);
   const [lightboxImage, setLightboxImage] = useState<LightboxImage | null>(null);
 
@@ -69,29 +89,36 @@ export function ArticleDetailBody({
     <>
       {coverImageUrl ? (
         <div className="mt-5">
-          <button
-            type="button"
+          <div
             className={cn(
-              "group relative block aspect-[16/9] w-full overflow-hidden rounded-xl border bg-muted",
-              "cursor-zoom-in transition-transform duration-200 hover:shadow-md",
+              "group relative aspect-[16/9] w-full overflow-hidden rounded-xl border bg-muted",
+              "transition-transform duration-200 hover:shadow-md",
             )}
-            aria-label="Rasmni kattalashtirish"
-            onClick={() => openLightbox(coverImageUrl, title)}
           >
-            <Image
-              src={coverImageUrl}
-              alt={title}
-              fill
-              priority
-              sizes="(max-width: 768px) 100vw, 768px"
-              className="object-cover transition-transform duration-300 group-hover:scale-[1.02]"
-              itemProp="image"
-              unoptimized
-            />
-            <span className="absolute right-3 top-3 inline-flex size-9 items-center justify-center rounded-full bg-black/45 text-white opacity-0 backdrop-blur-sm transition-opacity duration-200 group-hover:opacity-100">
-              <ZoomInIcon className="size-4" aria-hidden />
-            </span>
-          </button>
+            <button
+              type="button"
+              className="absolute inset-0 z-0 block w-full cursor-zoom-in"
+              aria-label="Rasmni kattalashtirish"
+              onClick={() => openLightbox(coverImageUrl, title)}
+            >
+              <Image
+                src={coverImageUrl}
+                alt={title}
+                fill
+                priority
+                sizes="(max-width: 768px) 100vw, 768px"
+                className="object-cover transition-transform duration-300 group-hover:scale-[1.02]"
+                itemProp="image"
+                unoptimized
+              />
+              <span className="pointer-events-none absolute right-3 top-3 inline-flex size-9 items-center justify-center rounded-full bg-black/45 text-white opacity-0 backdrop-blur-sm transition-opacity duration-200 group-hover:opacity-100">
+                <ZoomInIcon className="size-4" aria-hidden />
+              </span>
+            </button>
+            <div className="absolute left-3 top-3 z-10">
+              <ArticleShareStory storyData={storyData} variant="overlay" />
+            </div>
+          </div>
         </div>
       ) : null}
 

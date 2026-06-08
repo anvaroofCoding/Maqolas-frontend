@@ -44,7 +44,7 @@ export const articleRequestsApi = baseApi.injectEndpoints({
       ],
     }),
     createArticleRequest: builder.mutation<
-      { request: ArticleRequest },
+      { request: ArticleRequest; pending?: boolean },
       CreateArticleRequestPayload
     >({
       query: (body) => ({
@@ -52,13 +52,21 @@ export const articleRequestsApi = baseApi.injectEndpoints({
         method: "POST",
         body,
       }),
-      invalidatesTags: (_r, _e, { authorUsername }) => [
-        ...(authorUsername
-          ? [{ type: "ArticleRequest" as const, id: authorUsername.toLowerCase() }]
-          : []),
-        { type: "ArticleRequest", id: "TRENDING" },
-        { type: "ArticleRequest", id: "ALL" },
-      ],
+      invalidatesTags: (result, _error, { authorUsername }) =>
+        result?.pending
+          ? []
+          : [
+              ...(authorUsername
+                ? [
+                    {
+                      type: "ArticleRequest" as const,
+                      id: authorUsername.toLowerCase(),
+                    },
+                  ]
+                : []),
+              { type: "ArticleRequest", id: "TRENDING" },
+              { type: "ArticleRequest", id: "ALL" },
+            ],
     }),
     toggleArticleRequestLike: builder.mutation<
       { liked: boolean; likeCount: number },

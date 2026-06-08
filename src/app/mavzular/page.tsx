@@ -3,7 +3,7 @@ import { feedMainClassName } from "@/lib/layout";
 import { buildPageMetadata } from "@/lib/seo/metadata";
 
 export const metadata = buildPageMetadata({
-  title: "Taklif qilingan mavzular",
+  title: "Ko'p so'ralgan mavzular",
   description:
     "Qiziq mavzularni taklif qiling yoki mavjudlariga ovoz bering.",
   path: "/mavzular",

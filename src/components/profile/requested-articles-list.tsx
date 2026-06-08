@@ -30,6 +30,7 @@ import type {
 } from "@/features/article-requests/types";
 import { formatCount, formatRelativeTime } from "@/lib/format";
 import { useAppSelector } from "@/lib/store/hooks";
+import { toast } from "@/lib/toast";
 import { getUserInitials } from "@/lib/user";
 import { cn } from "@/lib/utils";
 
@@ -292,8 +293,11 @@ export function RequestedArticlesList({
       setTitle("");
       setDescription("");
       setCreateOpen(false);
+      toast.success(
+        "So'rov yuborildi. Admin tasdiqlagach, muallif va boshqalar ko'radi.",
+      );
     } catch {
-      // keep dialog open on failure
+      toast.error("So'rov yuborilmadi. Qayta urinib ko'ring.");
     }
   };
 
@@ -304,7 +308,7 @@ export function RequestedArticlesList({
   return (
     <>
       <div className="space-y-4">
-        <div className="flex items-center justify-between gap-3">
+        <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
           <h2 className="text-lg font-semibold text-foreground">
             So&apos;ralgan maqolalar
           </h2>
@@ -312,7 +316,7 @@ export function RequestedArticlesList({
             <Button
               type="button"
               size="sm"
-              className="rounded-full bg-nav-active px-4 text-nav-active-foreground hover:bg-nav-active-hover hover:text-nav-active-foreground"
+              className="w-fit shrink-0 rounded-full bg-nav-active px-4 text-nav-active-foreground hover:bg-nav-active-hover hover:text-nav-active-foreground"
               onClick={handleOpenCreate}
             >
               <PlusIcon className="size-4" aria-hidden />
@@ -362,8 +366,8 @@ export function RequestedArticlesList({
           <DialogHeader>
             <DialogTitle>Maqola so&apos;rash</DialogTitle>
             <DialogDescription>
-              Qanday mavzuda maqola yozilishini xohlaysiz? Muallif ko&apos;rib
-              chiqadi.
+              Qanday mavzuda maqola yozilishini xohlaysiz? So&apos;rov avval
+              admin tomonidan ko&apos;rib chiqiladi.
             </DialogDescription>
           </DialogHeader>
           <div className="space-y-3">

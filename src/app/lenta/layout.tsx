@@ -1,7 +1,7 @@
 import { buildPageMetadata } from "@/lib/seo/metadata";
 
 export const metadata = buildPageMetadata({
-  title: "Mening lentalarim",
+  title: "Mening maqolam",
   description: "Saqlangan va sevimli maqolalaringiz.",
   path: "/lenta",
 });

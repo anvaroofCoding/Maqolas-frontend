@@ -113,7 +113,14 @@ export function FollowButton({
           onClick={handleClick}
         >
           {icon}
-          {following ? "Obunani bekor qilish" : "Obuna bo'lish"}
+          {following ? (
+            <>
+              <span className="sm:hidden">Bekor qilish</span>
+              <span className="hidden sm:inline">Obunani bekor qilish</span>
+            </>
+          ) : (
+            "Obuna bo'lish"
+          )}
         </Button>
       )}
 

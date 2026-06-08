@@ -32,7 +32,7 @@ export function isMainNavActive(pathname: string, href: string): boolean {
 export const mainNavItems: NavItem[] = [
   { label: "Siz uchun", href: "/", icon: ThumbsUpIcon },
   { label: "Yangi", href: "/yangi", icon: ClockIcon },
-  { label: "Mening lentalarim", href: "/lenta", icon: NewspaperIcon },
+  { label: "Mening maqolam", href: "/lenta", icon: NewspaperIcon },
 ];
 
 export const topicNavItems: NavItem[] = [

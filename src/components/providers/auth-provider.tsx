@@ -7,6 +7,7 @@ import {
   setCredentials,
 } from "@/features/auth/slice/auth-slice";
 import { useAppDispatch, useAppSelector } from "@/lib/store/hooks";
+import { BannedScreen } from "@/components/layout/banned-screen";
 
 export function AuthProvider({ children }: { children: React.ReactNode }) {
   const dispatch = useAppDispatch();
@@ -15,6 +16,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   const accessToken = useAppSelector((state) => state.auth.accessToken);
   const user = useAppSelector((state) => state.auth.user);
   const refreshToken = useAppSelector((state) => state.auth.refreshToken);
+  const ban = useAppSelector((state) => state.auth.ban);
 
   useEffect(() => {
     if (!hydrated.current) {
@@ -45,6 +47,10 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       }),
     );
   }, [isSuccess, data, accessToken, refreshToken, user, dispatch]);
+
+  if (ban) {
+    return <BannedScreen ban={ban} />;
+  }
 
   return children;
 }

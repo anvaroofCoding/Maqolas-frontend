@@ -1,6 +1,6 @@
 "use client";
 
-import { ChevronUp, Loader2Icon, PlusIcon } from "lucide-react";
+import { Loader2Icon, PlusIcon } from "lucide-react";
 import Link from "next/link";
 import { useState } from "react";
 import { AuthLoginModal } from "@/components/auth/auth-login-modal";
@@ -24,11 +24,11 @@ import {
   useToggleArticleRequestLikeMutation,
 } from "@/features/article-requests/api/article-requests-api";
 import type { ArticleRequest } from "@/features/article-requests/types";
-import { formatCount, formatRelativeTime } from "@/lib/format";
+import { TopicSupportButton } from "@/components/topics/topic-support-button";
+import { formatRelativeTime } from "@/lib/format";
 import { useAppSelector } from "@/lib/store/hooks";
+import { toast } from "@/lib/toast";
 import { getUserInitials } from "@/lib/user";
-import { cn } from "@/lib/utils";
-
 const DESCRIPTION_PREVIEW_LENGTH = 180;
 
 function TopicSuggestionsSkeleton() {
@@ -91,23 +91,12 @@ function TopicSuggestionCard({
   return (
     <Card className="min-w-0 max-w-full overflow-hidden rounded-xl border shadow-sm">
       <div className="flex gap-4 p-4 sm:p-5">
-        <button
-          type="button"
-          className={cn(
-            "inline-flex size-12 shrink-0 flex-col items-center justify-center rounded-full border transition-colors",
-            likedByMe || likeCount > 0
-              ? "border-nav-active/40 text-nav-active"
-              : "border-border text-muted-foreground hover:border-nav-active/30 hover:text-nav-active",
-          )}
-          aria-label="Ovoz berish"
+        <TopicSupportButton
+          likeCount={likeCount}
+          likedByMe={likedByMe}
           disabled={isLoading}
           onClick={() => void handleVote()}
-        >
-          <ChevronUp className="size-4" aria-hidden />
-          <span className="text-sm font-semibold tabular-nums">
-            {formatCount(likeCount)}
-          </span>
-        </button>
+        />
 
         <div className="min-w-0 flex-1 space-y-3">
           <div>
@@ -192,8 +181,11 @@ export function TopicSuggestionsPage() {
       setTitle("");
       setDescription("");
       setCreateOpen(false);
+      toast.success(
+        "Taklif yuborildi. Admin tasdiqlagach, barcha foydalanuvchilar ko'radi.",
+      );
     } catch {
-      // keep dialog open on failure
+      toast.error("Taklif yuborilmadi. Qayta urinib ko'ring.");
     }
   };
 
@@ -206,7 +198,7 @@ export function TopicSuggestionsPage() {
               Qaysi mavzuda yozaylik?
             </h1>
             <p className="text-sm text-muted-foreground">
-              Qiziq mavzularni taklif qiling yoki mavjudlariga ovoz bering
+              Qiziq mavzularni taklif qiling yoki mavjudlarini qo&apos;llab-quvvatlang
             </p>
           </div>
           <Button
@@ -259,8 +251,8 @@ export function TopicSuggestionsPage() {
           <DialogHeader>
             <DialogTitle>Mavzu taklif qilish</DialogTitle>
             <DialogDescription>
-              Qaysi mavzuda maqola yozilishini xohlaysiz? Taklif barcha foydalanuvchilar
-              uchun ko&apos;rinadi.
+              Qaysi mavzuda maqola yozilishini xohlaysiz? Taklif avval admin
+              tomonidan ko&apos;rib chiqiladi, keyin nashr etiladi.
             </DialogDescription>
           </DialogHeader>
           <div className="space-y-3">

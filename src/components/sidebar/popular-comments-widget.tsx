@@ -24,7 +24,7 @@ export function PopularCommentsWidget({
     <Card className="overflow-hidden rounded-2xl border-border/70 shadow-sm">
       <CardHeader className="px-4 pb-2 pt-4">
         <CardTitle className="text-base font-semibold tracking-tight">
-          Ommabop sharhlar
+          Mashxur izohlar
         </CardTitle>
       </CardHeader>
       <CardContent className="space-y-4 px-4 pb-4">
@@ -41,7 +41,7 @@ export function PopularCommentsWidget({
           ))
         ) : comments.length === 0 ? (
           <p className="text-sm text-muted-foreground">
-            Hozircha ommabop sharhlar yo&apos;q.
+            Hozircha mashxur izohlar yo&apos;q.
           </p>
         ) : (
           comments.map((comment) => {

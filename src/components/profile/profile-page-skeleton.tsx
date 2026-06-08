@@ -6,12 +6,12 @@ import { cn } from "@/lib/utils";
 function OwnProfileHeaderSkeleton() {
   return (
     <header
-      className="flex flex-col gap-4 border-b border-border pb-6 sm:flex-row sm:items-start sm:gap-6"
+      className="flex items-start gap-4 border-b border-border pb-5 sm:gap-6 sm:pb-6"
       aria-hidden
     >
-      <div className="relative mb-6 shrink-0 sm:mb-0">
-        <Skeleton className="size-20 rounded-full sm:size-24" />
-        <Skeleton className="absolute right-0 bottom-0 size-8 rounded-full border border-border" />
+      <div className="relative shrink-0">
+        <Skeleton className="size-16 rounded-full sm:size-24" />
+        <Skeleton className="absolute right-0 bottom-0 size-7 rounded-full border border-border sm:size-8" />
       </div>
 
       <div className="min-w-0 flex-1 space-y-3">
@@ -39,10 +39,10 @@ function OwnProfileHeaderSkeleton() {
 function PublicProfileHeaderSkeleton() {
   return (
     <header
-      className="flex flex-col gap-4 border-b border-border pb-6 sm:flex-row sm:items-start sm:gap-6"
+      className="flex items-start gap-4 border-b border-border pb-5 sm:gap-6 sm:pb-6"
       aria-hidden
     >
-      <Skeleton className="size-20 shrink-0 rounded-full sm:size-24" />
+      <Skeleton className="size-16 shrink-0 rounded-full sm:size-24" />
 
       <div className="min-w-0 flex-1 space-y-3">
         <div className="flex flex-wrap items-center gap-3">
@@ -73,20 +73,22 @@ type ProfileTabsSkeletonProps = {
 export function ProfileTabsSkeleton({ variant = "own" }: ProfileTabsSkeletonProps) {
   return (
     <div className="flex flex-col gap-2" aria-hidden>
-      <div className="inline-flex h-10 w-fit max-w-full items-center gap-1 rounded-xl bg-muted/80 p-1">
-        {variant === "own" ? (
-          <>
-            <Skeleton className="h-8 w-[5.75rem] shrink-0 rounded-lg" />
-            <Skeleton className="h-8 w-[10.5rem] shrink-0 rounded-lg" />
-            <Skeleton className="h-8 w-[5.75rem] shrink-0 rounded-lg" />
-          </>
-        ) : (
-          <>
-            <Skeleton className="h-8 w-[5.5rem] shrink-0 rounded-lg" />
-            <Skeleton className="h-8 w-[10.5rem] shrink-0 rounded-lg" />
-            <Skeleton className="h-8 w-[5.75rem] shrink-0 rounded-lg" />
-          </>
-        )}
+      <div className="-mx-4 overflow-x-auto px-4 [-ms-overflow-style:none] [scrollbar-width:none] sm:mx-0 sm:px-0 [&::-webkit-scrollbar]:hidden">
+        <div className="inline-flex h-10 w-max min-w-full items-center gap-1 rounded-xl bg-muted/80 p-1 sm:min-w-0">
+          {variant === "own" ? (
+            <>
+              <Skeleton className="h-8 w-[5.75rem] shrink-0 rounded-lg" />
+              <Skeleton className="h-8 w-[5.5rem] shrink-0 rounded-lg sm:w-[10.5rem]" />
+              <Skeleton className="h-8 w-[5.75rem] shrink-0 rounded-lg" />
+            </>
+          ) : (
+            <>
+              <Skeleton className="h-8 w-[5.5rem] shrink-0 rounded-lg" />
+              <Skeleton className="h-8 w-[5.5rem] shrink-0 rounded-lg sm:w-[10.5rem]" />
+              <Skeleton className="h-8 w-[5.75rem] shrink-0 rounded-lg" />
+            </>
+          )}
+        </div>
       </div>
 
       <div className="pt-1">

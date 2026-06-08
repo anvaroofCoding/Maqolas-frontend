@@ -2,6 +2,10 @@ import { baseApi } from "@/lib/store/api/base-api";
 import type {
   AdminUpdateArticlePayload,
   AdminUsersResponse,
+  ArticleRequestModerationResponse,
+  CommentModerationResponse,
+  ModerationArticleRequestItem,
+  PlatformStats,
   CreateBanPayload,
   Category,
   ReportsResponse,
@@ -65,6 +69,10 @@ export const adminApi = baseApi.injectEndpoints({
         method: "PATCH",
       }),
       invalidatesTags: [{ type: "Admin", id: "REPORTS" }],
+    }),
+    getPlatformStats: builder.query<PlatformStats, void>({
+      query: () => "/admin/stats",
+      providesTags: [{ type: "Admin", id: "STATS" }],
     }),
     listUsers: builder.query<
       AdminUsersResponse,
@@ -207,6 +215,109 @@ export const adminApi = baseApi.injectEndpoints({
         { type: "Category", id: "LIST" },
       ],
     }),
+    listCommentsForModeration: builder.query<
+      CommentModerationResponse,
+      {
+        page?: number;
+        limit?: number;
+        status?: "pending" | "approved" | "rejected";
+      } | void
+    >({
+      query: (params) => {
+        const searchParams = new URLSearchParams();
+        searchParams.set("page", String(params?.page ?? 1));
+        searchParams.set("limit", String(params?.limit ?? 50));
+        searchParams.set("status", params?.status ?? "pending");
+        return `/admin/comments?${searchParams.toString()}`;
+      },
+      providesTags: [{ type: "Admin", id: "COMMENTS" }],
+    }),
+    approveComments: builder.mutation<
+      { approved: number; commentIds: string[] },
+      { commentIds: string[] }
+    >({
+      query: (body) => ({
+        url: "/admin/comments/approve",
+        method: "POST",
+        body,
+      }),
+      invalidatesTags: [
+        { type: "Admin", id: "COMMENTS" },
+        { type: "Comment" },
+        { type: "Article", id: "LIST" },
+      ],
+    }),
+    rejectComments: builder.mutation<
+      { rejected: number; commentIds: string[] },
+      { commentIds: string[]; reason?: string }
+    >({
+      query: (body) => ({
+        url: "/admin/comments/reject",
+        method: "POST",
+        body,
+      }),
+      invalidatesTags: [
+        { type: "Admin", id: "COMMENTS" },
+        { type: "Comment" },
+      ],
+    }),
+    deleteCommentsAdmin: builder.mutation<
+      { deleted: number; commentIds: string[] },
+      { commentIds: string[] }
+    >({
+      query: (body) => ({
+        url: "/admin/comments/delete",
+        method: "POST",
+        body,
+      }),
+      invalidatesTags: [
+        { type: "Admin", id: "COMMENTS" },
+        { type: "Comment" },
+        { type: "Article", id: "LIST" },
+      ],
+    }),
+    listArticleRequestsForModeration: builder.query<
+      ArticleRequestModerationResponse,
+      {
+        page?: number;
+        limit?: number;
+        status?: "pending" | "approved" | "rejected";
+      } | void
+    >({
+      query: (params) => {
+        const searchParams = new URLSearchParams();
+        searchParams.set("page", String(params?.page ?? 1));
+        searchParams.set("limit", String(params?.limit ?? 20));
+        searchParams.set("status", params?.status ?? "pending");
+        return `/admin/article-requests?${searchParams.toString()}`;
+      },
+      providesTags: [{ type: "Admin", id: "ARTICLE_REQUESTS" }],
+    }),
+    approveArticleRequest: builder.mutation<
+      { request: ModerationArticleRequestItem },
+      string
+    >({
+      query: (id) => ({
+        url: `/admin/article-requests/${id}/approve`,
+        method: "POST",
+      }),
+      invalidatesTags: [
+        { type: "Admin", id: "ARTICLE_REQUESTS" },
+        { type: "ArticleRequest", id: "TRENDING" },
+        { type: "ArticleRequest", id: "ALL" },
+      ],
+    }),
+    rejectArticleRequest: builder.mutation<
+      { request: ModerationArticleRequestItem },
+      { id: string; reason?: string }
+    >({
+      query: ({ id, reason }) => ({
+        url: `/admin/article-requests/${id}/reject`,
+        method: "POST",
+        body: { reason },
+      }),
+      invalidatesTags: [{ type: "Admin", id: "ARTICLE_REQUESTS" }],
+    }),
   }),
 });
 
@@ -216,6 +327,7 @@ export const {
   useRejectArticleMutation,
   useListReportsQuery,
   useDismissReportMutation,
+  useGetPlatformStatsQuery,
   useListUsersQuery,
   useBanUserMutation,
   useUnbanUserMutation,
@@ -229,4 +341,11 @@ export const {
   useCreateCategoryMutation,
   useUpdateCategoryMutation,
   useDeleteCategoryMutation,
+  useListCommentsForModerationQuery,
+  useApproveCommentsMutation,
+  useRejectCommentsMutation,
+  useDeleteCommentsAdminMutation,
+  useListArticleRequestsForModerationQuery,
+  useApproveArticleRequestMutation,
+  useRejectArticleRequestMutation,
 } = adminApi;

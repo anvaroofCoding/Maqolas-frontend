@@ -275,6 +275,99 @@ html:not(.dark) {
   content: attr(data-placeholder);
 }
 
+.article-editor-content mark {
+  @apply rounded px-0.5;
+}
+
+.article-editor-content ul[data-type="taskList"] {
+  @apply list-none pl-0;
+}
+
+.article-editor-content ul[data-type="taskList"] li {
+  @apply flex items-start gap-2;
+}
+
+.article-editor-content ul[data-type="taskList"] li > label {
+  @apply mt-1 flex shrink-0 items-center;
+}
+
+.article-editor-content ul[data-type="taskList"] li > label input[type="checkbox"] {
+  @apply size-4 rounded border-border accent-primary;
+}
+
+.article-editor-content ul[data-type="taskList"] li > div {
+  @apply min-w-0 flex-1;
+}
+
+.article-editor-content table {
+  @apply my-4 w-full border-collapse overflow-hidden rounded-lg border border-border text-sm;
+}
+
+.article-editor-content th,
+.article-editor-content td {
+  @apply border border-border px-3 py-2 text-left align-top;
+}
+
+.article-editor-content th {
+  @apply bg-muted font-semibold;
+}
+
+.article-editor-content .article-callout {
+  @apply my-4 overflow-hidden rounded-xl border;
+}
+
+.article-editor-content .article-callout__label {
+  @apply px-4 py-2 text-xs font-semibold uppercase tracking-wide;
+}
+
+.article-editor-content .article-callout__body {
+  @apply px-4 pb-4 pt-1;
+}
+
+.article-editor-content .article-callout__body > *:first-child {
+  @apply mt-0;
+}
+
+.article-editor-content .article-callout--tip {
+  @apply border-emerald-500/30 bg-emerald-500/5;
+}
+
+.article-editor-content .article-callout--tip .article-callout__label {
+  @apply bg-emerald-500/10 text-emerald-700 dark:text-emerald-300;
+}
+
+.article-editor-content .article-callout--warning {
+  @apply border-amber-500/30 bg-amber-500/5;
+}
+
+.article-editor-content .article-callout--warning .article-callout__label {
+  @apply bg-amber-500/10 text-amber-700 dark:text-amber-300;
+}
+
+.article-editor-content .article-callout--important {
+  @apply border-primary/30 bg-primary/5;
+}
+
+.article-editor-content .article-callout--important .article-callout__label {
+  @apply bg-primary/10 text-primary;
+}
+
+.article-editor-content .article-youtube-embed,
+.article-editor-content div[data-youtube-video] {
+  @apply my-4 aspect-video w-full overflow-hidden rounded-xl border border-border;
+}
+
+.article-editor-content .article-youtube-embed iframe,
+.article-editor-content div[data-youtube-video] iframe {
+  @apply h-full w-full;
+}
+
+.article-editor-content h1[id],
+.article-editor-content h2[id],
+.article-editor-content h3[id] {
+  scroll-margin-top: 5rem;
+}
+
 /* Fokus o'qish rejimi — kattaroq va qulayroq tipografiya */
 .article-focus-content p {
   @apply my-5 text-lg leading-8 sm:text-xl sm:leading-9;
@@ -455,6 +548,17 @@ html:not(.dark) .code-block-shell pre {
 }
 
 .notification-scroll::-webkit-scrollbar {
+  width: 0;
+  height: 0;
+  display: none; /* Chrome/Safari */
+}
+
+.scrollbar-hidden {
+  scrollbar-width: none; /* Firefox */
+  -ms-overflow-style: none; /* IE/old Edge */
+}
+
+.scrollbar-hidden::-webkit-scrollbar {
   width: 0;
   height: 0;
   display: none; /* Chrome/Safari */

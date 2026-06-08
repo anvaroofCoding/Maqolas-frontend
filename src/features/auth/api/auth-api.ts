@@ -3,9 +3,11 @@ import {
   clearCredentials,
   setCredentials,
   setUser,
+  setBan,
 } from "@/features/auth/slice/auth-slice";
 import type {
   AuthTokensResponse,
+  BanInfo,
   MeResponse,
   UpdateProfilePayload,
 } from "@/features/auth/types";
@@ -20,6 +22,26 @@ export const authApi = createApi({
     getMe: builder.query<MeResponse, void>({
       query: () => "/auth/me",
       providesTags: ["AuthUser"],
+      async onQueryStarted(_arg, { dispatch, queryFulfilled }) {
+        try {
+          await queryFulfilled;
+        } catch (err: unknown) {
+          const error = err as { error?: { status?: number; data?: unknown } };
+          if (error?.error?.status === 403) {
+            const data = error.error.data as Record<string, unknown> | undefined;
+            if (data && typeof data.message === "string" && "isPermanent" in data) {
+              dispatch(
+                setBan({
+                  message: data.message as string,
+                  reason: (data.reason as string) ?? "",
+                  expiresAt: (data.expiresAt as string | null) ?? null,
+                  isPermanent: data.isPermanent as boolean,
+                } satisfies BanInfo),
+              );
+            }
+          }
+        }
+      },
     }),
     uploadAvatar: builder.mutation<MeResponse, FormData>({
       query: (body) => ({

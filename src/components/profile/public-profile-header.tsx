@@ -59,31 +59,32 @@ export function PublicProfileHeader({
   };
 
   return (
-    <header className="flex flex-col gap-4 border-b border-border pb-6 sm:flex-row sm:items-start sm:gap-6">
-      <Avatar className="size-20 shrink-0 sm:size-24">
+    <header className="flex items-start gap-4 border-b border-border pb-5 sm:gap-6 sm:pb-6">
+      <Avatar className="size-16 shrink-0 sm:size-24">
         {user.avatarUrl ? (
           <AvatarImage src={user.avatarUrl} alt={user.displayName} />
         ) : null}
-        <AvatarFallback className="text-lg">
+        <AvatarFallback className="text-base sm:text-lg">
           {getUserInitials(user.displayName)}
         </AvatarFallback>
       </Avatar>
 
-      <div className="min-w-0 flex-1 space-y-3">
-        <div className="flex flex-wrap items-center gap-3">
-          <h1 className="text-xl font-semibold tracking-tight text-foreground sm:text-2xl">
+      <div className="min-w-0 flex-1 space-y-2 sm:space-y-3">
+        <div className="flex min-w-0 flex-col gap-2 sm:flex-row sm:flex-wrap sm:items-center sm:gap-3">
+          <h1 className="min-w-0 truncate text-lg font-semibold tracking-tight text-foreground sm:text-2xl">
             {user.displayName}
           </h1>
           <FollowButton
             username={user.username}
             initialFollowing={isFollowing}
+            className="shrink-0 self-start"
           />
         </div>
 
-        <p className="text-sm text-muted-foreground">{user.email}</p>
+        <p className="truncate text-sm text-muted-foreground">{user.email}</p>
 
         {user.bio ? (
-          <p className="max-w-xl text-sm text-foreground/80">{user.bio}</p>
+          <p className="text-sm break-words text-foreground/80">{user.bio}</p>
         ) : null}
 
         <div className="flex flex-wrap items-center gap-2">

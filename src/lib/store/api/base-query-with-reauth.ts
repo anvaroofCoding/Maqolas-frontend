@@ -10,7 +10,9 @@ import {
   getAccessToken,
   getRefreshToken,
   setSessionTokens,
+  setBan,
 } from "@/features/auth/slice/auth-slice";
+import type { BanInfo } from "@/features/auth/types";
 
 type AuthTokensPayload = {
   accessToken: string;
@@ -53,6 +55,21 @@ export const baseQueryWithReauth: BaseQueryFn<
   FetchBaseQueryError
 > = async (args, api, extraOptions) => {
   let result = await rawBaseQuery(args, api, extraOptions);
+
+  if (result.error?.status === 403) {
+    const data = result.error.data as Record<string, unknown> | undefined;
+    if (data && typeof data.message === "string" && "isPermanent" in data) {
+      api.dispatch(
+        setBan({
+          message: data.message as string,
+          reason: (data.reason as string) ?? "",
+          expiresAt: (data.expiresAt as string | null) ?? null,
+          isPermanent: data.isPermanent as boolean,
+        } satisfies BanInfo),
+      );
+    }
+    return result;
+  }
 
   if (result.error?.status !== 401) {
     return result;

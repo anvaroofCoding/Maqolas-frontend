@@ -19,13 +19,10 @@ export function SiteRightSidebar() {
 
   return (
     <aside
-      className={cn(
-        rightSidebarWidthClass,
-        "sticky top-14 z-30 w-full shrink-0 self-start pb-6",
-      )}
+      className={cn(rightSidebarWidthClass, "w-full shrink-0")}
       aria-label="Qo'shimcha ma'lumotlar"
     >
-      <div className="space-y-4">
+      <div className="space-y-4 lg:pr-2">
         <PopularCommentsWidget currentUserId={currentUser?.id} />
         <SuggestedTopicsWidget />
         <PromoBannerCarousel />

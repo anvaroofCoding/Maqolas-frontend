@@ -24,7 +24,7 @@ import { useAppSelector } from "@/lib/store/hooks";
 
 function ProfilePageShell({ children }: { children: React.ReactNode }) {
   return (
-    <main className="mx-auto w-full max-w-3xl px-4 py-8 sm:px-6">
+    <main className="mx-auto w-full max-w-3xl px-4 py-5 sm:px-6 sm:py-8">
       {children}
     </main>
   );

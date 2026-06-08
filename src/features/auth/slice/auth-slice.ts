@@ -1,5 +1,5 @@
 import { createSlice, type PayloadAction } from "@reduxjs/toolkit";
-import type { AuthUser } from "@/features/auth/types";
+import type { AuthUser, BanInfo } from "@/features/auth/types";
 
 const ACCESS_TOKEN_KEY = "maqolas_access_token";
 const REFRESH_TOKEN_KEY = "maqolas_refresh_token";
@@ -14,6 +14,7 @@ export interface AuthState {
   accessToken: string | null;
   refreshToken: string | null;
   isAuthenticated: boolean;
+  ban: BanInfo | null;
 }
 
 const initialState: AuthState = {
@@ -21,6 +22,7 @@ const initialState: AuthState = {
   accessToken: null,
   refreshToken: null,
   isAuthenticated: false,
+  ban: null,
 };
 
 const authSlice = createSlice({
@@ -72,6 +74,7 @@ const authSlice = createSlice({
       state.accessToken = null;
       state.refreshToken = null;
       state.isAuthenticated = false;
+      state.ban = null;
 
       if (typeof window !== "undefined") {
         localStorage.removeItem(ACCESS_TOKEN_KEY);
@@ -82,6 +85,12 @@ const authSlice = createSlice({
       state.user = action.payload;
       state.isAuthenticated = true;
     },
+    setBan(state, action: PayloadAction<BanInfo>) {
+      state.ban = action.payload;
+    },
+    clearBan(state) {
+      state.ban = null;
+    },
   },
 });
 
@@ -91,6 +100,8 @@ export const {
   setCredentials,
   clearCredentials,
   setUser,
+  setBan,
+  clearBan,
 } = authSlice.actions;
 export const authReducer = authSlice.reducer;
 

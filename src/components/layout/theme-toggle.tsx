@@ -33,13 +33,13 @@ export function ThemeToggle({ className }: { className?: string }) {
       <SunIcon
         className={cn(
           "size-4 text-current transition-all",
-          mounted && isDark ? "scale-0 rotate-90 opacity-0" : "scale-100 opacity-100",
+          mounted && isDark ? "scale-100 opacity-100" : "scale-0 rotate-90 opacity-0",
         )}
       />
       <MoonIcon
         className={cn(
           "absolute size-4 text-current transition-all",
-          mounted && isDark ? "scale-100 opacity-100" : "scale-0 -rotate-90 opacity-0",
+          mounted && isDark ? "scale-0 -rotate-90 opacity-0" : "scale-100 opacity-100",
         )}
       />
     </Button>

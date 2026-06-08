@@ -1,5 +1,10 @@
 export type ArticleRequestStatus = "new" | "in_progress" | "fulfilled";
 
+export type ArticleRequestModerationStatus =
+  | "pending"
+  | "approved"
+  | "rejected";
+
 export type ArticleRequestUser = {
   id: string;
   displayName: string;
@@ -13,6 +18,9 @@ export type ArticleRequest = {
   description: string;
   authorNote?: string;
   status: ArticleRequestStatus;
+  moderationStatus?: ArticleRequestModerationStatus;
+  rejectionReason?: string;
+  reviewedAt?: string;
   likeCount: number;
   likedByMe?: boolean;
   requester?: ArticleRequestUser;

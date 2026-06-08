@@ -7,7 +7,11 @@ export const feedMainClassName =
   "w-full min-w-0 max-w-full px-3 py-0 md:px-4 lg:px-5";
 
 /** Feed sahifalarida uch ustunni bir xil balandlikda boshlash */
-export const feedColumnTopPaddingClass = "md:pt-6";
+export const feedColumnTopPaddingClass = "md:pt-6 md:pb-6";
+
+/** Feed ustunlari — mustaqil scroll, yashirin scrollbar */
+export const feedColumnScrollClassName =
+  "scrollbar-hidden min-w-0 md:h-full md:overflow-y-auto md:overscroll-contain";
 
 export const sidebarWidthClass = "w-56";
 export const rightSidebarWidthClass = "w-72";

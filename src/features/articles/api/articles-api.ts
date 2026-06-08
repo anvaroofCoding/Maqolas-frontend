@@ -157,7 +157,7 @@ export const articlesApi = baseApi.injectEndpoints({
       ],
     }),
     createArticleComment: builder.mutation<
-      { comment: ArticleComment; commentCount: number },
+      { comment: ArticleComment; commentCount: number; pending?: boolean },
       { articleId: string; content: string; parentId?: string }
     >({
       query: ({ articleId, content, parentId }) => ({
@@ -165,12 +165,15 @@ export const articlesApi = baseApi.injectEndpoints({
         method: "POST",
         body: { content, parentId },
       }),
-      invalidatesTags: (_r, _e, { articleId }) => [
-        { type: "Comment", id: articleId },
-        { type: "Article", id: `engagement-${articleId}` },
-        { type: "Article", id: "LIST" },
-        { type: "Notification", id: "UNREAD_COUNT" },
-      ],
+      invalidatesTags: (_result, _error, { articleId }) =>
+        _result?.pending
+          ? []
+          : [
+              { type: "Comment", id: articleId },
+              { type: "Article", id: `engagement-${articleId}` },
+              { type: "Article", id: "LIST" },
+              { type: "Notification", id: "UNREAD_COUNT" },
+            ],
     }),
     getPopularComments: builder.query<PopularCommentsResponse, { limit?: number } | void>({
       query: (params) =>
@@ -214,6 +217,13 @@ export const articlesApi = baseApi.injectEndpoints({
         { type: "Article", id: "LIST" },
       ],
     }),
+    uploadArticleImage: builder.mutation<{ url: string }, FormData>({
+      query: (body) => ({
+        url: "/articles/upload-image",
+        method: "POST",
+        body,
+      }),
+    }),
   }),
 });
 
@@ -238,4 +248,5 @@ export const {
   useToggleCommentLikeMutation,
   useReportCommentMutation,
   useDeleteArticleCommentMutation,
+  useUploadArticleImageMutation,
 } = articlesApi;

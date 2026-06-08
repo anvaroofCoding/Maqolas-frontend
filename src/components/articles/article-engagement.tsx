@@ -3,6 +3,7 @@
 import { Bookmark, Eye, Heart, MessageCircle } from "lucide-react";
 import { useEffect, useRef, useState } from "react";
 import { AuthLoginModal } from "@/components/auth/auth-login-modal";
+import { ArticleShareStory } from "@/components/articles/article-share-story";
 import { CommentThreadList } from "@/components/articles/comment-thread";
 import { FlyingLikeHeart, iosIconClass } from "@/components/articles/flying-like-heart";
 import { Button } from "@/components/ui/button";
@@ -23,10 +24,12 @@ import {
 import { formatCount } from "@/lib/format";
 import { useAppSelector } from "@/lib/store/hooks";
 import { toast } from "@/lib/toast";
+import type { ArticleStoryData } from "@/lib/articles/export-article-story-image";
 import { cn } from "@/lib/utils";
 
 type ArticleEngagementProps = {
   articleId: string;
+  storyData: ArticleStoryData;
   viewCount?: number;
   initialLikeCount?: number;
   initialCommentCount?: number;
@@ -69,6 +72,7 @@ function EngagementAction({
 
 export function ArticleEngagement({
   articleId,
+  storyData,
   viewCount = 0,
   initialLikeCount = 0,
   initialCommentCount = 0,
@@ -153,8 +157,13 @@ export function ArticleEngagement({
     }
     void (async () => {
       try {
-        await createComment({ articleId, content }).unwrap();
+        const result = await createComment({ articleId, content }).unwrap();
         setCommentText("");
+        if (result.pending) {
+          toast.info(
+            "Izohingiz moderatsiyaga yuborildi. Tasdiqlangandan keyin ko'rinadi.",
+          );
+        }
       } catch {
         // keep draft on failure
       }
@@ -240,6 +249,8 @@ export function ArticleEngagement({
               }
             />
           )}
+
+          <ArticleShareStory storyData={storyData} variant="engagement" />
         </div>
 
         <Separator />
@@ -311,7 +322,16 @@ export function ArticleEngagement({
               isLoggedIn={isLoggedIn}
               onRequireAuth={() => setLoginOpen(true)}
               onReply={async (payload) => {
-                await createComment(payload).unwrap();
+                try {
+                  const result = await createComment(payload).unwrap();
+                  if (result.pending) {
+                    toast.info(
+                      "Javobingiz moderatsiyaga yuborildi. Tasdiqlangandan keyin ko'rinadi.",
+                    );
+                  }
+                } catch {
+                  toast.error("Javob yuborilmadi. Qayta urinib ko'ring.");
+                }
               }}
               onReport={async (payload) => {
                 try {

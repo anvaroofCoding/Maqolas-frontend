@@ -7,6 +7,7 @@ import { SiteMobileNav } from "@/components/layout/site-mobile-nav";
 import { SiteRightSidebar } from "@/components/layout/site-right-sidebar";
 import { SiteSidebar } from "@/components/layout/site-sidebar";
 import {
+  feedColumnScrollClassName,
   feedColumnTopPaddingClass,
   rightSidebarWidthClass,
   sidebarWidthClass,
@@ -18,7 +19,7 @@ function shouldShowMobileNav(pathname: string | null) {
   return (
     !pathname.startsWith("/yozish") &&
     !pathname.startsWith("/admin") &&
-    pathname !== "/profil" &&
+    !pathname.startsWith("/profil") &&
     !pathname.startsWith("/maqola") &&
     !pathname.startsWith("/auth")
   );
@@ -43,7 +44,15 @@ export function AppShell({ children }: { children: React.ReactNode }) {
   const showRightSidebar = shouldShowRightSidebar(pathname);
   const isFeedLayout = showMobileNav;
 
-  if (isEditorRoute || isAdminRoute) {
+  if (isAdminRoute) {
+    return (
+      <SiteContainer className="min-h-[calc(100vh-3.5rem)] px-4 py-6 sm:px-6 sm:py-8 md:px-4 xl:px-6 2xl:px-8">
+        {children}
+      </SiteContainer>
+    );
+  }
+
+  if (isEditorRoute) {
     return <div className="min-h-[calc(100vh-3.5rem)]">{children}</div>;
   }
 
@@ -51,7 +60,7 @@ export function AppShell({ children }: { children: React.ReactNode }) {
     <SiteContainer>
       <div
         className={cn(
-          "grid min-h-[calc(100vh-3.5rem)] min-w-0 items-start overflow-x-hidden bg-background",
+          "grid min-h-[calc(100vh-3.5rem)] min-w-0 items-start overflow-x-hidden bg-background md:h-[calc(100vh-3.5rem)] md:overflow-hidden",
           showRightSidebar
             ? "md:grid-cols-[var(--sidebar-width)_minmax(0,1fr)] lg:grid-cols-[var(--sidebar-width)_minmax(0,1fr)_var(--right-sidebar-width)]"
             : "md:grid-cols-[var(--sidebar-width)_minmax(0,1fr)]",
@@ -65,32 +74,38 @@ export function AppShell({ children }: { children: React.ReactNode }) {
       >
         <div
           className={cn(
-            "hidden min-w-0 md:block",
-            isFeedLayout && feedColumnTopPaddingClass,
+            feedColumnScrollClassName,
+            "hidden md:block",
             sidebarWidthClass,
           )}
         >
-          <SiteSidebar />
+          <div className={feedColumnTopPaddingClass}>
+            <SiteSidebar />
+          </div>
         </div>
 
-        <div className={cn("min-w-0", isFeedLayout && feedColumnTopPaddingClass)}>
-          {showMobileNav ? (
-            <div className="md:hidden">
-              <SiteMobileNav />
-            </div>
-          ) : null}
-          {children}
+        <div className={feedColumnScrollClassName}>
+          <div className={cn(isFeedLayout && feedColumnTopPaddingClass)}>
+            {showMobileNav ? (
+              <div className="md:hidden">
+                <SiteMobileNav />
+              </div>
+            ) : null}
+            {children}
+          </div>
         </div>
 
         {showRightSidebar ? (
           <div
             className={cn(
-              "hidden min-w-0 lg:block",
-              isFeedLayout && feedColumnTopPaddingClass,
+              feedColumnScrollClassName,
+              "hidden lg:block",
               rightSidebarWidthClass,
             )}
           >
-            <SiteRightSidebar />
+            <div className={feedColumnTopPaddingClass}>
+              <SiteRightSidebar />
+            </div>
           </div>
         ) : null}
       </div>

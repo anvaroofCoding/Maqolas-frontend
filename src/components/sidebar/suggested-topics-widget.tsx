@@ -1,6 +1,5 @@
 "use client";
 
-import { ChevronUp } from "lucide-react";
 import Link from "next/link";
 import { useState } from "react";
 import { AuthLoginModal } from "@/components/auth/auth-login-modal";
@@ -10,9 +9,8 @@ import {
   useListTrendingArticleRequestsQuery,
   useToggleArticleRequestLikeMutation,
 } from "@/features/article-requests/api/article-requests-api";
-import { formatCount } from "@/lib/format";
+import { TopicSupportButton } from "@/components/topics/topic-support-button";
 import { useAppSelector } from "@/lib/store/hooks";
-import { cn } from "@/lib/utils";
 
 function truncateTitle(title: string, maxLength = 42) {
   const normalized = title.trim();
@@ -43,7 +41,7 @@ export function SuggestedTopicsWidget() {
       <Card className="overflow-hidden rounded-2xl border-border/70 shadow-sm">
         <CardHeader className="px-4 pb-2 pt-4">
           <CardTitle className="text-base font-semibold tracking-tight">
-            Taklif qilingan mavzular
+            Ko&apos;p so&apos;ralgan mavzular
           </CardTitle>
         </CardHeader>
         <CardContent className="space-y-1 px-2 pb-3">
@@ -64,22 +62,12 @@ export function SuggestedTopicsWidget() {
                 key={request.id}
                 className="flex items-start gap-1 rounded-xl px-2 py-2 transition-colors hover:bg-muted/40"
               >
-                <button
-                  type="button"
-                  className={cn(
-                    "mt-0.5 inline-flex min-w-10 shrink-0 flex-col items-center rounded-md px-1 py-0.5 text-xs transition-colors",
-                    request.likedByMe
-                      ? "text-nav-active"
-                      : "text-muted-foreground hover:text-nav-active",
-                  )}
+                <TopicSupportButton
+                  size="compact"
+                  likeCount={request.likeCount}
+                  likedByMe={request.likedByMe}
                   onClick={() => handleLike(request.id)}
-                  aria-label="Ovoz berish"
-                >
-                  <ChevronUp className="size-3.5" />
-                  <span className="font-medium tabular-nums">
-                    {formatCount(request.likeCount)}
-                  </span>
-                </button>
+                />
 
                 <div className="min-w-0 flex-1">
                   <Link

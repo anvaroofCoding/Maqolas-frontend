@@ -39,6 +39,13 @@ export interface AuthTokensResponse {
   refreshToken: string;
 }
 
+export interface BanInfo {
+  message: string;
+  reason: string;
+  expiresAt: string | null;
+  isPermanent: boolean;
+}
+
 export interface UpdateProfilePayload {
   displayName?: string;
   bio?: string;

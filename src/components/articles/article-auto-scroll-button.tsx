@@ -12,35 +12,68 @@ const SCROLL_SPEED_LEVELS = [
   { label: "3x", pxPerSecond: 84 },
 ] as const;
 
-function getScrollTop() {
+function isDocumentScroller(element: HTMLElement) {
   return (
-    window.scrollY ||
-    document.documentElement.scrollTop ||
-    document.body.scrollTop ||
-    0
+    element === document.documentElement ||
+    element === document.body ||
+    element === document.scrollingElement
   );
 }
 
-function getMaxScrollTop() {
-  const scrollHeight = Math.max(
-    document.body.scrollHeight,
-    document.documentElement.scrollHeight,
-  );
-  const clientHeight =
-    window.innerHeight || document.documentElement.clientHeight;
-
-  return Math.max(0, scrollHeight - clientHeight);
-}
-
-function scrollPageBy(delta: number) {
-  const scrollingElement = document.scrollingElement;
-
-  if (scrollingElement) {
-    scrollingElement.scrollTop += delta;
-    return;
+function findScrollContainer(anchor: HTMLElement | null): HTMLElement {
+  if (typeof window === "undefined" || !anchor) {
+    return document.documentElement;
   }
 
-  window.scrollBy({ top: delta, left: 0, behavior: "auto" });
+  let current: HTMLElement | null = anchor.parentElement;
+
+  while (current) {
+    const { overflowY } = window.getComputedStyle(current);
+    const canScroll =
+      overflowY === "auto" ||
+      overflowY === "scroll" ||
+      overflowY === "overlay";
+
+    if (canScroll && current.scrollHeight > current.clientHeight + 1) {
+      return current;
+    }
+
+    current = current.parentElement;
+  }
+
+  return (document.scrollingElement as HTMLElement | null) ?? document.documentElement;
+}
+
+function getScrollTop(container: HTMLElement) {
+  if (isDocumentScroller(container)) {
+    return (
+      window.scrollY ??
+      document.documentElement.scrollTop ??
+      document.body.scrollTop ??
+      0
+    );
+  }
+
+  return container.scrollTop;
+}
+
+function getMaxScrollTop(container: HTMLElement) {
+  if (isDocumentScroller(container)) {
+    const scrollHeight = Math.max(
+      document.body.scrollHeight,
+      document.documentElement.scrollHeight,
+    );
+    const clientHeight =
+      window.innerHeight || document.documentElement.clientHeight;
+
+    return Math.max(0, scrollHeight - clientHeight);
+  }
+
+  return Math.max(0, container.scrollHeight - container.clientHeight);
+}
+
+function scrollContainerBy(container: HTMLElement, delta: number) {
+  container.scrollTop += delta;
 }
 
 type ArticleAutoScrollButtonProps = {
@@ -52,11 +85,17 @@ export function ArticleAutoScrollButton({
 }: ArticleAutoScrollButtonProps) {
   const [active, setActive] = useState(false);
   const [speedIndex, setSpeedIndex] = useState(0);
+  const anchorRef = useRef<HTMLButtonElement>(null);
   const frameRef = useRef<number | null>(null);
   const lastFrameTimeRef = useRef<number | null>(null);
   const speedRef = useRef<number>(SCROLL_SPEED_LEVELS[0].pxPerSecond);
+  const scrollContainerRef = useRef<HTMLElement | null>(null);
 
   const currentSpeed = SCROLL_SPEED_LEVELS[speedIndex];
+
+  const resolveScrollContainer = useCallback(() => {
+    scrollContainerRef.current = findScrollContainer(anchorRef.current);
+  }, []);
 
   const stopScrolling = useCallback(() => {
     if (frameRef.current !== null) {
@@ -64,10 +103,21 @@ export function ArticleAutoScrollButton({
       frameRef.current = null;
     }
     lastFrameTimeRef.current = null;
+    scrollContainerRef.current = null;
   }, []);
 
   const scrollStep = useCallback(
     (timestamp: number) => {
+      if (!scrollContainerRef.current) {
+        resolveScrollContainer();
+      }
+
+      const container = scrollContainerRef.current;
+      if (!container) {
+        frameRef.current = requestAnimationFrame(scrollStep);
+        return;
+      }
+
       if (lastFrameTimeRef.current === null) {
         lastFrameTimeRef.current = timestamp;
       }
@@ -75,8 +125,8 @@ export function ArticleAutoScrollButton({
       const elapsedMs = timestamp - lastFrameTimeRef.current;
       lastFrameTimeRef.current = timestamp;
 
-      const maxScrollTop = getMaxScrollTop();
-      const currentScrollTop = getScrollTop();
+      const maxScrollTop = getMaxScrollTop(container);
+      const currentScrollTop = getScrollTop(container);
 
       if (currentScrollTop >= maxScrollTop - 1) {
         setActive(false);
@@ -86,12 +136,12 @@ export function ArticleAutoScrollButton({
 
       const delta = (speedRef.current * elapsedMs) / 1000;
       if (delta > 0) {
-        scrollPageBy(delta);
+        scrollContainerBy(container, delta);
       }
 
       frameRef.current = requestAnimationFrame(scrollStep);
     },
-    [stopScrolling],
+    [resolveScrollContainer, stopScrolling],
   );
 
   const cycleSpeed = useCallback(() => {
@@ -112,9 +162,10 @@ export function ArticleAutoScrollButton({
       return;
     }
 
+    resolveScrollContainer();
     frameRef.current = requestAnimationFrame(scrollStep);
     return stopScrolling;
-  }, [active, disabled, scrollStep, stopScrolling]);
+  }, [active, disabled, resolveScrollContainer, scrollStep, stopScrolling]);
 
   useEffect(() => {
     if (!active) return;
@@ -125,11 +176,17 @@ export function ArticleAutoScrollButton({
       }
     };
 
+    const handleResize = () => {
+      resolveScrollContainer();
+    };
+
     document.addEventListener("visibilitychange", handleVisibilityChange);
+    window.addEventListener("resize", handleResize);
     return () => {
       document.removeEventListener("visibilitychange", handleVisibilityChange);
+      window.removeEventListener("resize", handleResize);
     };
-  }, [active]);
+  }, [active, resolveScrollContainer]);
 
   useEffect(() => {
     if (disabled && active) {
@@ -152,6 +209,7 @@ export function ArticleAutoScrollButton({
       </Button>
 
       <Button
+        ref={anchorRef}
         type="button"
         size="icon"
         variant={active ? "default" : "outline"}

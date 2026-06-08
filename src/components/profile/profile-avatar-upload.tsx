@@ -60,7 +60,7 @@ export function ProfileAvatarUpload({ user, className }: ProfileAvatarUploadProp
 
   return (
     <div className={cn("relative shrink-0", className)}>
-      <Avatar className="size-20 sm:size-24">
+      <Avatar className="size-16 sm:size-24">
         <AvatarImage src={avatarSrc ?? undefined} alt={user.displayName} />
         <AvatarFallback className="bg-muted text-xl font-medium text-muted-foreground">
           {initials}
@@ -84,7 +84,7 @@ export function ProfileAvatarUpload({ user, className }: ProfileAvatarUploadProp
         disabled={isLoading}
         onClick={() => inputRef.current?.click()}
         className={cn(
-          "absolute right-0 bottom-0 inline-flex size-8 items-center justify-center rounded-full",
+          "absolute right-0 bottom-0 inline-flex size-7 items-center justify-center rounded-full sm:size-8",
           "border border-border bg-background text-muted-foreground shadow-sm transition-colors",
           "hover:bg-muted hover:text-foreground disabled:opacity-60",
         )}
@@ -98,7 +98,7 @@ export function ProfileAvatarUpload({ user, className }: ProfileAvatarUploadProp
       </button>
 
       {error ? (
-        <p className="absolute -bottom-6 left-0 max-w-48 text-xs text-destructive">
+        <p className="mt-2 max-w-40 text-xs text-destructive sm:absolute sm:-bottom-6 sm:left-0 sm:mt-0 sm:max-w-48">
           {error}
         </p>
       ) : null}

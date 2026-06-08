@@ -6,12 +6,15 @@ import {
   ExternalLink,
   FolderOpen,
   ImageIcon,
+  Lightbulb,
   Loader2,
+  MessageSquare,
   Pencil,
   Pin,
   PinOff,
   ShieldBan,
   ShieldCheck,
+  Trash2,
   Users2,
   XCircle,
 } from "lucide-react";
@@ -36,30 +39,42 @@ import { Skeleton } from "@/components/ui/skeleton";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Textarea } from "@/components/ui/textarea";
 import {
+  useApproveArticleRequestMutation,
+  useApproveCommentsMutation,
   useApproveArticleMutation,
   useBanIpMutation,
   useBanUserMutation,
   useCreateCategoryMutation,
   useDeleteCategoryMutation,
+  useDeleteCommentsAdminMutation,
   useGetAdminCategoriesQuery,
   useGetPublishedArticlesQuery,
   useGetReviewQueueQuery,
+  useListArticleRequestsForModerationQuery,
+  useListCommentsForModerationQuery,
   useListReportsQuery,
   useListUsersQuery,
   useDismissReportMutation,
+  useRejectArticleRequestMutation,
+  useRejectCommentsMutation,
   useRejectArticleMutation,
   useTogglePinArticleMutation,
   useUnbanUserMutation,
   useUpdateCategoryMutation,
 } from "@/features/admin/api/admin-api";
 import type {
+  ArticleRequestModerationStatus,
   BanUnit,
   Category,
+  CommentModerationStatus,
   CommentReportItem,
   CreateBanPayload,
   ModerationArticle,
+  ModerationArticleRequestItem,
+  ModerationCommentItem,
 } from "@/features/admin/types";
 import { BannersPanel } from "@/components/admin/banners-panel";
+import { PlatformStatsDashboard } from "@/components/admin/platform-stats-dashboard";
 import { useGetMeQuery } from "@/features/auth/api/auth-api";
 import { useAppSelector } from "@/lib/store/hooks";
 import { formatRelativeTime } from "@/lib/format";
@@ -660,6 +675,690 @@ function PublishedArticlesPanel() {
   );
 }
 
+function CommentsPanel() {
+  const [status, setStatus] = useState<CommentModerationStatus>("pending");
+  const [page, setPage] = useState(1);
+  const [selectedIds, setSelectedIds] = useState<string[]>([]);
+  const [rejectOpen, setRejectOpen] = useState(false);
+  const [rejectReason, setRejectReason] = useState("");
+
+  const { data, isLoading, isFetching, isError, refetch } =
+    useListCommentsForModerationQuery({
+      status,
+      page,
+      limit: 50,
+    });
+  const [approveComments, { isLoading: approving }] =
+    useApproveCommentsMutation();
+  const [rejectComments, { isLoading: rejecting }] =
+    useRejectCommentsMutation();
+  const [deleteComments, { isLoading: deleting }] =
+    useDeleteCommentsAdminMutation();
+
+  const comments = data?.comments ?? [];
+  const total = data?.pagination?.total ?? 0;
+  const totalPages = data?.pagination?.totalPages ?? 1;
+  const isBusy = approving || rejecting || deleting;
+
+  useEffect(() => {
+    setPage(1);
+  }, [status]);
+
+  useEffect(() => {
+    setSelectedIds([]);
+  }, [status, page, data?.comments]);
+
+  function toggleSelected(commentId: string) {
+    setSelectedIds((current) =>
+      current.includes(commentId)
+        ? current.filter((id) => id !== commentId)
+        : [...current, commentId],
+    );
+  }
+
+  function toggleSelectAll() {
+    if (selectedIds.length === comments.length) {
+      setSelectedIds([]);
+      return;
+    }
+    setSelectedIds(comments.map((comment) => comment.id));
+  }
+
+  async function handleApprove(commentIds: string[]) {
+    if (commentIds.length === 0) return;
+    try {
+      const result = await approveComments({ commentIds }).unwrap();
+      toast.success(`${result.approved} ta izoh tasdiqlandi`);
+      setSelectedIds([]);
+    } catch {
+      toast.error("Izohlarni tasdiqlashda xatolik");
+    }
+  }
+
+  async function handleReject(commentIds: string[], reason?: string) {
+    if (commentIds.length === 0) return;
+    try {
+      const result = await rejectComments({
+        commentIds,
+        reason: reason?.trim() || undefined,
+      }).unwrap();
+      toast.success(`${result.rejected} ta izoh rad etildi`);
+      setSelectedIds([]);
+      setRejectOpen(false);
+      setRejectReason("");
+    } catch {
+      toast.error("Izohlarni rad etishda xatolik");
+    }
+  }
+
+  async function handleDelete(commentIds: string[]) {
+    if (commentIds.length === 0) return;
+    try {
+      const result = await deleteComments({ commentIds }).unwrap();
+      toast.success(`${result.deleted} ta izoh o'chirildi`);
+      setSelectedIds([]);
+    } catch {
+      toast.error("Izohlarni o'chirishda xatolik");
+    }
+  }
+
+  if (isLoading) {
+    return (
+      <div className="space-y-3">
+        {Array.from({ length: 3 }).map((_, index) => (
+          <Skeleton key={index} className="h-28 w-full rounded-xl" />
+        ))}
+      </div>
+    );
+  }
+
+  if (isError) {
+    return (
+      <Card>
+        <CardContent className="flex flex-col items-center gap-3 py-12 text-center">
+          <MessageSquare className="size-10 text-destructive/50" />
+          <p className="text-sm text-muted-foreground">
+            Izohlarni yuklab bo&apos;lmadi. Backend ishlayotganini tekshiring.
+          </p>
+          <Button size="sm" variant="outline" onClick={() => void refetch()}>
+            Qayta urinish
+          </Button>
+        </CardContent>
+      </Card>
+    );
+  }
+
+  return (
+    <>
+      <div className="mb-4 flex flex-wrap items-center justify-between gap-3">
+        <div className="flex flex-wrap items-center gap-2">
+          {(["pending", "approved", "rejected"] as const).map((item) => (
+            <Button
+              key={item}
+              size="sm"
+              variant={status === item ? "default" : "outline"}
+              onClick={() => setStatus(item)}
+            >
+              {item === "pending"
+                ? "Kutilmoqda"
+                : item === "approved"
+                  ? "Tasdiqlangan"
+                  : "Rad etilgan"}
+            </Button>
+          ))}
+          <span className="text-sm text-muted-foreground">
+            Jami: {total} ta
+          </span>
+        </div>
+
+        {comments.length > 0 ? (
+          <div className="flex flex-wrap items-center gap-2">
+            <Button size="sm" variant="outline" onClick={toggleSelectAll}>
+              {selectedIds.length === comments.length
+                ? "Tanlovni bekor qilish"
+                : "Hammasini tanlash"}
+            </Button>
+            {status === "pending" ? (
+              <>
+                <Button
+                  size="sm"
+                  disabled={isBusy || selectedIds.length === 0}
+                  onClick={() => void handleApprove(selectedIds)}
+                >
+                  {approving ? (
+                    <Loader2 className="size-4 animate-spin" />
+                  ) : (
+                    <CheckCircle2 className="size-4" />
+                  )}
+                  Tanlanganlarni tasdiqlash
+                </Button>
+                <Button
+                  size="sm"
+                  variant="outline"
+                  disabled={isBusy || selectedIds.length === 0}
+                  onClick={() => setRejectOpen(true)}
+                >
+                  <XCircle className="size-4" />
+                  Tanlanganlarni rad etish
+                </Button>
+              </>
+            ) : null}
+            <Button
+              size="sm"
+              variant="destructive"
+              disabled={isBusy || selectedIds.length === 0}
+              onClick={() => void handleDelete(selectedIds)}
+            >
+              {deleting ? (
+                <Loader2 className="size-4 animate-spin" />
+              ) : (
+                <Trash2 className="size-4" />
+              )}
+              Tanlanganlarni o&apos;chirish
+            </Button>
+          </div>
+        ) : null}
+      </div>
+
+      {comments.length === 0 ? (
+        <Card>
+          <CardContent className="flex flex-col items-center gap-3 py-12 text-center">
+            <MessageSquare className="size-10 text-muted-foreground/50" />
+            <p className="text-sm text-muted-foreground">
+              {status === "pending"
+                ? "Moderatsiya kutayotgan izohlar yo'q."
+                : status === "approved"
+                  ? "Tasdiqlangan izohlar yo'q."
+                  : "Rad etilgan izohlar yo'q."}
+            </p>
+          </CardContent>
+        </Card>
+      ) : (
+        <div className="space-y-4">
+          {comments.map((comment) => (
+            <CommentModerationCard
+              key={comment.id}
+              comment={comment}
+              selected={selectedIds.includes(comment.id)}
+              isBusy={isBusy}
+              onToggleSelected={() => toggleSelected(comment.id)}
+              onApprove={() => void handleApprove([comment.id])}
+              onReject={() => {
+                setSelectedIds([comment.id]);
+                setRejectOpen(true);
+              }}
+              onDelete={() => void handleDelete([comment.id])}
+            />
+          ))}
+        </div>
+      )}
+
+      {totalPages > 1 ? (
+        <div className="flex items-center justify-center gap-2 pt-2">
+          <Button
+            size="sm"
+            variant="outline"
+            disabled={page <= 1 || isFetching}
+            onClick={() => setPage((current) => Math.max(1, current - 1))}
+          >
+            Oldingi
+          </Button>
+          <span className="text-sm text-muted-foreground">
+            {page} / {totalPages}
+          </span>
+          <Button
+            size="sm"
+            variant="outline"
+            disabled={page >= totalPages || isFetching}
+            onClick={() =>
+              setPage((current) => Math.min(totalPages, current + 1))
+            }
+          >
+            Keyingi
+          </Button>
+        </div>
+      ) : null}
+
+      {isFetching && !isLoading ? (
+        <p className="text-center text-xs text-muted-foreground">
+          Yangilanmoqda...
+        </p>
+      ) : null}
+
+      <Dialog open={rejectOpen} onOpenChange={setRejectOpen}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>Izohlarni rad etish</DialogTitle>
+            <DialogDescription>
+              Tanlangan izohlar saytda ko&apos;rinmaydi. Sabab ixtiyoriy.
+            </DialogDescription>
+          </DialogHeader>
+          <div className="space-y-2">
+            <Label htmlFor="reject-reason">Rad etish sababi</Label>
+            <Textarea
+              id="reject-reason"
+              value={rejectReason}
+              onChange={(event) => setRejectReason(event.target.value)}
+              placeholder="Masalan: haqoratli so'zlar ishlatilgan"
+              rows={4}
+              maxLength={500}
+            />
+          </div>
+          <DialogFooter>
+            <Button variant="outline" onClick={() => setRejectOpen(false)}>
+              Bekor qilish
+            </Button>
+            <Button
+              disabled={rejecting || selectedIds.length === 0}
+              onClick={() => void handleReject(selectedIds, rejectReason)}
+            >
+              {rejecting ? "Rad etilmoqda..." : "Rad etish"}
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+    </>
+  );
+}
+
+function TopicSuggestionsPanel() {
+  const [status, setStatus] =
+    useState<ArticleRequestModerationStatus>("pending");
+  const [page, setPage] = useState(1);
+  const [rejectOpen, setRejectOpen] = useState(false);
+  const [rejectReason, setRejectReason] = useState("");
+  const [rejectingId, setRejectingId] = useState<string | null>(null);
+
+  const { data, isLoading, isFetching, isError, refetch } =
+    useListArticleRequestsForModerationQuery({
+      status,
+      page,
+      limit: 20,
+    });
+  const [approveRequest, { isLoading: approving }] =
+    useApproveArticleRequestMutation();
+  const [rejectRequest, { isLoading: rejecting }] =
+    useRejectArticleRequestMutation();
+
+  const requests = data?.requests ?? [];
+  const total = data?.pagination?.total ?? 0;
+  const totalPages = data?.pagination?.totalPages ?? 1;
+
+  useEffect(() => {
+    setPage(1);
+  }, [status]);
+
+  async function handleApprove(id: string) {
+    try {
+      await approveRequest(id).unwrap();
+      toast.success("Mavzu taklifi tasdiqlandi");
+    } catch {
+      toast.error("Tasdiqlashda xatolik");
+    }
+  }
+
+  async function handleReject() {
+    if (!rejectingId) return;
+    try {
+      await rejectRequest({
+        id: rejectingId,
+        reason: rejectReason.trim() || undefined,
+      }).unwrap();
+      toast.success("Mavzu taklifi rad etildi");
+      setRejectOpen(false);
+      setRejectReason("");
+      setRejectingId(null);
+    } catch {
+      toast.error("Rad etishda xatolik");
+    }
+  }
+
+  if (isLoading) {
+    return (
+      <div className="space-y-3">
+        {Array.from({ length: 3 }).map((_, index) => (
+          <Skeleton key={index} className="h-32 w-full rounded-xl" />
+        ))}
+      </div>
+    );
+  }
+
+  if (isError) {
+    return (
+      <Card>
+        <CardContent className="flex flex-col items-center gap-3 py-12 text-center">
+          <Lightbulb className="size-10 text-destructive/50" />
+          <p className="text-sm text-muted-foreground">
+            Takliflarni yuklab bo&apos;lmadi. Backend ishlayotganini tekshiring.
+          </p>
+          <Button size="sm" variant="outline" onClick={() => void refetch()}>
+            Qayta urinish
+          </Button>
+        </CardContent>
+      </Card>
+    );
+  }
+
+  return (
+    <>
+      <div className="mb-4 flex flex-wrap items-center gap-2">
+        {(["pending", "approved", "rejected"] as const).map((item) => (
+          <Button
+            key={item}
+            size="sm"
+            variant={status === item ? "default" : "outline"}
+            onClick={() => setStatus(item)}
+          >
+            {item === "pending"
+              ? "Kutilmoqda"
+              : item === "approved"
+                ? "Tasdiqlangan"
+                : "Rad etilgan"}
+          </Button>
+        ))}
+        <span className="text-sm text-muted-foreground">Jami: {total} ta</span>
+      </div>
+
+      {requests.length === 0 ? (
+        <Card>
+          <CardContent className="flex flex-col items-center gap-3 py-12 text-center">
+            <Lightbulb className="size-10 text-muted-foreground/50" />
+            <p className="text-sm text-muted-foreground">
+              {status === "pending"
+                ? "Ko'rib chiqish kutayotgan mavzu takliflari yo'q."
+                : status === "approved"
+                  ? "Tasdiqlangan mavzu takliflari yo'q."
+                  : "Rad etilgan mavzu takliflari yo'q."}
+            </p>
+          </CardContent>
+        </Card>
+      ) : (
+        <div className="space-y-4">
+          {requests.map((request) => (
+            <TopicSuggestionModerationCard
+              key={request.id}
+              request={request}
+              isBusy={approving || rejecting}
+              onApprove={() => void handleApprove(request.id)}
+              onReject={() => {
+                setRejectingId(request.id);
+                setRejectOpen(true);
+              }}
+            />
+          ))}
+        </div>
+      )}
+
+      {totalPages > 1 ? (
+        <div className="flex items-center justify-center gap-2 pt-2">
+          <Button
+            size="sm"
+            variant="outline"
+            disabled={page <= 1 || isFetching}
+            onClick={() => setPage((current) => Math.max(1, current - 1))}
+          >
+            Oldingi
+          </Button>
+          <span className="text-sm text-muted-foreground">
+            {page} / {totalPages}
+          </span>
+          <Button
+            size="sm"
+            variant="outline"
+            disabled={page >= totalPages || isFetching}
+            onClick={() =>
+              setPage((current) => Math.min(totalPages, current + 1))
+            }
+          >
+            Keyingi
+          </Button>
+        </div>
+      ) : null}
+
+      {isFetching && !isLoading ? (
+        <p className="text-center text-xs text-muted-foreground">
+          Yangilanmoqda...
+        </p>
+      ) : null}
+
+      <Dialog open={rejectOpen} onOpenChange={setRejectOpen}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>Mavzu taklifini rad etish</DialogTitle>
+            <DialogDescription>
+              Rad etilgan taklif foydalanuvchilarga ko&apos;rinmaydi. Sabab
+              ixtiyoriy.
+            </DialogDescription>
+          </DialogHeader>
+          <div className="space-y-2">
+            <Label htmlFor="topic-reject-reason">Rad etish sababi</Label>
+            <Textarea
+              id="topic-reject-reason"
+              value={rejectReason}
+              onChange={(event) => setRejectReason(event.target.value)}
+              placeholder="Masalan: mavzu platforma qoidalariga mos kelmaydi"
+              rows={4}
+              maxLength={500}
+            />
+          </div>
+          <DialogFooter>
+            <Button variant="outline" onClick={() => setRejectOpen(false)}>
+              Bekor qilish
+            </Button>
+            <Button
+              disabled={rejecting || !rejectingId}
+              onClick={() => void handleReject()}
+            >
+              {rejecting ? "Rad etilmoqda..." : "Rad etish"}
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+    </>
+  );
+}
+
+function TopicSuggestionModerationCard({
+  request,
+  isBusy,
+  onApprove,
+  onReject,
+}: {
+  request: ModerationArticleRequestItem;
+  isBusy: boolean;
+  onApprove: () => void;
+  onReject: () => void;
+}) {
+  const requesterName =
+    request.requester?.displayName ??
+    request.requester?.username ??
+    "Foydalanuvchi";
+
+  return (
+    <Card>
+      <CardContent className="space-y-3 p-4">
+        <div className="flex flex-wrap items-start justify-between gap-3">
+          <div className="min-w-0 flex-1 space-y-1">
+            <p className="font-semibold text-foreground">{request.title}</p>
+            <p className="text-sm text-muted-foreground whitespace-pre-wrap">
+              {request.description}
+            </p>
+          </div>
+          <Badge
+            variant={
+              request.moderationStatus === "approved"
+                ? "default"
+                : request.moderationStatus === "rejected"
+                  ? "destructive"
+                  : "secondary"
+            }
+          >
+            {request.moderationStatus === "pending"
+              ? "Kutilmoqda"
+              : request.moderationStatus === "approved"
+                ? "Tasdiqlangan"
+                : "Rad etilgan"}
+          </Badge>
+        </div>
+
+        <div className="flex flex-wrap items-center gap-2 text-xs text-muted-foreground">
+          <span>{requesterName}</span>
+          {request.author?.username ? (
+            <span>· @{request.author.username} uchun</span>
+          ) : null}
+          {request.createdAt ? (
+            <span>· {formatRelativeTime(request.createdAt)}</span>
+          ) : null}
+          {request.likeCount > 0 ? <span>· {request.likeCount} ovoz</span> : null}
+        </div>
+
+        {request.rejectionReason ? (
+          <p className="rounded-lg bg-destructive/10 px-3 py-2 text-sm text-destructive">
+            Sabab: {request.rejectionReason}
+          </p>
+        ) : null}
+
+        {request.moderationStatus === "pending" ? (
+          <div className="flex flex-wrap gap-2">
+            <Button size="sm" disabled={isBusy} onClick={onApprove}>
+              {isBusy ? (
+                <Loader2 className="size-4 animate-spin" />
+              ) : (
+                <CheckCircle2 className="size-4" />
+              )}
+              Tasdiqlash
+            </Button>
+            <Button
+              size="sm"
+              variant="outline"
+              disabled={isBusy}
+              onClick={onReject}
+            >
+              <XCircle className="size-4" />
+              Rad etish
+            </Button>
+          </div>
+        ) : null}
+      </CardContent>
+    </Card>
+  );
+}
+
+function CommentModerationCard({
+  comment,
+  selected,
+  isBusy,
+  onToggleSelected,
+  onApprove,
+  onReject,
+  onDelete,
+}: {
+  comment: ModerationCommentItem;
+  selected: boolean;
+  isBusy: boolean;
+  onToggleSelected: () => void;
+  onApprove: () => void;
+  onReject: () => void;
+  onDelete: () => void;
+}) {
+  const authorName =
+    comment.author?.displayName ?? comment.author?.username ?? "Foydalanuvchi";
+  const articleTitle = comment.article?.title ?? "Maqola";
+  const articleSlug = comment.article?.slug;
+
+  return (
+    <Card>
+      <CardHeader className="pb-3">
+        <div className="flex flex-wrap items-start gap-3">
+          <input
+            type="checkbox"
+            checked={selected}
+            onChange={onToggleSelected}
+            className="mt-1 size-4 rounded border-input"
+            aria-label="Izohni tanlash"
+          />
+          <div className="min-w-0 flex-1 space-y-1">
+            <CardTitle className="text-base leading-snug">
+              {authorName} izohi
+            </CardTitle>
+            <p className="text-sm text-muted-foreground">
+              {articleTitle}
+              {comment.createdAt
+                ? ` · ${formatRelativeTime(comment.createdAt)}`
+                : ""}
+            </p>
+          </div>
+          <Badge
+            variant={
+              !comment.status || comment.status === "pending"
+                ? "secondary"
+                : comment.status === "approved"
+                  ? "outline"
+                  : "destructive"
+            }
+          >
+            {!comment.status || comment.status === "pending"
+              ? "Kutilmoqda"
+              : comment.status === "approved"
+                ? "Tasdiqlangan"
+                : "Rad etilgan"}
+          </Badge>
+        </div>
+      </CardHeader>
+      <CardContent className="space-y-3">
+        <p className="rounded-lg border bg-muted/20 p-3 text-sm text-foreground/90">
+          {comment.content}
+        </p>
+        {comment.rejectReason ? (
+          <p className="text-sm text-muted-foreground">
+            <span className="font-medium text-foreground">Rad sababi:</span>{" "}
+            {comment.rejectReason}
+          </p>
+        ) : null}
+
+        <div className="flex flex-wrap gap-2">
+          {articleSlug ? (
+            <Button variant="outline" size="sm" asChild>
+              <Link href={`/maqola/${articleSlug}`} target="_blank">
+                <ExternalLink className="size-4" />
+                Maqola
+              </Link>
+            </Button>
+          ) : null}
+
+          {!comment.status || comment.status === "pending" ? (
+            <>
+              <Button size="sm" disabled={isBusy} onClick={onApprove}>
+                <CheckCircle2 className="size-4" />
+                Tasdiqlash
+              </Button>
+              <Button
+                size="sm"
+                variant="outline"
+                disabled={isBusy}
+                onClick={onReject}
+              >
+                <XCircle className="size-4" />
+                Rad etish
+              </Button>
+            </>
+          ) : null}
+
+          <Button
+            size="sm"
+            variant="destructive"
+            disabled={isBusy}
+            onClick={onDelete}
+          >
+            <Trash2 className="size-4" />
+            O&apos;chirish
+          </Button>
+        </div>
+      </CardContent>
+    </Card>
+  );
+}
+
 function ReportedContentPlaceholder() {
   return (
     <Card className="border-dashed">
@@ -1019,6 +1718,8 @@ function UsersPanel() {
 
   return (
     <>
+      <PlatformStatsDashboard />
+
       <Card>
         <CardHeader className="pb-3">
           <CardTitle className="text-base">Foydalanuvchilar</CardTitle>
@@ -1207,7 +1908,7 @@ export function AdminPanel() {
   }
 
   return (
-    <div className="mx-auto w-full max-w-5xl px-4 py-6 sm:px-6 sm:py-8">
+    <div className="w-full min-w-0">
       <div className="mb-6 flex flex-wrap items-start justify-between gap-4">
         <div className="space-y-1">
           <div className="flex items-center gap-2">
@@ -1235,6 +1936,10 @@ export function AdminPanel() {
             <CheckCircle2 className="size-4" />
             Ko&apos;rib chiqish
           </TabsTrigger>
+          <TabsTrigger value="topic-suggestions" className="gap-2">
+            <Lightbulb className="size-4" />
+            Mavzu takliflari
+          </TabsTrigger>
           <TabsTrigger value="published" className="gap-2">
             <Pin className="size-4" />
             Nashr etilgan
@@ -1246,6 +1951,10 @@ export function AdminPanel() {
           <TabsTrigger value="banners" className="gap-2">
             <ImageIcon className="size-4" />
             Reklamalar
+          </TabsTrigger>
+          <TabsTrigger value="comments" className="gap-2">
+            <MessageSquare className="size-4" />
+            Izohlar
           </TabsTrigger>
           <TabsTrigger value="reports" className="gap-2">
             <AlertTriangle className="size-4" />
@@ -1263,6 +1972,10 @@ export function AdminPanel() {
           <ReviewQueuePanel />
         </TabsContent>
 
+        <TabsContent value="topic-suggestions">
+          <TopicSuggestionsPanel />
+        </TabsContent>
+
         <TabsContent value="published">
           <PublishedArticlesPanel />
         </TabsContent>
@@ -1273,6 +1986,10 @@ export function AdminPanel() {
 
         <TabsContent value="banners">
           <BannersPanel />
+        </TabsContent>
+
+        <TabsContent value="comments">
+          <CommentsPanel />
         </TabsContent>
 
         <TabsContent value="reports">

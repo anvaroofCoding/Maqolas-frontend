@@ -32,13 +32,18 @@ export function ProfileTabs({
 
   return (
     <Tabs key={defaultTab} defaultValue={defaultTab} className="gap-2">
-      <TabsList>
-        <TabsTrigger value={isOwnProfile ? "maqolalarim" : "articles"}>
-          {isOwnProfile ? "Maqolalarim" : "Maqolalar"}
-        </TabsTrigger>
-        <TabsTrigger value="requested">So&apos;ralgan maqolalar</TabsTrigger>
-        <TabsTrigger value="followers">Obunachilar</TabsTrigger>
-      </TabsList>
+      <div className="-mx-4 overflow-x-auto px-4 [-ms-overflow-style:none] [scrollbar-width:none] sm:mx-0 sm:px-0 [&::-webkit-scrollbar]:hidden">
+        <TabsList className="w-max min-w-full sm:min-w-0">
+          <TabsTrigger value={isOwnProfile ? "maqolalarim" : "articles"}>
+            {isOwnProfile ? "Maqolalarim" : "Maqolalar"}
+          </TabsTrigger>
+          <TabsTrigger value="requested">
+            <span className="sm:hidden">So&apos;ralgan</span>
+            <span className="hidden sm:inline">So&apos;ralgan maqolalar</span>
+          </TabsTrigger>
+          <TabsTrigger value="followers">Obunachilar</TabsTrigger>
+        </TabsList>
+      </div>
 
       {isOwnProfile ? (
         <TabsContent value="maqolalarim" className="pt-1">

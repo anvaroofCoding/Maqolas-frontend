@@ -33,7 +33,7 @@ export function ArticleFeed({
       <div
         className={cn(
           "flex flex-col gap-4",
-          compact ? "pt-0 pb-2" : "pb-4 pt-2 md:gap-5 md:pb-6 md:pt-0",
+          compact ? "pt-0 pb-2" : "pb-4 pt-0 md:gap-5 md:pb-6",
         )}
       >
         {articles.map((article) => (

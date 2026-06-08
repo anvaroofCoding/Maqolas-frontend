@@ -74,8 +74,13 @@ export default async function ArticleDetailPage({ params }: ArticlePageProps) {
         />
 
         <ArticleDetailBody
+          slug={article.slug}
           coverImageUrl={article.coverImageUrl}
           title={article.title}
+          excerpt={article.excerpt}
+          authorName={authorName}
+          authorAvatarUrl={article.author?.avatarUrl}
+          categoryName={article.categories?.[0]?.name}
           contentHtml={articleBodyHtml}
           contentClassName="mt-6"
           itemProp="articleBody"
@@ -84,6 +89,15 @@ export default async function ArticleDetailPage({ params }: ArticlePageProps) {
         <footer className="mt-8">
           <ArticleEngagement
             articleId={article.id}
+            storyData={{
+              slug: article.slug,
+              title: article.title,
+              excerpt: article.excerpt,
+              coverImageUrl: article.coverImageUrl,
+              authorName,
+              authorAvatarUrl: article.author?.avatarUrl,
+              categoryName: article.categories?.[0]?.name,
+            }}
             viewCount={article.viewCount}
             initialLikeCount={article.likeCount}
             initialCommentCount={article.commentCount}

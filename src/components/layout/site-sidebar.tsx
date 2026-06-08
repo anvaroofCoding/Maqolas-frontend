@@ -58,13 +58,10 @@ export function SiteSidebar() {
 
   return (
     <aside
-      className={cn(
-        "sticky top-14 z-40 w-full shrink-0 self-start bg-transparent",
-        sidebarWidthClass,
-      )}
+      className={cn("w-full shrink-0 bg-transparent", sidebarWidthClass)}
       aria-label="Yon menyu"
     >
-      <nav className="flex max-h-[calc(100vh-3.5rem)] flex-col gap-1 overflow-y-auto pb-4 pr-2">
+      <nav className="flex flex-col gap-1 pb-4 pr-2">
         {mainNavItems.map((item) => (
           <SidebarNavItem
             key={item.href}
