@@ -3,6 +3,7 @@
 import { Bookmark, Eye, Heart, MessageCircle } from "lucide-react";
 import { useEffect, useRef, useState } from "react";
 import { AuthLoginModal } from "@/components/auth/auth-login-modal";
+import { ArticleShareLink } from "@/components/articles/article-share-link";
 import { ArticleShareStory } from "@/components/articles/article-share-story";
 import { CommentThreadList } from "@/components/articles/comment-thread";
 import { FlyingLikeHeart, iosIconClass } from "@/components/articles/flying-like-heart";
@@ -250,6 +251,7 @@ export function ArticleEngagement({
             />
           )}
 
+          <ArticleShareLink slug={storyData.slug} />
           <ArticleShareStory storyData={storyData} variant="engagement" />
         </div>
 
