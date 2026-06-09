@@ -5,6 +5,7 @@ import {
   InfoIcon,
   LogOutIcon,
   ScrollTextIcon,
+  SettingsIcon,
   ShieldCheckIcon,
   ShieldIcon,
   UserIcon,
@@ -12,6 +13,7 @@ import {
 import { useRouter } from "next/navigation";
 import { forwardRef, useEffect, useState } from "react";
 import { AuthLoginModal } from "@/components/auth/auth-login-modal";
+import { useSettings } from "@/components/providers/settings-provider";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
 import {
@@ -83,6 +85,7 @@ export function ProfileMenu() {
     skip: !mounted || !accessToken,
   });
   const [logout] = useLogoutMutation();
+  const { openSettings } = useSettings();
 
   const activeUser = meData?.user ?? user;
 
@@ -164,6 +167,16 @@ export function ProfileMenu() {
             Admin panel
           </DropdownMenuItem>
         ) : null}
+        <DropdownMenuItem
+          className="cursor-pointer"
+          onSelect={(event) => {
+            event.preventDefault();
+            openSettings();
+          }}
+        >
+          <SettingsIcon />
+          Sozlamalar
+        </DropdownMenuItem>
         <DropdownMenuSeparator />
         <DropdownMenuItem
           className="cursor-pointer"

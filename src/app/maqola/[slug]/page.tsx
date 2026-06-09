@@ -14,7 +14,7 @@ import {
 } from "@/lib/seo/json-ld";
 import { buildArticleKeywords } from "@/lib/seo/keywords";
 import { buildPageMetadata } from "@/lib/seo/metadata";
-import { absoluteUrl } from "@/lib/seo/urls";
+import { articleOgImageUrl, resolveOgImageUrl } from "@/lib/seo/urls";
 
 type ArticlePageProps = {
   params: Promise<{ slug: string }>;
@@ -47,7 +47,7 @@ export async function generateMetadata({
     titleFormat: "article",
     description,
     path: `/maqola/${article.slug}`,
-    image: article.coverImageUrl,
+    image: articleOgImageUrl(article.slug, article.coverImageUrl),
     keywords: buildArticleKeywords(
       article.title,
       article.categories,
@@ -99,9 +99,7 @@ export default async function ArticleDetailPage({ params }: ArticlePageProps) {
             title: article.title,
             description,
             slug: article.slug,
-            coverImageUrl: article.coverImageUrl
-              ? absoluteUrl(article.coverImageUrl)
-              : undefined,
+            coverImageUrl: resolveOgImageUrl(article.coverImageUrl),
             authorName,
             authorUsername: article.author?.username,
             publishedAt: article.publishedAt ?? article.createdAt,

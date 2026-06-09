@@ -78,6 +78,10 @@ export interface ArticleFeedResponse {
   };
 }
 
+export interface ArticleSearchResponse {
+  articles: ArticleSummary[];
+}
+
 export interface ArticleCommentAuthor {
   id: string;
   displayName: string;

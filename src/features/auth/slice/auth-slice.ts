@@ -14,6 +14,7 @@ export interface AuthState {
   accessToken: string | null;
   refreshToken: string | null;
   isAuthenticated: boolean;
+  silentAuthAttempted: boolean;
   ban: BanInfo | null;
 }
 
@@ -22,6 +23,7 @@ const initialState: AuthState = {
   accessToken: null,
   refreshToken: null,
   isAuthenticated: false,
+  silentAuthAttempted: false,
   ban: null,
 };
 
@@ -37,6 +39,10 @@ const authSlice = createSlice({
       state.accessToken = accessToken;
       state.refreshToken = refreshToken;
       state.isAuthenticated = true;
+      state.silentAuthAttempted = true;
+    },
+    setSilentAuthAttempted(state) {
+      state.silentAuthAttempted = true;
     },
     setSessionTokens(
       state,
@@ -96,6 +102,7 @@ const authSlice = createSlice({
 
 export const {
   hydrateAuthFromStorage,
+  setSilentAuthAttempted,
   setSessionTokens,
   setCredentials,
   clearCredentials,

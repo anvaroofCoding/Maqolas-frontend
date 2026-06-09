@@ -1,0 +1,198 @@
+import type { ThemePreset } from "@/lib/settings/types";
+
+export const THEME_PRESETS: ThemePreset[] = [
+  {
+    id: "indigo",
+    name: "Indigo",
+    swatch: "#4f46e5",
+    light: {
+      primary: "oklch(0.511 0.262 276.966)",
+      ring: "oklch(0.623 0.214 277.023)",
+      navActive: "rgb(79, 70, 229)",
+      navActiveHover: "rgb(67, 56, 202)",
+      sidebarPrimary: "oklch(0.511 0.262 276.966)",
+    },
+    dark: {
+      primary: "oklch(0.585 0.233 277.117)",
+      ring: "oklch(0.623 0.214 277.023)",
+      navActive: "rgb(99, 102, 241)",
+      navActiveHover: "rgb(79, 70, 229)",
+      sidebarPrimary: "oklch(0.585 0.233 277.117)",
+    },
+  },
+  {
+    id: "emerald",
+    name: "Zumrad",
+    swatch: "#059669",
+    light: {
+      primary: "oklch(0.596 0.145 163.225)",
+      ring: "oklch(0.65 0.13 163)",
+      navActive: "rgb(5, 150, 105)",
+      navActiveHover: "rgb(4, 120, 87)",
+      sidebarPrimary: "oklch(0.596 0.145 163.225)",
+    },
+    dark: {
+      primary: "oklch(0.696 0.17 162.48)",
+      ring: "oklch(0.65 0.13 163)",
+      navActive: "rgb(16, 185, 129)",
+      navActiveHover: "rgb(5, 150, 105)",
+      sidebarPrimary: "oklch(0.696 0.17 162.48)",
+    },
+  },
+  {
+    id: "rose",
+    name: "Atirgul",
+    swatch: "#e11d48",
+    light: {
+      primary: "oklch(0.586 0.253 17.585)",
+      ring: "oklch(0.62 0.22 17)",
+      navActive: "rgb(225, 29, 72)",
+      navActiveHover: "rgb(190, 18, 60)",
+      sidebarPrimary: "oklch(0.586 0.253 17.585)",
+    },
+    dark: {
+      primary: "oklch(0.645 0.246 16.439)",
+      ring: "oklch(0.62 0.22 17)",
+      navActive: "rgb(251, 113, 133)",
+      navActiveHover: "rgb(244, 63, 94)",
+      sidebarPrimary: "oklch(0.645 0.246 16.439)",
+    },
+  },
+  {
+    id: "amber",
+    name: "Kehribar",
+    swatch: "#d97706",
+    light: {
+      primary: "oklch(0.666 0.179 58.318)",
+      ring: "oklch(0.7 0.16 58)",
+      navActive: "rgb(217, 119, 6)",
+      navActiveHover: "rgb(180, 83, 9)",
+      sidebarPrimary: "oklch(0.666 0.179 58.318)",
+    },
+    dark: {
+      primary: "oklch(0.769 0.188 70.08)",
+      ring: "oklch(0.7 0.16 58)",
+      navActive: "rgb(251, 191, 36)",
+      navActiveHover: "rgb(245, 158, 11)",
+      sidebarPrimary: "oklch(0.769 0.188 70.08)",
+    },
+  },
+  {
+    id: "sky",
+    name: "Osmon",
+    swatch: "#0284c7",
+    light: {
+      primary: "oklch(0.588 0.158 241.966)",
+      ring: "oklch(0.62 0.14 241)",
+      navActive: "rgb(2, 132, 199)",
+      navActiveHover: "rgb(3, 105, 161)",
+      sidebarPrimary: "oklch(0.588 0.158 241.966)",
+    },
+    dark: {
+      primary: "oklch(0.685 0.169 237.323)",
+      ring: "oklch(0.62 0.14 241)",
+      navActive: "rgb(56, 189, 248)",
+      navActiveHover: "rgb(14, 165, 233)",
+      sidebarPrimary: "oklch(0.685 0.169 237.323)",
+    },
+  },
+  {
+    id: "violet",
+    name: "Binafsha",
+    swatch: "#7c3aed",
+    light: {
+      primary: "oklch(0.541 0.281 293.009)",
+      ring: "oklch(0.6 0.24 293)",
+      navActive: "rgb(124, 58, 237)",
+      navActiveHover: "rgb(109, 40, 217)",
+      sidebarPrimary: "oklch(0.541 0.281 293.009)",
+    },
+    dark: {
+      primary: "oklch(0.606 0.25 292.717)",
+      ring: "oklch(0.6 0.24 293)",
+      navActive: "rgb(167, 139, 250)",
+      navActiveHover: "rgb(139, 92, 246)",
+      sidebarPrimary: "oklch(0.606 0.25 292.717)",
+    },
+  },
+  {
+    id: "orange",
+    name: "Apelsin",
+    swatch: "#ea580c",
+    light: {
+      primary: "oklch(0.646 0.222 41.116)",
+      ring: "oklch(0.68 0.2 41)",
+      navActive: "rgb(234, 88, 12)",
+      navActiveHover: "rgb(194, 65, 12)",
+      sidebarPrimary: "oklch(0.646 0.222 41.116)",
+    },
+    dark: {
+      primary: "oklch(0.705 0.213 47.604)",
+      ring: "oklch(0.68 0.2 41)",
+      navActive: "rgb(251, 146, 60)",
+      navActiveHover: "rgb(249, 115, 22)",
+      sidebarPrimary: "oklch(0.705 0.213 47.604)",
+    },
+  },
+  {
+    id: "teal",
+    name: "Moviy-yashil",
+    swatch: "#0d9488",
+    light: {
+      primary: "oklch(0.6 0.118 184.704)",
+      ring: "oklch(0.64 0.11 184)",
+      navActive: "rgb(13, 148, 136)",
+      navActiveHover: "rgb(15, 118, 110)",
+      sidebarPrimary: "oklch(0.6 0.118 184.704)",
+    },
+    dark: {
+      primary: "oklch(0.704 0.14 182.503)",
+      ring: "oklch(0.64 0.11 184)",
+      navActive: "rgb(45, 212, 191)",
+      navActiveHover: "rgb(20, 184, 166)",
+      sidebarPrimary: "oklch(0.704 0.14 182.503)",
+    },
+  },
+  {
+    id: "fuchsia",
+    name: "Fuksiya",
+    swatch: "#c026d3",
+    light: {
+      primary: "oklch(0.591 0.293 322.896)",
+      ring: "oklch(0.62 0.26 322)",
+      navActive: "rgb(192, 38, 211)",
+      navActiveHover: "rgb(162, 28, 175)",
+      sidebarPrimary: "oklch(0.591 0.293 322.896)",
+    },
+    dark: {
+      primary: "oklch(0.667 0.295 322.15)",
+      ring: "oklch(0.62 0.26 322)",
+      navActive: "rgb(232, 121, 249)",
+      navActiveHover: "rgb(217, 70, 239)",
+      sidebarPrimary: "oklch(0.667 0.295 322.15)",
+    },
+  },
+  {
+    id: "slate",
+    name: "Kulrang",
+    swatch: "#475569",
+    light: {
+      primary: "oklch(0.446 0.043 257.281)",
+      ring: "oklch(0.5 0.04 257)",
+      navActive: "rgb(71, 85, 105)",
+      navActiveHover: "rgb(51, 65, 85)",
+      sidebarPrimary: "oklch(0.446 0.043 257.281)",
+    },
+    dark: {
+      primary: "oklch(0.554 0.046 257.417)",
+      ring: "oklch(0.5 0.04 257)",
+      navActive: "rgb(148, 163, 184)",
+      navActiveHover: "rgb(100, 116, 139)",
+      sidebarPrimary: "oklch(0.554 0.046 257.417)",
+    },
+  },
+];
+
+export function getThemePreset(id: string) {
+  return THEME_PRESETS.find((preset) => preset.id === id);
+}

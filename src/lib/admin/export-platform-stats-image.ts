@@ -153,7 +153,7 @@ export async function exportPlatformStatsImage(stats: PlatformStats) {
   ctx.font = "600 32px system-ui, -apple-system, Segoe UI, sans-serif";
   ctx.fillText("O'zbek tilidagi maqolalar platformasi", 72, 780);
 
-  const siteHost = siteConfig.url.replace(/^https?:\/\//, "");
+  const siteHost = siteConfig.host;
   ctx.fillStyle = "rgba(255, 255, 255, 0.68)";
   ctx.font = "500 28px system-ui, -apple-system, Segoe UI, sans-serif";
   ctx.fillText(siteHost, 72, 828);

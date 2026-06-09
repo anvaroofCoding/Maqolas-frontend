@@ -14,6 +14,9 @@ export const baseApi = createApi({
     "Comment",
     "Banner",
     "Notification",
+    "WelcomePromo",
+    "WelcomePromoComment",
+    "AiArticle",
   ],
   endpoints: () => ({}),
 });

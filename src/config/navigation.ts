@@ -35,7 +35,13 @@ export const mainNavItems: NavItem[] = [
   { label: "Mening maqolam", href: "/lenta", icon: NewspaperIcon },
 ];
 
-export const topicNavItems: NavItem[] = [
+function sortTopicsAlphabetically(items: NavItem[]): NavItem[] {
+  return [...items].sort((a, b) =>
+    a.label.localeCompare(b.label, "uz", { sensitivity: "base" }),
+  );
+}
+
+const topicNavItemsSource: NavItem[] = [
   { label: "Texnologiya", href: "/mavzu/texnologiya", icon: CpuIcon },
   { label: "Startaplar", href: "/mavzu/startaplar", icon: LayersIcon },
   { label: "AI", href: "/mavzu/ai", icon: BotIcon },
@@ -47,3 +53,5 @@ export const topicNavItems: NavItem[] = [
   { label: "Ta'lim", href: "/mavzu/talim", icon: BookOpenIcon },
   { label: "Moliya", href: "/mavzu/moliya", icon: BanknoteIcon },
 ];
+
+export const topicNavItems = sortTopicsAlphabetically(topicNavItemsSource);

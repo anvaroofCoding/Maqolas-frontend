@@ -7,6 +7,7 @@ import type {
   ArticleFeedResponse,
   ArticleStatus,
   ArticleSummary,
+  ArticleSearchResponse,
   ArticleComment,
   PopularCommentsResponse,
   MyArticlesResponse,
@@ -58,6 +59,17 @@ export const articlesApi = baseApi.injectEndpoints({
         return `/articles/feed?${searchParams.toString()}`;
       },
       providesTags: [{ type: "Article", id: "LIST" }],
+    }),
+    searchArticles: builder.query<
+      ArticleSearchResponse,
+      { q: string; limit?: number }
+    >({
+      query: ({ q, limit = 10 }) => {
+        const searchParams = new URLSearchParams();
+        searchParams.set("q", q);
+        searchParams.set("limit", String(limit));
+        return `/articles/search?${searchParams.toString()}`;
+      },
     }),
     getArticleBySlug: builder.query<{ article: ArticleSummary }, string>({
       query: (slug) => `/articles/slug/${encodeURIComponent(slug)}`,
@@ -235,6 +247,8 @@ export const {
   useSubmitArticleMutation,
   useListArticlesQuery,
   useLazyListArticlesQuery,
+  useSearchArticlesQuery,
+  useLazySearchArticlesQuery,
   useListMyArticlesQuery,
   useListSavedArticlesQuery,
   useLazyListSavedArticlesQuery,

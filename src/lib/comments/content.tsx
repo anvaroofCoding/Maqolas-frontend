@@ -42,5 +42,9 @@ export function CommentContent({ content }: { content: string }) {
     parts.push(content.slice(lastIndex));
   }
 
-  return <span className="whitespace-pre-wrap">{parts}</span>;
+  return (
+    <span className="break-words whitespace-pre-wrap [overflow-wrap:anywhere]">
+      {parts}
+    </span>
+  );
 }

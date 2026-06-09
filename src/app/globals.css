@@ -5,7 +5,22 @@
 @custom-variant dark (&:where(.dark, .dark *));
 
 html {
-  scrollbar-gutter: stable;
+  scrollbar-width: none; /* Firefox */
+  -ms-overflow-style: none; /* IE/old Edge */
+}
+
+html::-webkit-scrollbar {
+  display: none; /* Chrome/Safari */
+}
+
+/* Barcha scroll qilinadigan joylarda scrollbar ko'rinmasin */
+* {
+  scrollbar-width: none;
+  -ms-overflow-style: none;
+}
+
+*::-webkit-scrollbar {
+  display: none;
 }
 
 :root {
@@ -562,4 +577,23 @@ html:not(.dark) .code-block-shell pre {
   width: 0;
   height: 0;
   display: none; /* Chrome/Safari */
+}
+
+.ai-ghost-suggestion {
+  display: inline;
+  color: var(--muted-foreground);
+  opacity: 0.72;
+  font-style: italic;
+  pointer-events: none;
+  user-select: none;
+  white-space: pre-wrap;
+}
+
+.article-editor-content .ai-ghost-suggestion::before {
+  content: "Tab · ";
+  font-size: 0.65rem;
+  font-style: normal;
+  letter-spacing: 0.02em;
+  opacity: 0.65;
+  margin-right: 0.2rem;
 }

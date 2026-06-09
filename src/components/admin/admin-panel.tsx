@@ -2,6 +2,7 @@
 
 import {
   AlertTriangle,
+  BadgeCheck,
   CheckCircle2,
   ExternalLink,
   FolderOpen,
@@ -74,6 +75,7 @@ import type {
   ModerationCommentItem,
 } from "@/features/admin/types";
 import { BannersPanel } from "@/components/admin/banners-panel";
+import { WelcomePromoPanel } from "@/components/admin/welcome-promo-panel";
 import { PlatformStatsDashboard } from "@/components/admin/platform-stats-dashboard";
 import { useGetMeQuery } from "@/features/auth/api/auth-api";
 import { useAppSelector } from "@/lib/store/hooks";
@@ -1952,6 +1954,10 @@ export function AdminPanel() {
             <ImageIcon className="size-4" />
             Reklamalar
           </TabsTrigger>
+          <TabsTrigger value="welcome-promo" className="gap-2">
+            <BadgeCheck className="size-4" />
+            Kirish reklamasi
+          </TabsTrigger>
           <TabsTrigger value="comments" className="gap-2">
             <MessageSquare className="size-4" />
             Izohlar
@@ -1986,6 +1992,10 @@ export function AdminPanel() {
 
         <TabsContent value="banners">
           <BannersPanel />
+        </TabsContent>
+
+        <TabsContent value="welcome-promo">
+          <WelcomePromoPanel />
         </TabsContent>
 
         <TabsContent value="comments">

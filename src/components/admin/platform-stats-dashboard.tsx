@@ -61,7 +61,7 @@ function StatCard({
 }
 
 function ShareStatsPreview({ stats }: { stats: PlatformStats }) {
-  const siteHost = siteConfig.url.replace(/^https?:\/\//, "");
+  const siteHost = siteConfig.host;
 
   return (
     <div className="relative aspect-square w-full max-w-sm overflow-hidden rounded-3xl border border-white/20 shadow-2xl">
@@ -143,7 +143,7 @@ export function PlatformStatsDashboard() {
 
   if (!data) return null;
 
-  const siteHost = siteConfig.url.replace(/^https?:\/\//, "");
+  const siteHost = siteConfig.host;
 
   return (
     <div className="mb-6 space-y-4">

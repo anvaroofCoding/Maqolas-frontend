@@ -8,8 +8,9 @@ export const siteConfig = {
   description:
     "Maqolas — o'zbekcha maqolalar o'qish va yozish uchun zamonaviy platforma. Texnologiya, startaplar, AI, marketing va boshqa mavzularda sifatli maqolalar.",
   url: process.env.NEXT_PUBLIC_APP_URL ?? "http://localhost:3000",
+  host: process.env.NEXT_PUBLIC_SITE_HOST ?? "maqolas.tm2.uz",
   locale: "uz_UZ",
-  ogImage: "/logo.png",
+  ogImage: "/opengraph-image",
   twitterHandle: "@maqolas",
   googleSiteVerification:
     process.env.NEXT_PUBLIC_GOOGLE_SITE_VERIFICATION ?? "",

@@ -3,6 +3,7 @@
 import { PenLineIcon } from "lucide-react";
 import Link from "next/link";
 import { NotificationPopover } from "@/components/notifications/notification-popover";
+import { ArticleSearchTrigger } from "@/components/layout/article-search-trigger";
 import { ProfileMenu } from "@/components/layout/profile-menu";
 import { ThemeToggle } from "@/components/layout/theme-toggle";
 import { Badge } from "@/components/ui/badge";
@@ -45,6 +46,8 @@ export function SiteNavbar() {
           aria-label="Asosiy navigatsiya"
         >
           <ThemeToggle className={navIconButtonClass} />
+
+          <ArticleSearchTrigger />
 
           <Button
             variant="default"

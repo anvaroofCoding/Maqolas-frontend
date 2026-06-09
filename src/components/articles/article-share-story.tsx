@@ -18,6 +18,8 @@ import {
   DEFAULT_STORY_TEMPLATE,
   downloadArticleStoryImage,
   generateArticleStoryImage,
+  getStoryShareFallbackMessage,
+  getStoryShareSuccessMessage,
   shareArticleStoryImage,
   STORY_TEMPLATES,
   type StorySharePlatform,
@@ -164,21 +166,17 @@ export function ArticleShareStory({
         platform,
       );
 
-      if (result === "shared") {
-        toast.success(
-          platform === "instagram"
-            ? "Instagram orqali ulashish ochildi"
-            : "Telegram orqali ulashish ochildi",
-        );
+      if (result === "cancelled") {
+        return;
+      }
+
+      if (result === "opened") {
+        toast.success(getStoryShareSuccessMessage(platform));
         setOpen(false);
         return;
       }
 
-      toast.info(
-        platform === "instagram"
-          ? "Rasm yuklab olindi. Instagram Stories'ga qo'shing."
-          : "Rasm yuklab olindi. Telegram Stories'ga qo'shing.",
-      );
+      toast.info(getStoryShareFallbackMessage(platform));
     } catch (error) {
       if (error instanceof DOMException && error.name === "AbortError") {
         return;

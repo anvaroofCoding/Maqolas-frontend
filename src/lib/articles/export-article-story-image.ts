@@ -1,5 +1,8 @@
 import { siteConfig } from "@/config/site";
-import { resolveMediaUrl } from "@/lib/articles/resolve-media-url";
+import {
+  buildProxyImageUrl,
+  resolveMediaUrl,
+} from "@/lib/articles/resolve-media-url";
 import {
   DEFAULT_STORY_TEMPLATE,
   getStoryTemplate,
@@ -124,10 +127,7 @@ async function loadImageSource(
   const url = resolveMediaUrl(rawUrl);
   if (!url) return null;
 
-  const candidates = [
-    url,
-    `/api/proxy-image?url=${encodeURIComponent(url)}`,
-  ];
+  const candidates = [url, buildProxyImageUrl(url)];
 
   for (const candidate of candidates) {
     const blob = await fetchImageBlob(candidate);
@@ -392,7 +392,7 @@ export async function generateArticleStoryImage(
   const authorRowTop = STORY_HEIGHT - 248;
   drawAuthorRow(ctx, data.authorName, avatarImage, padding, authorRowTop);
 
-  const siteHost = siteConfig.url.replace(/^https?:\/\//, "");
+  const siteHost = siteConfig.host;
   ctx.textBaseline = "alphabetic";
   ctx.fillStyle = "rgba(255, 255, 255, 0.55)";
   ctx.font = "500 26px system-ui, -apple-system, Segoe UI, sans-serif";
@@ -415,38 +415,12 @@ export async function downloadArticleStoryImage(
   URL.revokeObjectURL(url);
 }
 
-export type StorySharePlatform = "instagram" | "telegram";
-
-export async function shareArticleStoryImage(
-  blob: Blob,
-  slug: string,
-  platform: StorySharePlatform,
-): Promise<"shared" | "downloaded"> {
-  const file = new File([blob], `maqolas-${slug}-story.png`, {
-    type: "image/png",
-  });
-
-  if (
-    typeof navigator !== "undefined" &&
-    typeof navigator.share === "function" &&
-    typeof navigator.canShare === "function" &&
-    navigator.canShare({ files: [file] })
-  ) {
-    await navigator.share({
-      files: [file],
-      title: siteConfig.name,
-      text: `${siteConfig.name} — maqola`,
-    });
-    return "shared";
-  }
-
-  await downloadArticleStoryImage(blob, slug);
-
-  if (platform === "instagram") {
-    window.open("https://www.instagram.com/", "_blank", "noopener,noreferrer");
-  } else {
-    window.open("https://web.telegram.org/", "_blank", "noopener,noreferrer");
-  }
-
-  return "downloaded";
-}
+export type {
+  StorySharePlatform,
+  StoryShareResult,
+} from "@/lib/articles/share-story-image";
+export {
+  getStoryShareFallbackMessage,
+  getStoryShareSuccessMessage,
+  shareStoryImageToPlatform as shareArticleStoryImage,
+} from "@/lib/articles/share-story-image";

@@ -1,6 +1,7 @@
 "use client";
 
 import { useSearchParams } from "next/navigation";
+import { AiArticleArchiveList } from "@/components/ai-article/ai-article-archive-list";
 import { FollowersList } from "@/components/profile/followers-list";
 import { MyArticlesList } from "@/components/profile/my-articles-list";
 import { RequestedArticlesList } from "@/components/profile/requested-articles-list";
@@ -19,6 +20,7 @@ function resolveDefaultTab(
 ): string {
   if (tab === "followers" || tab === "obunachilar") return "followers";
   if (tab === "requested" || tab === "soralgan") return "requested";
+  if (tab === "ai-arxiv" || tab === "arxiv") return "ai-arxiv";
   return isOwnProfile ? "maqolalarim" : "articles";
 }
 
@@ -41,6 +43,12 @@ export function ProfileTabs({
             <span className="sm:hidden">So&apos;ralgan</span>
             <span className="hidden sm:inline">So&apos;ralgan maqolalar</span>
           </TabsTrigger>
+          {isOwnProfile ? (
+            <TabsTrigger value="ai-arxiv">
+              <span className="sm:hidden">AI</span>
+              <span className="hidden sm:inline">AI arxiv</span>
+            </TabsTrigger>
+          ) : null}
           <TabsTrigger value="followers">Obunachilar</TabsTrigger>
         </TabsList>
       </div>
@@ -61,6 +69,12 @@ export function ProfileTabs({
           isOwnProfile={isOwnProfile}
         />
       </TabsContent>
+
+      {isOwnProfile ? (
+        <TabsContent value="ai-arxiv" className="pt-1">
+          <AiArticleArchiveList />
+        </TabsContent>
+      ) : null}
 
       <TabsContent value="followers" className="pt-1">
         <FollowersList

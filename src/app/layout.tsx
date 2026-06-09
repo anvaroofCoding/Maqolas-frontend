@@ -4,8 +4,14 @@ import { AppShell } from "@/components/layout/app-shell";
 import { SiteNavbar } from "@/components/layout/site-navbar";
 import { AuthProvider } from "@/components/providers/auth-provider";
 import { StoreProvider } from "@/components/providers/store-provider";
+import { NotificationSoundListener } from "@/components/notifications/notification-sound-listener";
+import { SettingsProvider } from "@/components/providers/settings-provider";
 import { ThemeProvider } from "@/components/providers/theme-provider";
 import { ToastProvider } from "@/components/providers/toast-provider";
+import { AccentThemeScript } from "@/components/settings/accent-theme-script";
+import { SettingsModal } from "@/components/settings/settings-modal";
+import { AiArticleAssistant } from "@/components/ai-article/ai-article-assistant";
+import { WelcomePromoModal } from "@/components/welcome-promo/welcome-promo-modal";
 import { JsonLdScript } from "@/components/seo/json-ld-script";
 import { siteConfig } from "@/config/site";
 import { defaultMetadata } from "@/lib/seo/metadata";
@@ -45,6 +51,9 @@ export default function RootLayout({
       suppressHydrationWarning
       className={cn("bg-background font-sans text-foreground", poppins.variable)}
     >
+      <head>
+        <AccentThemeScript />
+      </head>
       <body
         suppressHydrationWarning
         className="min-h-screen bg-background font-sans text-foreground antialiased"
@@ -53,16 +62,22 @@ export default function RootLayout({
           data={[buildOrganizationJsonLd(), buildWebSiteJsonLd()]}
         />
         <ThemeProvider>
-          <StoreProvider>
-            <ToastProvider>
-              <AuthProvider>
-                <SiteNavbar />
-                <div className="bg-background pt-14">
-                  <AppShell>{children}</AppShell>
-                </div>
-              </AuthProvider>
-            </ToastProvider>
-          </StoreProvider>
+          <SettingsProvider>
+            <StoreProvider>
+              <ToastProvider>
+                <AuthProvider>
+                  <NotificationSoundListener />
+                  <SettingsModal />
+                  <WelcomePromoModal />
+                  <AiArticleAssistant />
+                  <SiteNavbar />
+                  <div className="bg-background pt-14">
+                    <AppShell>{children}</AppShell>
+                  </div>
+                </AuthProvider>
+              </ToastProvider>
+            </StoreProvider>
+          </SettingsProvider>
         </ThemeProvider>
       </body>
     </html>

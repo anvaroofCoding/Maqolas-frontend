@@ -5,6 +5,7 @@ import { EditorContent, useEditor } from "@tiptap/react";
 import { Maximize2Icon, Minimize2Icon } from "lucide-react";
 import { usePathname, useRouter } from "next/navigation";
 import { useCallback, useEffect, useRef, useState } from "react";
+import { useSettings } from "@/components/providers/settings-provider";
 import { EditorToolbar } from "@/components/editor/editor-toolbar";
 import { Button } from "@/components/ui/button";
 import { useUpdateAdminArticleMutation } from "@/features/admin/api/admin-api";
@@ -15,7 +16,9 @@ import {
 } from "@/features/articles/api/articles-api";
 import { createEditorExtensions } from "@/lib/editor/extensions";
 import { extractTitleFromJson } from "@/lib/editor/extract-title";
+import { fetchAiSuggestion } from "@/lib/editor/fetch-ai-suggestion";
 import { toast } from "@/lib/toast";
+import { useAppSelector } from "@/lib/store/hooks";
 import { cn } from "@/lib/utils";
 
 const writeButtonClass =
@@ -50,6 +53,15 @@ export function ArticleEditor({
   const [submitArticle] = useSubmitArticleMutation();
   const [updateAdminArticle] = useUpdateAdminArticleMutation();
   const isAdminMode = mode === "admin";
+  const { settings } = useSettings();
+  const accessToken = useAppSelector((state) => state.auth.accessToken);
+  const aiEnabledRef = useRef(settings.aiAssistEnabled);
+  const accessTokenRef = useRef(accessToken);
+
+  const fetchSuggestion = useCallback(async (context: string) => {
+    if (!aiEnabledRef.current) return "";
+    return fetchAiSuggestion(context, accessTokenRef.current);
+  }, []);
 
   const persist = useCallback(async (ed: Editor) => {
       const contentHtml = ed.getHTML();
@@ -82,7 +94,12 @@ export function ArticleEditor({
   );
 
   const editor = useEditor({
-    extensions: createEditorExtensions(),
+    extensions: createEditorExtensions({
+      aiAutocomplete: {
+        enabled: settings.aiAssistEnabled,
+        fetchSuggestion,
+      },
+    }),
     content: initialJson ?? initialHtml,
     immediatelyRender: false,
     editorProps: {
@@ -99,6 +116,19 @@ export function ArticleEditor({
       }, 1500);
     },
   });
+
+  useEffect(() => {
+    aiEnabledRef.current = settings.aiAssistEnabled;
+    accessTokenRef.current = accessToken;
+    if (editor) {
+      const extension = editor.extensionManager.extensions.find(
+        (item) => item.name === "aiAutocomplete",
+      );
+      if (extension) {
+        extension.options.enabled = settings.aiAssistEnabled;
+      }
+    }
+  }, [settings.aiAssistEnabled, accessToken, editor]);
 
   useEffect(() => {
     return () => {

@@ -1,6 +1,6 @@
 import type { Metadata } from "next";
 import { siteConfig } from "@/config/site";
-import { absoluteUrl } from "@/lib/seo/urls";
+import { absoluteUrl, resolveOgImageUrl } from "@/lib/seo/urls";
 
 export type TitleFormat = "site" | "page" | "article" | "profile";
 
@@ -45,7 +45,9 @@ export function buildPageMetadata(input: PageMetadataInput = {}): Metadata {
   const title = resolveTitle(input);
   const description = input.description ?? siteConfig.description;
   const canonical = absoluteUrl(input.path ?? "");
-  const image = absoluteUrl(input.image ?? siteConfig.ogImage);
+  const image = input.image
+    ? (resolveOgImageUrl(input.image) ?? absoluteUrl(input.image))
+    : absoluteUrl(siteConfig.ogImage);
   const keywords = dedupeKeywords([
     ...(input.keywords ?? []),
     ...siteConfig.keywords,

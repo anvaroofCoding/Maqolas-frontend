@@ -196,7 +196,7 @@ function CommentItem({
             ) : null}
           </div>
 
-          <p className="mt-1.5 text-sm leading-relaxed text-foreground/90">
+          <p className="mt-1.5 min-w-0 break-words text-sm leading-relaxed text-foreground/90 [overflow-wrap:anywhere]">
             <CommentContent content={comment.content} />
           </p>
 
