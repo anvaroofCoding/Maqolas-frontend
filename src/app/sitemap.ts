@@ -1,7 +1,6 @@
 import type { MetadataRoute } from "next";
-import { topicNavItems } from "@/config/navigation";
 import { siteConfig } from "@/config/site";
-import { fetchSitemapEntries } from "@/lib/articles/server";
+import { fetchCategories, fetchSitemapEntries } from "@/lib/articles/server";
 
 const STATIC_ROUTES: Array<{
   path: string;
@@ -19,7 +18,10 @@ const STATIC_ROUTES: Array<{
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   const base = siteConfig.url.replace(/\/$/, "");
   const now = new Date();
-  const articleEntries = await fetchSitemapEntries();
+  const [articleEntries, categories] = await Promise.all([
+    fetchSitemapEntries(),
+    fetchCategories(),
+  ]);
 
   const staticPages: MetadataRoute.Sitemap = STATIC_ROUTES.map((route) => ({
     url: `${base}${route.path}`,
@@ -28,8 +30,8 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     priority: route.priority,
   }));
 
-  const topicPages: MetadataRoute.Sitemap = topicNavItems.map((topic) => ({
-    url: `${base}${topic.href}`,
+  const topicPages: MetadataRoute.Sitemap = categories.map((category) => ({
+    url: `${base}/mavzu/${category.slug}`,
     lastModified: now,
     changeFrequency: "daily",
     priority: 0.8,

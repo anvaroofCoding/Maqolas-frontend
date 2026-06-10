@@ -11,58 +11,75 @@ import {
 } from "@/components/ui/dialog";
 import { Separator } from "@/components/ui/separator";
 
+const MAX_ARTICLE_WORDS = 5000;
+
 const GUIDE_SECTIONS = [
   {
-    title: "Mavzu va maqsad",
+    title: "AI qanday ishlaydi?",
     items: [
-      "Qaysi mavzu haqida yozmoqchisiz? (aniq va tor qiling)",
-      "Maqolaning maqsadi nima? (o'rgatish, tushuntirish, maslahat berish, tahlil qilish)",
-      "O'quvchi nima bilishi yoki qilishi kerak? (natija)",
+      "Siz bergan talab asosida to'g'ridan-to'g'ri tayyor maqola yozadi — nashr qilishga tayyor matn",
+      "Mavzu yoki so'rov haqida umumiy sharh emas, balki o'zi maqola bo'ladi",
+      "Bir nechta paragraf yoki band bersangiz ham, barchasini qamrab oladi",
+      `Professional darajada, ${MAX_ARTICLE_WORDS.toLocaleString()} so'zgacha yozishi mumkin`,
     ],
   },
   {
-    title: "Auditoriya",
+    title: "Senior darajadagi prompt tuzilmasi",
     items: [
-      "Kim o'qiydi? (boshlovchi, o'rta, professional)",
-      "Qaysi til va uslub mos? (oddiy, rasmiy, do'stona)",
-      "O'quvchining oldindan bilimi qanday?",
+      "1-qator: mavzu sarlavhasi — aniq, tor va professional",
+      "2-blok: maqsad — maqola nima berishi kerak?",
+      "3-blok: auditoriya — kim o'qiydi va qanday bilimga ega?",
+      "4-blok: hajm — aniq so'z soni (masalan: 2000 so'z)",
+      "5-blok: qamrov — qaysi bo'limlar, misollar, tahlillar bo'lsin?",
+      "6-blok: uslub va format — rasmiy, amaliy, jadval, ro'yxat va hokazo",
     ],
   },
   {
-    title: "Tuzilma va hajm",
+    title: "Kuchli prompt uchun qoidalar",
     items: [
-      "Taxminiy so'z soni yoki hajm (masalan: 600–1000 so'z)",
-      "Bo'limlar kerakmi? (kirish, asosiy qism, xulosa)",
-      "Ro'yxatlar, jadval, callout, rasm yoki kod bloki kerakmi?",
+      "«Mavzu haqida yoz» emas — «quyidagi mavzuda professional maqola yoz» deb aniqlang",
+      "Umumiy gaplardan qoching: «yaxshi maqola», «batafsil» — o'rniga aniq talab bering",
+      "Har bir bandni raqamli yoki bullet bilan ajrating — AI tartib bilan yozadi",
+      "Hajm ko'rsatmasangiz, AI o'rtacha hajmda yozadi; uzun maqola kerak bo'lsa, so'z sonini yozing",
+      "Nimalardan qochish kerakligini ham ayting (reklama, umumiy gaplar, mavzudan chetlanish)",
     ],
   },
   {
-    title: "Kontent talablari",
+    title: "Tavsiya etilgan format",
     items: [
-      "Amaliy maslahatlar yoki qadam-baqadam ko'rsatma kerakmi?",
-      "Haqiqiy misollar, statistika yoki manbalar bo'lsinmi?",
-      "Nimalardan qochish kerak? (umumiy gaplar, reklama, mavzudan chetlanish)",
+      "Mavzu sarlavhasi birinchi qatorda",
+      "Keyin bo'sh qator va «Maqsad:», «Auditoriya:», «Hajm:» bloklari",
+      "«Qamrab olsin:» ostida raqamli ro'yxat",
+      "Oxirida «Uslub:» va «Formatlash:» qo'shing",
     ],
   },
   {
-    title: "So'rov yuborishdan oldin tekshiring",
+    title: "Tez-tez qilinadigan xatolar",
     items: [
-      "Mavzu aniq va bitta yo'nalishga qaratilganmi?",
-      "Auditoriya va maqsad yozilganmi?",
-      "Hajm yoki tuzilma ko'rsatilganmi?",
-      "Kerakli misollar yoki uslub belgilanganmi?",
+      "Juda qisqa prompt: «Python haqida yoz» — natija ham umumiy bo'ladi",
+      "Hajm ko'rsatmaslik — maqola kutilganidan qisqa chiqishi mumkin",
+      "Bir nechta mavzuni aralashtirish — bitta maqola, bitta yo'nalish yaxshiroq",
+      "Faqat savol berish — AI ga topshiriq bering, savol emas",
     ],
   },
 ] as const;
 
-const EXAMPLE_PROMPT = `Python dasturlashni boshlovchilar uchun maqola yoz.
+const EXAMPLE_PROMPT = `Sun'iy intellekt zamonaviy ta'limdagi o'rni va amaliy qo'llanilishi
 
-Maqsad: o'qishni boshlashni xohlayotganlar uchun amaliy yo'riqnoma.
-Auditoriya: dasturlashni bilmaydigan yoshlar va talabalar.
-Hajm: taxminan 800 so'z.
-Tuzilma: kirish, 5 ta asosiy qadam, xulosa.
-Uslub: oddiy va tushunarli, har bo'limda qisqa misol bo'lsin.
-Formatlash: kod bloklari, vazifa ro'yxati, jadval, maslahat callout va rasm bo'lsin.`;
+Maqsad: o'qituvchilarga AI vositalarini dars jarayoniga joriy etish bo'yicha amaliy qo'llanma berish.
+Auditoriya: IT bilimi o'rta darajadagi maktab va universitet o'qituvchilari.
+Hajm: taxminan 2500 so'z.
+
+Qamrab olsin:
+1) AI ta'limdagi afzalliklari va cheklovlari (obektiv tahlil)
+2) Darsda qo'llashning 3 ta amaliy ssenariysi (har biri qadam-baqadam)
+3) Ma'lumot xavfsizligi va akademik halollik masalalari
+4) 2025–2026 yillardagi asosiy tendensiyalar
+
+Uslub: professional, aniq, har bo'limda real misollar.
+Formatlash: kirish, 4 ta h2 bo'lim, xulosa; ro'yxatlar, 1 ta jadval, maslahat callout va 1 ta rasm.
+
+Qochish kerak: umumiy motivatsion gaplar, reklama ohangi, mavzudan chetlanish.`;
 
 type AiPromptGuideDialogProps = {
   open: boolean;
@@ -78,11 +95,12 @@ export function AiPromptGuideDialog({
       <DialogContent className="max-h-[min(90vh,640px)] gap-0 overflow-hidden p-0 sm:max-w-md">
         <DialogHeader className="space-y-2 border-b px-5 py-4 text-left">
           <DialogTitle className="text-base">
-            Professional maqola so&apos;rovi qanday yoziladi?
+            Promptni professional yozish qo&apos;llanmasi
           </DialogTitle>
           <DialogDescription className="text-xs leading-relaxed">
-            AI siz yozgan talab asosida maqola tayyorlaydi. Qanchalik aniq va
-            to&apos;liq yozsangiz, natija shunchalik professional bo&apos;ladi.
+            AI siz yozgan talab asosida to&apos;g&apos;ridan-to&apos;g&apos;ri
+            tayyor maqola yozadi. Quyidagi tuzilma va qoidalarga amal qilsangiz,
+            natija senior darajada chiqadi.
           </DialogDescription>
         </DialogHeader>
 
@@ -107,10 +125,11 @@ export function AiPromptGuideDialog({
 
           <section className="space-y-2">
             <h3 className="text-sm font-semibold text-foreground">
-              Namuna so&apos;rov
+              Tayyor namuna — shu formatda yozing
             </h3>
             <p className="text-xs text-muted-foreground">
-              Quyidagicha yozishingiz mumkin:
+              Promptingizni quyidagi namunaga o&apos;xshatishingiz mumkin.
+              Nusxa ko&apos;chirib, o&apos;z mavzuingizga moslashtiring:
             </p>
             <pre className="whitespace-pre-wrap rounded-lg border bg-muted/40 p-3 text-xs leading-relaxed text-foreground">
               {EXAMPLE_PROMPT}

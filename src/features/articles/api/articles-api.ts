@@ -21,6 +21,40 @@ type FeedQuery = {
   limit?: number;
 };
 
+function updateCommentInTree(
+  comments: ArticleComment[],
+  commentId: string,
+  updater: (comment: ArticleComment) => ArticleComment,
+): ArticleComment[] {
+  return comments.map((comment) => {
+    if (comment.id === commentId) {
+      return updater(comment);
+    }
+
+    if (comment.replies?.length) {
+      return {
+        ...comment,
+        replies: updateCommentInTree(comment.replies, commentId, updater),
+      };
+    }
+
+    return comment;
+  });
+}
+
+function patchCommentLike(
+  draft: ArticleCommentsResponse,
+  commentId: string,
+  liked: boolean,
+  likeCount: number,
+) {
+  draft.comments = updateCommentInTree(draft.comments, commentId, (comment) => ({
+    ...comment,
+    likedByMe: liked,
+    likeCount,
+  }));
+}
+
 export const articlesApi = baseApi.injectEndpoints({
   endpoints: (builder) => ({
     listMyArticles: builder.query<
@@ -200,8 +234,65 @@ export const articlesApi = baseApi.injectEndpoints({
         url: `/articles/${articleId}/comments/${commentId}/like`,
         method: "POST",
       }),
+      async onQueryStarted({ articleId, commentId }, { dispatch, queryFulfilled, getState }) {
+        const commentArgs = { articleId };
+        const cached = articlesApi.endpoints.getArticleComments.select(commentArgs)(
+          getState(),
+        ).data;
+
+        let nextLiked = true;
+        let nextCount = 1;
+
+        if (cached) {
+          const findComment = (
+            comments: ArticleComment[],
+          ): ArticleComment | undefined => {
+            for (const comment of comments) {
+              if (comment.id === commentId) return comment;
+              if (comment.replies?.length) {
+                const nested = findComment(comment.replies);
+                if (nested) return nested;
+              }
+            }
+            return undefined;
+          };
+
+          const target = findComment(cached.comments);
+          if (target) {
+            nextLiked = !target.likedByMe;
+            nextCount = Math.max(
+              0,
+              (target.likeCount ?? 0) + (nextLiked ? 1 : -1),
+            );
+          }
+        }
+
+        const patchResult = dispatch(
+          articlesApi.util.updateQueryData(
+            "getArticleComments",
+            commentArgs,
+            (draft) => {
+              patchCommentLike(draft, commentId, nextLiked, nextCount);
+            },
+          ),
+        );
+
+        try {
+          const { data } = await queryFulfilled;
+          dispatch(
+            articlesApi.util.updateQueryData(
+              "getArticleComments",
+              commentArgs,
+              (draft) => {
+                patchCommentLike(draft, commentId, data.liked, data.likeCount);
+              },
+            ),
+          );
+        } catch {
+          patchResult.undo();
+        }
+      },
       invalidatesTags: (_r, _e, { articleId }) => [
-        { type: "Comment", id: articleId },
         { type: "Comment", id: "POPULAR" },
       ],
     }),

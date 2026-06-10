@@ -42,7 +42,7 @@ export function NotificationPopover() {
 
   const { data: unreadData } = useGetUnreadNotificationCountQuery(undefined, {
     skip: !isActive,
-    pollingInterval: 60_000,
+    pollingInterval: 30_000,
   });
   const [fetchNotifications] = useLazyGetNotificationsQuery();
   const [markRead] = useMarkNotificationReadMutation();

@@ -1,3 +1,4 @@
+import { Suspense } from "react";
 import { AdminPanel } from "@/components/admin/admin-panel";
 import { buildPageMetadata } from "@/lib/seo/metadata";
 
@@ -9,5 +10,9 @@ export const metadata = buildPageMetadata({
 });
 
 export default function AdminPage() {
-  return <AdminPanel />;
+  return (
+    <Suspense fallback={null}>
+      <AdminPanel />
+    </Suspense>
+  );
 }

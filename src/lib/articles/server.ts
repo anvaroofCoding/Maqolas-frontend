@@ -1,6 +1,7 @@
 import { cache } from "react";
 import { env } from "@/config/env";
 import type { ArticleFeedResponse, ArticleSummary } from "@/features/articles/types";
+import type { CategoriesResponse } from "@/features/categories/types";
 import { ARTICLE_FEED_PAGE_SIZE } from "@/lib/articles/constants";
 
 type FeedParams = {
@@ -77,6 +78,15 @@ export const fetchArticleBySlug = cache(
     return data?.article ?? null;
   },
 );
+
+export const fetchCategories = cache(async () => {
+  const data = await fetchJson<CategoriesResponse>(
+    `${env.NEXT_PUBLIC_API_URL}/categories`,
+    60,
+  );
+
+  return data?.categories ?? [];
+});
 
 export async function fetchSitemapEntries(): Promise<SitemapEntry[]> {
   const data = await fetchJson<{ entries: SitemapEntry[] }>(

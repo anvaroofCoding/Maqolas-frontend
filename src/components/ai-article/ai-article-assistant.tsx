@@ -54,6 +54,7 @@ export function useAiArticle() {
 const POLL_INTERVAL_MS = 2000;
 const MIN_PROMPT_LENGTH = 20;
 const MAX_PROMPT_WORDS = 1000;
+const MAX_ARTICLE_WORDS = 5000;
 
 function isJobActive(job: AiArticleJob | null | undefined) {
   return job?.status === "pending" || job?.status === "processing";
@@ -317,7 +318,8 @@ export function AiArticleAssistant() {
                   <div>
                     <p className="text-sm font-semibold">AI maqola yordamchisi</p>
                     <p className="text-xs text-muted-foreground">
-                      Mavzuni yozing — AI maqolani tayyorlab beradi
+                      Mavzuni yozing — AI tayyor professional maqola yozadi (
+                      {MAX_ARTICLE_WORDS.toLocaleString()} so&apos;zgacha)
                     </p>
                   </div>
                 </div>

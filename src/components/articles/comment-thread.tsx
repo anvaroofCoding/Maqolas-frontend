@@ -208,9 +208,10 @@ function CommentItem({
               className={cn(
                 "h-8 gap-1 rounded-full px-2.5 text-xs",
                 comment.likedByMe
-                  ? "text-nav-active"
+                  ? "text-nav-active hover:bg-transparent hover:text-nav-active"
                   : "text-muted-foreground",
               )}
+              aria-pressed={comment.likedByMe}
               onClick={() => {
                 if (!isLoggedIn) {
                   onRequireAuth();
@@ -222,7 +223,7 @@ function CommentItem({
               <Heart
                 className={cn(
                   "size-3.5",
-                  comment.likedByMe && "fill-nav-active",
+                  comment.likedByMe && "fill-nav-active text-nav-active",
                 )}
               />
               <span className="tabular-nums">

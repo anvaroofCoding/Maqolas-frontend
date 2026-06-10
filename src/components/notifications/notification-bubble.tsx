@@ -1,11 +1,16 @@
 "use client";
 
 import {
+  AlertTriangleIcon,
+  BadgeCheckIcon,
   CheckCircle2Icon,
   HeartIcon,
+  LightbulbIcon,
   MessageSquareIcon,
   ReplyIcon,
+  ShieldCheckIcon,
   UserPlusIcon,
+  UsersIcon,
   XCircleIcon,
 } from "lucide-react";
 import Link from "next/link";
@@ -22,6 +27,11 @@ const typeIcons = {
   user_followed: UserPlusIcon,
   article_approved: CheckCircle2Icon,
   article_rejected: XCircleIcon,
+  admin_article_review: ShieldCheckIcon,
+  admin_topic_suggestion: LightbulbIcon,
+  admin_welcome_promo_comment: BadgeCheckIcon,
+  admin_comment_report: AlertTriangleIcon,
+  admin_new_user: UsersIcon,
 } as const;
 
 interface NotificationBubbleProps {
@@ -64,11 +74,14 @@ export function NotificationBubble({
             <Icon
               className={cn(
                 "mt-0.5 size-3.5 shrink-0",
-                notification.type === "article_rejected"
+                notification.type === "article_rejected" ||
+                notification.type === "admin_comment_report"
                   ? "text-destructive"
                   : notification.type === "article_approved"
                     ? "text-emerald-600 dark:text-emerald-400"
-                    : "text-nav-active",
+                    : notification.type.startsWith("admin_")
+                      ? "text-amber-600 dark:text-amber-400"
+                      : "text-nav-active",
               )}
               aria-hidden
             />

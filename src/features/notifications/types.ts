@@ -6,7 +6,12 @@ export type NotificationType =
   | "comment_replied"
   | "user_followed"
   | "article_approved"
-  | "article_rejected";
+  | "article_rejected"
+  | "admin_article_review"
+  | "admin_topic_suggestion"
+  | "admin_welcome_promo_comment"
+  | "admin_comment_report"
+  | "admin_new_user";
 
 export interface NotificationItem {
   id: string;

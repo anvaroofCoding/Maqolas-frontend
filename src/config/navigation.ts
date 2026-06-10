@@ -12,6 +12,7 @@ import {
   MessageCircleIcon,
   NewspaperIcon,
   PaletteIcon,
+  TagIcon,
   ThumbsUpIcon,
 } from "lucide-react";
 
@@ -19,6 +20,11 @@ export type NavItem = {
   label: string;
   href: string;
   icon: LucideIcon;
+};
+
+export type TopicSource = {
+  name: string;
+  slug: string;
 };
 
 export function isMainNavActive(pathname: string, href: string): boolean {
@@ -35,23 +41,35 @@ export const mainNavItems: NavItem[] = [
   { label: "Mening maqolam", href: "/lenta", icon: NewspaperIcon },
 ];
 
-function sortTopicsAlphabetically(items: NavItem[]): NavItem[] {
+const topicIconBySlug: Record<string, LucideIcon> = {
+  texnologiya: CpuIcon,
+  startaplar: LayersIcon,
+  ai: BotIcon,
+  marketing: MegaphoneIcon,
+  mahsulot: PaletteIcon,
+  tahlil: BarChart3Icon,
+  karyera: BriefcaseIcon,
+  fikr: MessageCircleIcon,
+  talim: BookOpenIcon,
+  moliya: BanknoteIcon,
+};
+
+export function getTopicIcon(slug: string): LucideIcon {
+  return topicIconBySlug[slug.toLowerCase()] ?? TagIcon;
+}
+
+export function sortTopicsAlphabetically<T extends { name: string }>(
+  items: T[],
+): T[] {
   return [...items].sort((a, b) =>
-    a.label.localeCompare(b.label, "uz", { sensitivity: "base" }),
+    a.name.localeCompare(b.name, "uz", { sensitivity: "base" }),
   );
 }
 
-const topicNavItemsSource: NavItem[] = [
-  { label: "Texnologiya", href: "/mavzu/texnologiya", icon: CpuIcon },
-  { label: "Startaplar", href: "/mavzu/startaplar", icon: LayersIcon },
-  { label: "AI", href: "/mavzu/ai", icon: BotIcon },
-  { label: "Marketing", href: "/mavzu/marketing", icon: MegaphoneIcon },
-  { label: "Mahsulot", href: "/mavzu/mahsulot", icon: PaletteIcon },
-  { label: "Tahlil", href: "/mavzu/tahlil", icon: BarChart3Icon },
-  { label: "Karyera", href: "/mavzu/karyera", icon: BriefcaseIcon },
-  { label: "Fikr", href: "/mavzu/fikr", icon: MessageCircleIcon },
-  { label: "Ta'lim", href: "/mavzu/talim", icon: BookOpenIcon },
-  { label: "Moliya", href: "/mavzu/moliya", icon: BanknoteIcon },
-];
-
-export const topicNavItems = sortTopicsAlphabetically(topicNavItemsSource);
+export function categoriesToNavItems(categories: TopicSource[]): NavItem[] {
+  return sortTopicsAlphabetically(categories).map((category) => ({
+    label: category.name,
+    href: `/mavzu/${category.slug}`,
+    icon: getTopicIcon(category.slug),
+  }));
+}

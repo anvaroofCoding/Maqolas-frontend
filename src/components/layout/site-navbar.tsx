@@ -5,6 +5,7 @@ import Link from "next/link";
 import { NotificationPopover } from "@/components/notifications/notification-popover";
 import { ArticleSearchTrigger } from "@/components/layout/article-search-trigger";
 import { ProfileMenu } from "@/components/layout/profile-menu";
+import { PromoReaderTrigger } from "@/components/promo-reader/promo-reader-trigger";
 import { ThemeToggle } from "@/components/layout/theme-toggle";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -45,6 +46,7 @@ export function SiteNavbar() {
           className="flex items-center gap-0.5 sm:gap-1"
           aria-label="Asosiy navigatsiya"
         >
+          <PromoReaderTrigger />
           <ThemeToggle className={navIconButtonClass} />
 
           <ArticleSearchTrigger />

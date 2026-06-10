@@ -20,7 +20,7 @@ import {
   XCircle,
 } from "lucide-react";
 import Link from "next/link";
-import { useRouter } from "next/navigation";
+import { usePathname, useRouter, useSearchParams } from "next/navigation";
 import { useEffect, useState } from "react";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -1875,8 +1875,28 @@ function UsersPanel() {
   );
 }
 
+const ADMIN_TABS = [
+  "review",
+  "topic-suggestions",
+  "published",
+  "categories",
+  "banners",
+  "welcome-promo",
+  "comments",
+  "reports",
+  "users",
+] as const;
+
+type AdminTab = (typeof ADMIN_TABS)[number];
+
+function isAdminTab(value: string | null): value is AdminTab {
+  return Boolean(value && ADMIN_TABS.includes(value as AdminTab));
+}
+
 export function AdminPanel() {
   const router = useRouter();
+  const pathname = usePathname();
+  const searchParams = useSearchParams();
   const accessToken = useAppSelector((state) => state.auth.accessToken);
   const user = useAppSelector((state) => state.auth.user);
   const [mounted, setMounted] = useState(false);
@@ -1887,6 +1907,15 @@ export function AdminPanel() {
 
   const activeUser = meData?.user ?? user;
   const isSuperAdmin = activeUser?.role === "super_admin";
+  const tabParam = searchParams.get("tab");
+  const activeTab: AdminTab = isAdminTab(tabParam) ? tabParam : "review";
+
+  const handleTabChange = (value: string) => {
+    if (!isAdminTab(value)) return;
+    const params = new URLSearchParams(searchParams.toString());
+    params.set("tab", value);
+    router.replace(`${pathname}?${params.toString()}`);
+  };
 
   useEffect(() => setMounted(true), []);
 
@@ -1932,7 +1961,7 @@ export function AdminPanel() {
         </Button>
       </div>
 
-      <Tabs defaultValue="review" className="gap-6">
+      <Tabs value={activeTab} onValueChange={handleTabChange} className="gap-6">
         <TabsList className="h-auto w-full flex-wrap justify-start gap-1 p-1">
           <TabsTrigger value="review" className="gap-2">
             <CheckCircle2 className="size-4" />

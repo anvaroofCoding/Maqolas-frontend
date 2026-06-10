@@ -3,6 +3,7 @@ import { notFound } from "next/navigation";
 import { ArticleDetailBody } from "@/components/articles/article-detail-body";
 import { ArticleDetailHeader } from "@/components/articles/article-detail-header";
 import { ArticleEngagement } from "@/components/articles/article-engagement";
+import { PromoAutoScrollActivator } from "@/components/promo-reader/promo-auto-scroll-activator";
 import { JsonLdScript } from "@/components/seo/json-ld-script";
 import { stripArticleLeadFromHtml } from "@/lib/articles/content";
 import { fetchArticleBySlug } from "@/lib/articles/server";
@@ -92,6 +93,8 @@ export default async function ArticleDetailPage({ params }: ArticlePageProps) {
   ];
 
   return (
+    <>
+    <PromoAutoScrollActivator />
     <main className="mx-auto w-full max-w-3xl px-4 py-6 sm:px-6 sm:py-8 lg:px-8">
       <JsonLdScript
         data={[
@@ -155,5 +158,6 @@ export default async function ArticleDetailPage({ params }: ArticlePageProps) {
         </footer>
       </article>
     </main>
+    </>
   );
 }

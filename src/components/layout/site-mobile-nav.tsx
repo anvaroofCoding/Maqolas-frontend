@@ -1,14 +1,17 @@
 "use client";
 
 import { usePathname } from "next/navigation";
+import { useTopicNavItems } from "@/components/layout/use-topic-nav-items";
 import { FeedTab, TopicPill } from "@/components/layout/nav-menu-styles";
-import { isMainNavActive, mainNavItems, topicNavItems } from "@/config/navigation";
+import { isMainNavActive, mainNavItems } from "@/config/navigation";
+import { Skeleton } from "@/components/ui/skeleton";
 import { cn } from "@/lib/utils";
 
 const allTopicsHref = "/";
 
 export function SiteMobileNav() {
   const pathname = usePathname();
+  const { topicNavItems, isLoading } = useTopicNavItems();
 
   const isTopicActive = (href: string) => {
     if (href === allTopicsHref) {
@@ -35,14 +38,20 @@ export function SiteMobileNav() {
           label="Barchasi"
           isActive={isTopicActive(allTopicsHref)}
         />
-        {topicNavItems.map((item) => (
-          <TopicPill
-            key={item.href}
-            href={item.href}
-            label={item.label}
-            isActive={isTopicActive(item.href)}
-          />
-        ))}
+        {isLoading ? (
+          Array.from({ length: 4 }).map((_, index) => (
+            <Skeleton key={index} className="h-8 w-20 shrink-0 rounded-full" />
+          ))
+        ) : (
+          topicNavItems.map((item) => (
+            <TopicPill
+              key={item.href}
+              href={item.href}
+              label={item.label}
+              isActive={isTopicActive(item.href)}
+            />
+          ))
+        )}
       </div>
 
       <div className="flex gap-5 px-4 pb-3">

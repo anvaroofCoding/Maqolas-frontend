@@ -2,9 +2,8 @@ import { connection } from "next/server";
 import { notFound } from "next/navigation";
 import { ArticleFeedWithPagination } from "@/components/articles/article-feed-with-pagination";
 import { JsonLdScript } from "@/components/seo/json-ld-script";
-import { topicNavItems } from "@/config/navigation";
 import { feedMainClassName } from "@/lib/layout";
-import { fetchArticleFeed } from "@/lib/articles/server";
+import { fetchArticleFeed, fetchCategories } from "@/lib/articles/server";
 import { buildTopicDescription } from "@/lib/seo/description";
 import {
   buildBreadcrumbJsonLd,
@@ -20,9 +19,14 @@ type TopicPageProps = {
 
 export const revalidate = 60;
 
+async function findTopicBySlug(slug: string) {
+  const categories = await fetchCategories();
+  return categories.find((category) => category.slug === slug) ?? null;
+}
+
 export async function generateMetadata({ params }: TopicPageProps) {
   const { slug } = await params;
-  const topic = topicNavItems.find((item) => item.href === `/mavzu/${slug}`);
+  const topic = await findTopicBySlug(slug);
 
   if (!topic) {
     return buildPageMetadata({
@@ -33,17 +37,17 @@ export async function generateMetadata({ params }: TopicPageProps) {
   }
 
   return buildPageMetadata({
-    title: `${topic.label} maqolalari`,
-    description: buildTopicDescription(topic.label),
+    title: `${topic.name} maqolalari`,
+    description: buildTopicDescription(topic.name),
     path: `/mavzu/${slug}`,
-    keywords: buildTopicKeywords(topic.label, slug),
+    keywords: buildTopicKeywords(topic.name, slug),
   });
 }
 
 export default async function TopicPage({ params }: TopicPageProps) {
   await connection();
   const { slug } = await params;
-  const topic = topicNavItems.find((item) => item.href === `/mavzu/${slug}`);
+  const topic = await findTopicBySlug(slug);
 
   if (!topic) {
     notFound();
@@ -58,13 +62,13 @@ export default async function TopicPage({ params }: TopicPageProps) {
     <main className={feedMainClassName}>
       <JsonLdScript
         data={[
-          buildTopicPageJsonLd(topic.label, slug),
+          buildTopicPageJsonLd(topic.name, slug),
           buildBreadcrumbJsonLd([
             { name: "Bosh sahifa", path: "/" },
-            { name: `${topic.label} maqolalari`, path: `/mavzu/${slug}` },
+            { name: `${topic.name} maqolalari`, path: `/mavzu/${slug}` },
           ]),
           buildItemListJsonLd(
-            `${topic.label} maqolalari`,
+            `${topic.name} maqolalari`,
             `/mavzu/${slug}`,
             feed.articles,
           ),
@@ -74,8 +78,8 @@ export default async function TopicPage({ params }: TopicPageProps) {
         feed={feed}
         sort="popular"
         category={slug}
-        title={`${topic.label} maqolalari`}
-        emptyMessage={`${topic.label} bo'yicha hozircha maqolalar yo'q.`}
+        title={`${topic.name} maqolalari`}
+        emptyMessage={`${topic.name} bo'yicha hozircha maqolalar yo'q.`}
       />
     </main>
   );

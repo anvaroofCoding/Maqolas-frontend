@@ -3,8 +3,10 @@
 import type { LucideIcon } from "lucide-react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { isMainNavActive, mainNavItems, topicNavItems } from "@/config/navigation";
+import { useTopicNavItems } from "@/components/layout/use-topic-nav-items";
+import { isMainNavActive, mainNavItems } from "@/config/navigation";
 import { Button } from "@/components/ui/button";
+import { Skeleton } from "@/components/ui/skeleton";
 import { sidebarWidthClass } from "@/lib/layout";
 import { cn } from "@/lib/utils";
 
@@ -48,6 +50,7 @@ function SidebarNavItem({
 
 export function SiteSidebar() {
   const pathname = usePathname();
+  const { topicNavItems, isLoading } = useTopicNavItems();
 
   const isActive = (href: string) => {
     if (href.startsWith("/mavzu/")) {
@@ -74,13 +77,23 @@ export function SiteSidebar() {
           Mavzular
         </p>
 
-        {topicNavItems.map((item) => (
-          <SidebarNavItem
-            key={item.href}
-            {...item}
-            isActive={isActive(item.href)}
-          />
-        ))}
+        {isLoading ? (
+          Array.from({ length: 6 }).map((_, index) => (
+            <Skeleton key={index} className="mx-3 h-10 rounded-lg" />
+          ))
+        ) : topicNavItems.length === 0 ? (
+          <p className="px-3 text-xs text-muted-foreground">
+            Hozircha mavzular yo&apos;q.
+          </p>
+        ) : (
+          topicNavItems.map((item) => (
+            <SidebarNavItem
+              key={item.href}
+              {...item}
+              isActive={isActive(item.href)}
+            />
+          ))
+        )}
       </nav>
     </aside>
   );
