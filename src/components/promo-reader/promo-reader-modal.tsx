@@ -290,14 +290,6 @@ export function PromoReaderModal({ open, onOpenChange }: PromoReaderModalProps) 
               <p className="line-clamp-2 text-sm leading-relaxed text-muted-foreground">
                 {getExcerpt(displayArticle)}
               </p>
-              {isSelected && phase === "selected" ? (
-                <p
-                  className="pt-1 text-xs font-medium animate-pulse"
-                  style={{ color: borderColors[0] ?? "var(--nav-active)" }}
-                >
-                  O&apos;qishga kirilmoqda...
-                </p>
-              ) : null}
             </div>
           </div>
 
