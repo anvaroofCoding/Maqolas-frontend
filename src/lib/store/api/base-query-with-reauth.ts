@@ -5,6 +5,7 @@ import {
   type FetchBaseQueryError,
 } from "@reduxjs/toolkit/query/react";
 import { env } from "@/config/env";
+import { isTokenExpired } from "@/lib/auth/token";
 import {
   clearCredentials,
   getAccessToken,
@@ -49,11 +50,70 @@ async function requestTokenRefresh(): Promise<AuthTokensPayload | null> {
   return (await response.json()) as AuthTokensPayload;
 }
 
+async function refreshSession(
+  api: Parameters<BaseQueryFn>[1],
+): Promise<boolean> {
+  if (!refreshPromise) {
+    refreshPromise = requestTokenRefresh().finally(() => {
+      refreshPromise = null;
+    });
+  }
+
+  const tokens = await refreshPromise;
+  if (!tokens) {
+    api.dispatch(clearCredentials());
+    return false;
+  }
+
+  api.dispatch(setSessionTokens(tokens));
+
+  const { baseApi } = await import("@/lib/store/api/base-api");
+  api.dispatch(baseApi.util.invalidateTags(["UserProfile", "AuthUser"]));
+
+  return true;
+}
+
+async function ensureFreshAccessToken(
+  api: Parameters<BaseQueryFn>[1],
+): Promise<boolean> {
+  const accessToken = getAccessToken();
+  if (!accessToken) return false;
+  if (!isTokenExpired(accessToken)) return true;
+
+  const refreshToken = getRefreshToken();
+  if (!refreshToken) {
+    api.dispatch(clearCredentials());
+    return false;
+  }
+
+  return refreshSession(api);
+}
+
 export const baseQueryWithReauth: BaseQueryFn<
   string | FetchArgs,
   unknown,
   FetchBaseQueryError
 > = async (args, api, extraOptions) => {
+  const requestUrl =
+    typeof args === "string" ? args : args.url?.toString() ?? "";
+
+  const isAuthEndpoint =
+    requestUrl.includes("/auth/refresh") ||
+    requestUrl.includes("/auth/logout") ||
+    requestUrl.includes("/auth/google");
+
+  if (!isAuthEndpoint && getAccessToken()) {
+    const hasValidToken = await ensureFreshAccessToken(api);
+    if (!hasValidToken && !getAccessToken()) {
+      return {
+        error: {
+          status: 401,
+          data: { message: "Sessiya tugagan" },
+        },
+      };
+    }
+  }
+
   let result = await rawBaseQuery(args, api, extraOptions);
 
   if (result.error?.status === 403) {
@@ -75,31 +135,19 @@ export const baseQueryWithReauth: BaseQueryFn<
     return result;
   }
 
-  const requestUrl =
-    typeof args === "string" ? args : args.url?.toString() ?? "";
+  if (requestUrl.includes("/auth/logout")) {
+    return result;
+  }
 
   if (requestUrl.includes("/auth/refresh")) {
     api.dispatch(clearCredentials());
     return result;
   }
 
-  if (!refreshPromise) {
-    refreshPromise = requestTokenRefresh().finally(() => {
-      refreshPromise = null;
-    });
-  }
-
-  const tokens = await refreshPromise;
-
-  if (!tokens) {
-    api.dispatch(clearCredentials());
+  const refreshed = await refreshSession(api);
+  if (!refreshed) {
     return result;
   }
-
-  api.dispatch(setSessionTokens(tokens));
-
-  const { baseApi } = await import("@/lib/store/api/base-api");
-  api.dispatch(baseApi.util.invalidateTags(["UserProfile"]));
 
   return rawBaseQuery(args, api, extraOptions);
 };

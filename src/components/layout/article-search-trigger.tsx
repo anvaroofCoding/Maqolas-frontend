@@ -9,8 +9,15 @@ import { cn } from "@/lib/utils";
 
 export function ArticleSearchTrigger() {
   const [open, setOpen] = useState(false);
+  const [mounted, setMounted] = useState(false);
 
   useEffect(() => {
+    setMounted(true);
+  }, []);
+
+  useEffect(() => {
+    if (!mounted) return;
+
     const handleKeyDown = (event: KeyboardEvent) => {
       if ((event.metaKey || event.ctrlKey) && event.key.toLowerCase() === "k") {
         event.preventDefault();
@@ -20,7 +27,7 @@ export function ArticleSearchTrigger() {
 
     window.addEventListener("keydown", handleKeyDown);
     return () => window.removeEventListener("keydown", handleKeyDown);
-  }, []);
+  }, [mounted]);
 
   return (
     <>
@@ -35,7 +42,9 @@ export function ArticleSearchTrigger() {
         <SearchIcon />
       </Button>
 
-      <ArticleSearchDialog open={open} onOpenChange={setOpen} />
+      {mounted ? (
+        <ArticleSearchDialog open={open} onOpenChange={setOpen} />
+      ) : null}
     </>
   );
 }

@@ -1,6 +1,10 @@
 import type { MetadataRoute } from "next";
 import { siteConfig } from "@/config/site";
-import { fetchCategories, fetchSitemapEntries } from "@/lib/articles/server";
+import {
+  fetchCategories,
+  fetchProfileSitemapEntries,
+  fetchSitemapEntries,
+} from "@/lib/articles/server";
 
 const STATIC_ROUTES: Array<{
   path: string;
@@ -18,8 +22,9 @@ const STATIC_ROUTES: Array<{
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   const base = siteConfig.url.replace(/\/$/, "");
   const now = new Date();
-  const [articleEntries, categories] = await Promise.all([
+  const [articleEntries, profileEntries, categories] = await Promise.all([
     fetchSitemapEntries(),
+    fetchProfileSitemapEntries(),
     fetchCategories(),
   ]);
 
@@ -44,5 +49,12 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     priority: 0.85,
   }));
 
-  return [...staticPages, ...topicPages, ...articlePages];
+  const profilePages: MetadataRoute.Sitemap = profileEntries.map((entry) => ({
+    url: `${base}/profil/${entry.username}`,
+    lastModified: new Date(entry.updatedAt),
+    changeFrequency: "weekly",
+    priority: 0.75,
+  }));
+
+  return [...staticPages, ...topicPages, ...articlePages, ...profilePages];
 }

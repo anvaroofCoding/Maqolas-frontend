@@ -64,7 +64,11 @@ export function AppShell({ children }: { children: React.ReactNode }) {
   }
 
   if (isEditorRoute) {
-    return <div className="min-h-[calc(100vh-3.5rem)]">{children}</div>;
+    return (
+      <SiteContainer className="min-h-[calc(100vh-3.5rem)]">
+        {children}
+      </SiteContainer>
+    );
   }
 
   return (

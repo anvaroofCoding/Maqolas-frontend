@@ -19,6 +19,7 @@ import { extractTitleFromJson } from "@/lib/editor/extract-title";
 import { fetchAiSuggestion } from "@/lib/editor/fetch-ai-suggestion";
 import { toast } from "@/lib/toast";
 import { useAppSelector } from "@/lib/store/hooks";
+import { articleSurfaceClassName } from "@/lib/layout";
 import { cn } from "@/lib/utils";
 
 const writeButtonClass =
@@ -204,7 +205,7 @@ export function ArticleEditor({
           "flex w-full flex-1 flex-col",
           focusMode
             ? "h-full min-h-0 max-w-none px-4 py-3"
-            : "mx-auto max-w-4xl px-4 py-6 sm:px-6",
+            : articleSurfaceClassName,
         )}
       >
         <div

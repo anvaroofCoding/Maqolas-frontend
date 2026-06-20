@@ -81,7 +81,7 @@ export function PublicProfileHeader({
           />
         </div>
 
-        <p className="truncate text-sm text-muted-foreground">{user.email}</p>
+        <p className="text-sm text-muted-foreground">@{user.username}</p>
 
         {user.bio ? (
           <p className="text-sm break-words text-foreground/80">{user.bio}</p>

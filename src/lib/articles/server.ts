@@ -1,6 +1,7 @@
 import { cache } from "react";
 import { env } from "@/config/env";
-import type { ArticleFeedResponse, ArticleSummary } from "@/features/articles/types";
+import type { ArticleFeedResponse, ArticleSummary, HomepageLayoutResponse } from "@/features/articles/types";
+import type { UserSocialLinks } from "@/features/auth/types";
 import type { CategoriesResponse } from "@/features/categories/types";
 import { ARTICLE_FEED_PAGE_SIZE } from "@/lib/articles/constants";
 
@@ -21,7 +22,15 @@ export type PublicProfileSummary = {
   username: string;
   bio?: string;
   avatarUrl?: string;
+  social?: UserSocialLinks;
   articlesCount: number;
+  followersCount: number;
+  updatedAt?: string;
+};
+
+export type ProfileSitemapEntry = {
+  username: string;
+  updatedAt: string;
 };
 
 async function fetchJson<T>(url: string, revalidate = 60): Promise<T | null> {
@@ -38,6 +47,40 @@ async function fetchJson<T>(url: string, revalidate = 60): Promise<T | null> {
   } catch {
     return null;
   }
+}
+
+export async function fetchHomepageLayout(): Promise<HomepageLayoutResponse> {
+  const data = await fetchJson<HomepageLayoutResponse>(
+    `${env.NEXT_PUBLIC_API_URL}/articles/homepage`,
+    30,
+  );
+
+  return (
+    data ?? {
+      algorithm: "popular",
+      layout: {
+        hero: null,
+        leftLead: [],
+        centerList: [],
+        editorChoice: null,
+        centerFill: [],
+        latest: [],
+        urgentLead: null,
+        urgentGrid: [],
+        showcase: [],
+        lowerGrid: [],
+      },
+      feed: {
+        articles: [],
+        pagination: {
+          page: 1,
+          limit: ARTICLE_FEED_PAGE_SIZE,
+          total: 0,
+          totalPages: 1,
+        },
+      },
+    }
+  );
 }
 
 export async function fetchArticleFeed(
@@ -97,6 +140,15 @@ export async function fetchSitemapEntries(): Promise<SitemapEntry[]> {
   return data?.entries ?? [];
 }
 
+export async function fetchProfileSitemapEntries(): Promise<ProfileSitemapEntry[]> {
+  const data = await fetchJson<{ entries: ProfileSitemapEntry[] }>(
+    `${env.NEXT_PUBLIC_API_URL}/users/sitemap`,
+    300,
+  );
+
+  return data?.entries ?? [];
+}
+
 export const fetchPublicProfile = cache(
   async (username: string): Promise<PublicProfileSummary | null> => {
     const data = await fetchJson<{
@@ -105,8 +157,10 @@ export const fetchPublicProfile = cache(
         username: string;
         bio?: string;
         avatarUrl?: string;
+        social?: UserSocialLinks;
+        updatedAt?: string;
       };
-      stats: { articlesCount: number };
+      stats: { articlesCount: number; followersCount: number };
     }>(
       `${env.NEXT_PUBLIC_API_URL}/users/${encodeURIComponent(username.toLowerCase())}`,
     );
@@ -120,7 +174,21 @@ export const fetchPublicProfile = cache(
       username: data.user.username,
       bio: data.user.bio,
       avatarUrl: data.user.avatarUrl,
+      social: data.user.social,
       articlesCount: data.stats.articlesCount,
+      followersCount: data.stats.followersCount,
+      updatedAt: data.user.updatedAt,
     };
+  },
+);
+
+export const fetchPublicProfileArticles = cache(
+  async (username: string, limit = 10): Promise<ArticleSummary[]> => {
+    const data = await fetchJson<{ articles: ArticleSummary[] }>(
+      `${env.NEXT_PUBLIC_API_URL}/users/${encodeURIComponent(username.toLowerCase())}/articles?page=1&limit=${limit}`,
+      60,
+    );
+
+    return data?.articles ?? [];
   },
 );

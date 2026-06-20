@@ -9,7 +9,7 @@ import { buildPageMetadata } from "@/lib/seo/metadata";
 export const metadata = buildPageMetadata({
   title: "Yangi maqolalar",
   description:
-    "Eng so'nggi nashr etilgan o'zbekcha maqolalar va yangiliklar. Maqolas platformasida har kuni yangi maqolalar.",
+    "Eng so'nggi nashr etilgan o'zbekcha maqolalar va yangiliklar. Maqolas platformasida o'qing yoki maqolalaringizni yozing.",
   path: "/yangi",
   keywords: [
     "yangi maqolalar",

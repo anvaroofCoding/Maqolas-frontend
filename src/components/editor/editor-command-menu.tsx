@@ -3,6 +3,7 @@
 import type { Editor } from "@tiptap/react";
 import {
   AlertTriangleIcon,
+  Columns2Icon,
   CodeIcon,
   Heading1Icon,
   Heading2Icon,
@@ -44,6 +45,7 @@ type CommandItem = {
 interface EditorCommandMenuProps {
   editor: Editor | null;
   onImageClick?: () => void;
+  onImageRowClick?: () => void;
   open?: boolean;
   onOpenChange?: (open: boolean) => void;
   showTrigger?: boolean;
@@ -61,7 +63,10 @@ function insertCallout(editor: Editor, variant: CalloutVariant) {
     .run();
 }
 
-function buildCommands(onImageClick: () => void): CommandItem[] {
+function buildCommands(
+  onImageClick: () => void,
+  onImageRowClick: () => void,
+): CommandItem[] {
   return [
     {
       id: "h1",
@@ -187,12 +192,20 @@ function buildCommands(onImageClick: () => void): CommandItem[] {
       icon: <ImageIcon className="size-4" />,
       run: () => onImageClick(),
     },
+    {
+      id: "image-row",
+      label: "Yonma-yon rasmlar",
+      keywords: ["image", "rasm", "row", "yonma", "galereya"],
+      icon: <Columns2Icon className="size-4" />,
+      run: () => onImageRowClick(),
+    },
   ];
 }
 
 export function EditorCommandMenu({
   editor,
   onImageClick,
+  onImageRowClick,
   open: controlledOpen,
   onOpenChange,
   showTrigger = true,
@@ -206,8 +219,12 @@ export function EditorCommandMenu({
   const setOpen = onOpenChange ?? setInternalOpen;
 
   const commands = useMemo(
-    () => buildCommands(() => onImageClick?.()),
-    [onImageClick],
+    () =>
+      buildCommands(
+        () => onImageClick?.(),
+        () => onImageRowClick?.(),
+      ),
+    [onImageClick, onImageRowClick],
   );
 
   const filtered = useMemo(() => {

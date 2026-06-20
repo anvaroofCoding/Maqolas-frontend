@@ -23,6 +23,7 @@ export interface Article {
   status: ArticleStatus;
   excerpt?: string;
   coverImageUrl?: string;
+  imageUrls?: string[];
   viewCount?: number;
   likeCount?: number;
   commentCount?: number;
@@ -66,7 +67,13 @@ export interface MyArticlesResponse {
   };
 }
 
-export type ArticleSummary = Omit<Article, "contentJson" | "authorId" | "status">;
+export type ArticleSummary = Omit<
+  Article,
+  "contentJson" | "authorId" | "status" | "contentHtml"
+> & {
+  contentHtml?: string;
+  previewText?: string;
+};
 
 export interface ArticleFeedResponse {
   articles: ArticleSummary[];
@@ -76,6 +83,25 @@ export interface ArticleFeedResponse {
     total: number;
     totalPages: number;
   };
+}
+
+export interface HomepageLayout {
+  hero: ArticleSummary | null;
+  leftLead: ArticleSummary[];
+  centerList: ArticleSummary[];
+  editorChoice: ArticleSummary | null;
+  centerFill: ArticleSummary[];
+  latest: ArticleSummary[];
+  urgentLead: ArticleSummary | null;
+  urgentGrid: ArticleSummary[];
+  showcase: ArticleSummary[];
+  lowerGrid: ArticleSummary[];
+}
+
+export interface HomepageLayoutResponse {
+  algorithm: "popular" | "forYou";
+  layout: HomepageLayout;
+  feed: ArticleFeedResponse;
 }
 
 export interface ArticleSearchResponse {

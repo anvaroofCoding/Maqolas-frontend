@@ -5,7 +5,7 @@ const UPDATED_AT = "8 iyun 2026";
 export const aboutPageContent = {
   title: "Dastur haqida",
   description:
-    "Maqolas — o‘zbek tilida sifatli maqolalar yozish, o‘qish va muhokama qilish uchun yaratilgan zamonaviy platforma.",
+    "Maqolas platformasida maqolalaringizni yozing. Yaratuvchi: Islomjon Anvarov (Full stack developer). Telegram: @rivoqchi.",
   updatedAt: UPDATED_AT,
   sections: [
     {
@@ -30,6 +30,13 @@ export const aboutPageContent = {
       title: "Kimlar uchun?",
       paragraphs: [
         "Dastur dasturchilar, yozuvchilar, talabalar, mutaxassislar va o‘z fikrini bo‘lishishni xohlaydigan har bir kishi uchun mos.",
+      ],
+    },
+    {
+      title: "Yaratuvchi",
+      paragraphs: [
+        "Maqolas platformasi Islomjon Anvarov tomonidan yaratilgan. Islomjon Anvarov — Full stack developer.",
+        "Bog'lanish: Telegram @rivoqchi (https://t.me/rivoqchi).",
       ],
     },
   ] satisfies LegalSection[],

@@ -1,5 +1,6 @@
 import { ImageResponse } from "next/og";
 import { siteConfig } from "@/config/site";
+import { BrandMark } from "@/lib/seo/brand-mark";
 
 export const runtime = "edge";
 export const alt = siteConfig.name;
@@ -22,57 +23,33 @@ export default function OpenGraphImage() {
           fontFamily: "system-ui, sans-serif",
         }}
       >
-        <div
-          style={{
-            display: "flex",
-            alignItems: "center",
-            gap: "16px",
-            fontSize: 36,
-            fontWeight: 700,
-            letterSpacing: "-0.02em",
-          }}
-        >
-          <div
-            style={{
-              width: 56,
-              height: 56,
-              borderRadius: 16,
-              background: "rgba(255,255,255,0.16)",
-              display: "flex",
-              alignItems: "center",
-              justifyContent: "center",
-              fontSize: 28,
-            }}
-          >
-            M
-          </div>
-          {siteConfig.name}
-        </div>
+        <BrandMark size={72} showName />
 
-        <div style={{ display: "flex", flexDirection: "column", gap: 24, maxWidth: 900 }}>
+        <div style={{ display: "flex", flexDirection: "column", gap: 24, maxWidth: 960 }}>
           <div
             style={{
-              fontSize: 58,
+              fontSize: 56,
               fontWeight: 700,
-              lineHeight: 1.1,
+              lineHeight: 1.12,
               letterSpacing: "-0.03em",
             }}
           >
-            O&apos;zbekcha maqolalar platformasi
+            {siteConfig.tagline}
           </div>
           <div
             style={{
-              fontSize: 30,
+              fontSize: 28,
               lineHeight: 1.45,
-              color: "rgba(255,255,255,0.82)",
+              color: "rgba(255,255,255,0.85)",
             }}
           >
             {siteConfig.description}
           </div>
         </div>
 
-        <div style={{ fontSize: 24, color: "rgba(255,255,255,0.65)" }}>
-          {siteConfig.host}
+        <div style={{ fontSize: 22, color: "rgba(255,255,255,0.7)" }}>
+          {siteConfig.creator.name} · {siteConfig.creator.role} ·{" "}
+          {siteConfig.creator.telegram}
         </div>
       </div>
     ),

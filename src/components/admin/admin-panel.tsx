@@ -47,6 +47,7 @@ import {
   useBanUserMutation,
   useCreateCategoryMutation,
   useDeleteCategoryMutation,
+  useDeletePublishedArticleMutation,
   useDeleteCommentsAdminMutation,
   useGetAdminCategoriesQuery,
   useGetPublishedArticlesQuery,
@@ -559,7 +560,10 @@ function CategoriesPanel() {
 function PublishedArticlesPanel() {
   const { data, isLoading, isFetching } = useGetPublishedArticlesQuery();
   const [togglePin] = useTogglePinArticleMutation();
+  const [deleteArticle, { isLoading: isDeleting }] =
+    useDeletePublishedArticleMutation();
   const [pinningId, setPinningId] = useState<string | null>(null);
+  const [pendingDeleteId, setPendingDeleteId] = useState<string | null>(null);
 
   const articles = data?.articles ?? [];
 
@@ -569,6 +573,18 @@ function PublishedArticlesPanel() {
       await togglePin({ id: articleId, isPinned: !isPinned }).unwrap();
     } finally {
       setPinningId(null);
+    }
+  }
+
+  async function handleDeleteArticle() {
+    if (!pendingDeleteId) return;
+
+    try {
+      await deleteArticle(pendingDeleteId).unwrap();
+      toast.success("Maqola o'chirildi");
+      setPendingDeleteId(null);
+    } catch {
+      toast.error("Maqolani o'chirishda xatolik");
     }
   }
 
@@ -648,6 +664,15 @@ function PublishedArticlesPanel() {
               </Button>
               <Button
                 size="sm"
+                variant="destructive"
+                disabled={pinningId !== null || isDeleting}
+                onClick={() => setPendingDeleteId(article.id)}
+              >
+                <Trash2 className="size-4" />
+                O&apos;chirish
+              </Button>
+              <Button
+                size="sm"
                 variant={article.isPinned ? "outline" : "default"}
                 disabled={pinningId !== null}
                 onClick={() =>
@@ -673,6 +698,44 @@ function PublishedArticlesPanel() {
           Yangilanmoqda...
         </p>
       ) : null}
+
+      <Dialog
+        open={pendingDeleteId !== null}
+        onOpenChange={(open) => {
+          if (!open) setPendingDeleteId(null);
+        }}
+      >
+        <DialogContent className="sm:max-w-md">
+          <DialogHeader>
+            <DialogTitle>Maqolani o&apos;chirish</DialogTitle>
+            <DialogDescription>
+              Bu amal maqolani saytdan olib tashlaydi. O&apos;chirilgan maqolani
+              qayta tiklash qiyin bo&apos;lishi mumkin.
+            </DialogDescription>
+          </DialogHeader>
+          <DialogFooter>
+            <Button
+              variant="outline"
+              onClick={() => setPendingDeleteId(null)}
+              disabled={isDeleting}
+            >
+              Bekor qilish
+            </Button>
+            <Button
+              variant="destructive"
+              onClick={() => void handleDeleteArticle()}
+              disabled={isDeleting}
+            >
+              {isDeleting ? (
+                <Loader2 className="size-4 animate-spin" />
+              ) : (
+                <Trash2 className="size-4" />
+              )}
+              O&apos;chirish
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 }

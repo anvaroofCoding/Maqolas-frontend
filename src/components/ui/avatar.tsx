@@ -4,6 +4,7 @@ import * as React from "react"
 import { Avatar as AvatarPrimitive } from "radix-ui"
 
 import { cn } from "@/lib/utils"
+import { resolveAvatarUrl } from "@/lib/user"
 
 function Avatar({
   className,
@@ -27,8 +28,12 @@ function Avatar({
 
 function AvatarImage({
   className,
+  src,
   ...props
 }: React.ComponentProps<typeof AvatarPrimitive.Image>) {
+  const resolvedSrc =
+    typeof src === "string" ? resolveAvatarUrl(src) : src;
+
   return (
     <AvatarPrimitive.Image
       data-slot="avatar-image"
@@ -37,6 +42,8 @@ function AvatarImage({
         className
       )}
       {...props}
+      src={resolvedSrc}
+      referrerPolicy="no-referrer"
     />
   )
 }

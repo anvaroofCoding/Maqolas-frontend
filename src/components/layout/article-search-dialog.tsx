@@ -13,7 +13,10 @@ import {
   CommandList,
 } from "@/components/ui/command";
 import { Skeleton } from "@/components/ui/skeleton";
-import { useLazySearchArticlesQuery } from "@/features/articles/api/articles-api";
+import {
+  useLazySearchArticlesQuery,
+  useListArticlesQuery,
+} from "@/features/articles/api/articles-api";
 import type { ArticleSummary } from "@/features/articles/types";
 import { getUserInitials } from "@/lib/user";
 
@@ -84,7 +87,13 @@ export function ArticleSearchDialog({
   const router = useRouter();
   const [query, setQuery] = useState("");
   const [debouncedQuery, setDebouncedQuery] = useState("");
-  const [searchArticles, { data, isFetching }] = useLazySearchArticlesQuery();
+  const { data: defaultArticlesData, isFetching: isDefaultFetching } =
+    useListArticlesQuery(
+      { sort: "popular", page: 1, limit: 10 },
+      { skip: !open },
+    );
+  const [searchArticles, { data: searchData, isFetching: isSearchFetching }] =
+    useLazySearchArticlesQuery();
 
   useEffect(() => {
     if (!open) {
@@ -116,16 +125,15 @@ export function ArticleSearchDialog({
     [onOpenChange, router],
   );
 
-  const articles = data?.articles ?? [];
-  const trimmedQuery = query.trim();
-  const showLoading =
-    debouncedQuery.length >= MIN_QUERY_LENGTH && isFetching;
-  const showHint =
-    trimmedQuery.length > 0 && trimmedQuery.length < MIN_QUERY_LENGTH;
+  const defaultArticles = defaultArticlesData?.articles ?? [];
+  const searchedArticles = searchData?.articles ?? [];
+  const isSearching = debouncedQuery.length >= MIN_QUERY_LENGTH;
+  const articles = isSearching ? searchedArticles : defaultArticles;
+  const showLoading = isSearching
+    ? isSearchFetching
+    : isDefaultFetching && defaultArticles.length === 0;
   const showEmpty =
-    debouncedQuery.length >= MIN_QUERY_LENGTH &&
-    !showLoading &&
-    articles.length === 0;
+    !showLoading && articles.length === 0;
 
   return (
     <CommandDialog
@@ -143,20 +151,16 @@ export function ArticleSearchDialog({
       <CommandList>
         {showLoading ? <SearchSkeletonList /> : null}
 
-        {!showLoading && trimmedQuery.length === 0 ? (
-          <CommandEmpty>Qidirish uchun matn yozing</CommandEmpty>
-        ) : null}
-
-        {!showLoading && showHint ? (
-          <CommandEmpty>Kamida {MIN_QUERY_LENGTH} ta belgi kiriting</CommandEmpty>
-        ) : null}
-
         {!showLoading && showEmpty ? (
-          <CommandEmpty>Mos maqola topilmadi</CommandEmpty>
+          <CommandEmpty>
+            {isSearching ? "Mos maqola topilmadi" : "Hozircha maqolalar topilmadi"}
+          </CommandEmpty>
         ) : null}
 
         {!showLoading && articles.length > 0 ? (
-          <CommandGroup heading="Natijalar">
+          <CommandGroup
+            heading={isSearching ? "Natijalar" : "Maqolalar"}
+          >
             {articles.map((article) => (
               <CommandItem
                 key={article.id}

@@ -1,6 +1,7 @@
 "use client";
 
-import { Link2 } from "lucide-react";
+import { Check, Link2 } from "lucide-react";
+import { useState } from "react";
 import { iosIconClass } from "@/components/articles/flying-like-heart";
 import { Button } from "@/components/ui/button";
 import { articleUrl } from "@/lib/seo/urls";
@@ -13,28 +14,19 @@ type ArticleShareLinkProps = {
 };
 
 export function ArticleShareLink({ slug, className }: ArticleShareLinkProps) {
-  const handleCopy = async () => {
-    const url = articleUrl(slug);
+  const [copied, setCopied] = useState(false);
 
-    try {
-      if (navigator.share) {
-        await navigator.share({
-          title: "Maqola",
-          url,
-        });
-        return;
-      }
-    } catch (error) {
-      if (error instanceof DOMException && error.name === "AbortError") {
-        return;
-      }
-    }
+  const handleCopy = async () => {
+    const url =
+      typeof window !== "undefined" && window.location.href
+        ? window.location.href
+        : articleUrl(slug);
 
     try {
       await navigator.clipboard.writeText(url);
-      toast.success(
-        "Havola nusxalandi. Telegram kanaliga yopishtiring — sarlavha va rasm avtomatik chiqadi.",
-      );
+      setCopied(true);
+      toast.success("Havola nusxalandi");
+      window.setTimeout(() => setCopied(false), 2000);
     } catch {
       toast.error("Havolani nusxalab bo'lmadi");
     }
@@ -50,11 +42,15 @@ export function ArticleShareLink({ slug, className }: ArticleShareLinkProps) {
         "hover:bg-transparent hover:text-foreground",
         className,
       )}
-      aria-label="Havolani ulashish"
+      aria-label="Havolani nusxalash"
       onClick={() => void handleCopy()}
     >
-      <Link2 className={iosIconClass} aria-hidden />
-      <span className="hidden text-sm sm:inline">Ulashish</span>
+      {copied ? (
+        <Check className={iosIconClass} aria-hidden />
+      ) : (
+        <Link2 className={iosIconClass} aria-hidden />
+      )}
+      <span className="hidden text-sm sm:inline">Link</span>
     </Button>
   );
 }

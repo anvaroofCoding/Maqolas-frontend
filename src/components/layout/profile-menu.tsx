@@ -23,6 +23,7 @@ import {
 import { useAppSelector } from "@/lib/store/hooks";
 import { navIconButtonClass } from "@/lib/layout";
 import { getUserInitials } from "@/lib/user";
+import { toast } from "@/lib/toast";
 import { cn } from "@/lib/utils";
 import {
   DropdownMenu,
@@ -84,10 +85,22 @@ export function ProfileMenu() {
   const { data: meData } = useGetMeQuery(undefined, {
     skip: !mounted || !accessToken,
   });
-  const [logout] = useLogoutMutation();
+  const [logout, { isLoading: isLoggingOut }] = useLogoutMutation();
   const { openSettings } = useSettings();
 
   const activeUser = meData?.user ?? user;
+
+  const handleLogout = async () => {
+    try {
+      await logout().unwrap();
+    } catch {
+      // Mahalliy sessiya baribir tozalanadi
+    } finally {
+      toast.success("Tizimdan chiqdingiz");
+      router.replace("/");
+      router.refresh();
+    }
+  };
 
   useEffect(() => setMounted(true), []);
 
@@ -203,7 +216,11 @@ export function ProfileMenu() {
         <DropdownMenuItem
           variant="destructive"
           className="cursor-pointer"
-          onSelect={() => void logout()}
+          disabled={isLoggingOut}
+          onSelect={(event) => {
+            event.preventDefault();
+            void handleLogout();
+          }}
         >
           <LogOutIcon />
           Chiqish

@@ -1,9 +1,11 @@
 import { createApi } from "@reduxjs/toolkit/query/react";
 import {
   clearCredentials,
+  getRefreshToken,
   setCredentials,
   setUser,
   setBan,
+  setSilentAuthAttempted,
 } from "@/features/auth/slice/auth-slice";
 import type {
   AuthTokensResponse,
@@ -12,6 +14,8 @@ import type {
   UpdateProfilePayload,
 } from "@/features/auth/types";
 import { env } from "@/config/env";
+import { disableGoogleAutoSelect, markManualLogout, clearManualLogout } from "@/lib/auth/logout-client";
+import { getGoogleOAuthUrl as buildGoogleOAuthUrl } from "@/lib/auth/google-silent-auth";
 import { baseQueryWithReauth } from "@/lib/store/api/base-query-with-reauth";
 
 export const authApi = createApi({
@@ -24,7 +28,8 @@ export const authApi = createApi({
       providesTags: ["AuthUser"],
       async onQueryStarted(_arg, { dispatch, queryFulfilled }) {
         try {
-          await queryFulfilled;
+          const { data } = await queryFulfilled;
+          dispatch(setUser(data.user));
         } catch (err: unknown) {
           const error = err as { error?: { status?: number; data?: unknown } };
           if (error?.error?.status === 403) {
@@ -77,6 +82,7 @@ export const authApi = createApi({
         async onQueryStarted(_arg, { dispatch, queryFulfilled }) {
           try {
             const { data } = await queryFulfilled;
+            clearManualLogout();
             dispatch(
               setCredentials({
                 user: data.user,
@@ -91,18 +97,30 @@ export const authApi = createApi({
       },
     ),
     logout: builder.mutation<{ success: boolean }, void>({
-      query: () => ({
-        url: "/auth/logout",
-        method: "POST",
-      }),
+      query: () => {
+        const refreshToken = getRefreshToken();
+        return {
+          url: "/auth/logout",
+          method: "POST",
+          body: refreshToken ? { refreshToken } : undefined,
+        };
+      },
       async onQueryStarted(_arg, { dispatch, queryFulfilled }) {
         try {
           await queryFulfilled;
+        } catch {
+          // Server chiqishi muvaffaqiyatsiz bo'lsa ham mahalliy sessiyani tozalaymiz
         } finally {
+          markManualLogout();
+          disableGoogleAutoSelect();
+          dispatch(setSilentAuthAttempted());
           dispatch(clearCredentials());
+          dispatch(authApi.util.resetApiState());
+
+          const { baseApi } = await import("@/lib/store/api/base-api");
+          dispatch(baseApi.util.resetApiState());
         }
       },
-      invalidatesTags: ["AuthUser"],
     }),
   }),
 });
@@ -116,6 +134,4 @@ export const {
   useUploadAvatarMutation,
 } = authApi;
 
-export function getGoogleOAuthUrl() {
-  return `${env.NEXT_PUBLIC_API_URL}/auth/google`;
-}
+export { buildGoogleOAuthUrl as getGoogleOAuthUrl };

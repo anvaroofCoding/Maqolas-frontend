@@ -9,6 +9,7 @@ import type {
   ArticleSummary,
   ArticleSearchResponse,
   ArticleComment,
+  HomepageLayoutResponse,
   PopularCommentsResponse,
   MyArticlesResponse,
   SaveArticlePayload,
@@ -94,6 +95,10 @@ export const articlesApi = baseApi.injectEndpoints({
       },
       providesTags: [{ type: "Article", id: "LIST" }],
     }),
+    getHomepageLayout: builder.query<HomepageLayoutResponse, void>({
+      query: () => "/articles/homepage",
+      providesTags: [{ type: "Article", id: "HOMEPAGE" }],
+    }),
     searchArticles: builder.query<
       ArticleSearchResponse,
       { q: string; limit?: number }
@@ -145,8 +150,10 @@ export const articlesApi = baseApi.injectEndpoints({
       }),
       invalidatesTags: [
         { type: "Article", id: "LIST" },
+        { type: "Article", id: "HOMEPAGE" },
         { type: "Article", id: "MINE" },
         { type: "Article", id: "SAVED" },
+        { type: "Admin", id: "PUBLISHED" },
       ],
     }),
     submitArticle: builder.mutation<
@@ -189,6 +196,7 @@ export const articlesApi = baseApi.injectEndpoints({
       invalidatesTags: (_r, _e, id) => [
         { type: "Article", id: `engagement-${id}` },
         { type: "Article", id: "LIST" },
+        { type: "Article", id: "HOMEPAGE" },
         { type: "Notification", id: "UNREAD_COUNT" },
       ],
     }),
@@ -338,6 +346,7 @@ export const {
   useSubmitArticleMutation,
   useListArticlesQuery,
   useLazyListArticlesQuery,
+  useGetHomepageLayoutQuery,
   useSearchArticlesQuery,
   useLazySearchArticlesQuery,
   useListMyArticlesQuery,

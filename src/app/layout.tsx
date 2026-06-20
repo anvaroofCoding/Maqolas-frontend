@@ -5,6 +5,7 @@ import { SiteNavbar } from "@/components/layout/site-navbar";
 import { AuthProvider } from "@/components/providers/auth-provider";
 import { StoreProvider } from "@/components/providers/store-provider";
 import { NotificationSoundListener } from "@/components/notifications/notification-sound-listener";
+import { RealtimeListener } from "@/components/providers/realtime-listener";
 import { SettingsProvider } from "@/components/providers/settings-provider";
 import { ThemeProvider } from "@/components/providers/theme-provider";
 import { ToastProvider } from "@/components/providers/toast-provider";
@@ -16,7 +17,9 @@ import { JsonLdScript } from "@/components/seo/json-ld-script";
 import { siteConfig } from "@/config/site";
 import { defaultMetadata } from "@/lib/seo/metadata";
 import {
+  buildCreatorJsonLd,
   buildOrganizationJsonLd,
+  buildSoftwareApplicationJsonLd,
   buildWebSiteJsonLd,
 } from "@/lib/seo/json-ld";
 import { cn } from "@/lib/utils";
@@ -47,7 +50,7 @@ export default function RootLayout({
 }>) {
   return (
     <html
-      lang={siteConfig.locale}
+      lang={siteConfig.htmlLang}
       suppressHydrationWarning
       className={cn("bg-background font-sans text-foreground", poppins.variable)}
     >
@@ -59,13 +62,19 @@ export default function RootLayout({
         className="min-h-screen bg-background font-sans text-foreground antialiased"
       >
         <JsonLdScript
-          data={[buildOrganizationJsonLd(), buildWebSiteJsonLd()]}
+          data={[
+            buildOrganizationJsonLd(),
+            buildWebSiteJsonLd(),
+            buildCreatorJsonLd(),
+            buildSoftwareApplicationJsonLd(),
+          ]}
         />
         <ThemeProvider>
           <SettingsProvider>
             <StoreProvider>
               <ToastProvider>
                 <AuthProvider>
+                  <RealtimeListener />
                   <NotificationSoundListener />
                   <SettingsModal />
                   <WelcomePromoModal />

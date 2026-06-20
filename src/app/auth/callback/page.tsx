@@ -3,6 +3,7 @@
 import { useRouter, useSearchParams } from "next/navigation";
 import { Suspense, useEffect, useRef } from "react";
 import { useLazyGetMeQuery } from "@/features/auth/api/auth-api";
+import { clearManualLogout } from "@/lib/auth/logout-client";
 import {
   setCredentials,
   setSessionTokens,
@@ -40,6 +41,7 @@ function AuthCallbackHandler() {
       }
 
       dispatch(setSessionTokens({ accessToken, refreshToken }));
+      clearManualLogout();
 
       try {
         const data = await fetchMe().unwrap();

@@ -19,9 +19,9 @@ function stripSharedArticleLead(html: string) {
   return result.trim();
 }
 
-/** Detail sahifada alohida ko'rsatiladigan sarlavha va muqovani HTML dan olib tashlash */
+/** Detail sahifada faqat takroriy sarlavhani olib tashlash, rasmlar o'z joyida qoladi */
 export function stripArticleLeadFromHtml(html: string): string {
-  return stripSharedArticleLead(html).replace(/<img[^>]*>/gi, "");
+  return stripSharedArticleLead(html);
 }
 
 /** Fokus rejimida matn ichidagi rasmlarni saqlab qolish */

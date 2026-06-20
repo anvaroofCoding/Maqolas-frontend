@@ -6,6 +6,8 @@ import { useEffect, useMemo } from "react";
 import { ArticleContent } from "@/components/articles/article-content";
 import { Button } from "@/components/ui/button";
 import { stripArticleLeadForFocus } from "@/lib/articles/content";
+import { articleSurfaceClassName } from "@/lib/layout";
+import { cn } from "@/lib/utils";
 
 type ArticleFocusReaderProps = {
   open: boolean;
@@ -63,7 +65,7 @@ export function ArticleFocusReader({
       </Button>
 
       <div className="flex-1 overflow-y-auto">
-        <article className="mx-auto w-full max-w-3xl px-6 py-10 sm:px-10 sm:py-14">
+        <article className={cn(articleSurfaceClassName, "py-10 sm:py-14")}>
           <h1 className="text-3xl font-bold tracking-tight text-foreground sm:text-4xl md:text-5xl md:leading-tight">
             {title}
           </h1>
@@ -74,7 +76,7 @@ export function ArticleFocusReader({
                 src={coverImageUrl}
                 alt={title}
                 fill
-                sizes="(max-width: 768px) 100vw, 768px"
+                sizes="100vw"
                 className="object-cover"
                 unoptimized
               />

@@ -1,6 +1,10 @@
-/** Mobil/planshet: 100% kenglik. Katta desktop (xl+): markazdagi container */
+/** Mobil/planshet/desktop: 100% kenglik */
 export const containerClassName =
-  "mx-auto w-full min-w-0 max-w-full overflow-x-hidden px-0 md:px-4 xl:w-[80%] xl:px-6 2xl:px-8";
+  "mx-auto w-full min-w-0 max-w-full overflow-x-hidden px-0 md:px-4 xl:px-6 2xl:px-8";
+
+/** Maqola o'qish va yozish — asosiy kontent maydoni */
+export const articleSurfaceClassName =
+  "w-full min-w-0 max-w-full px-4 py-6 sm:px-6 sm:py-8 lg:px-8";
 
 /** Maqola feed sahifalari — sidebarlar yonida */
 export const feedMainClassName =

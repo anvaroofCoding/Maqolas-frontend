@@ -5,7 +5,7 @@ import { buildPageMetadata } from "@/lib/seo/metadata";
 export const metadata = buildPageMetadata({
   title: "Mavzular",
   description:
-    "Maqolas platformasidagi mavzular: texnologiya, startaplar, AI, marketing va boshqalar. O'zingizga mos maqola mavzusini toping yoki yangisini taklif qiling.",
+    "Maqolas platformasidagi mavzular: texnologiya, startaplar, AI, marketing va boshqalar. O'qing yoki o'zingizga mos mavzuda maqolalaringizni yozing.",
   path: "/mavzular",
   keywords: [
     "maqola mavzulari",

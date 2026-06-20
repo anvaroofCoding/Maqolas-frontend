@@ -1,7 +1,6 @@
 import type { Extensions } from "@tiptap/core";
 import Color from "@tiptap/extension-color";
 import Highlight from "@tiptap/extension-highlight";
-import Image from "@tiptap/extension-image";
 import Link from "@tiptap/extension-link";
 import Placeholder from "@tiptap/extension-placeholder";
 import Subscript from "@tiptap/extension-subscript";
@@ -20,6 +19,8 @@ import StarterKit from "@tiptap/starter-kit";
 import { AiAutocompleteExtension } from "@/lib/editor/ai-autocomplete-extension";
 import { Callout } from "@/lib/editor/callout-extension";
 import { HeadingWithId } from "@/lib/editor/heading-with-id";
+import { ImageRow } from "@/lib/editor/image-row-extension";
+import { ResizableImage } from "@/lib/editor/resizable-image-extension";
 
 export interface EditorExtensionOptions {
   aiAutocomplete?: {
@@ -34,6 +35,8 @@ export function createEditorExtensions(
   const extensions: Extensions = [
     StarterKit.configure({
       heading: false,
+      link: false,
+      underline: false,
       bulletList: { keepMarks: true },
       orderedList: { keepMarks: true },
     }),
@@ -49,7 +52,8 @@ export function createEditorExtensions(
       openOnClick: false,
       HTMLAttributes: { class: "text-primary underline underline-offset-2" },
     }),
-    Image.configure({ HTMLAttributes: { class: "rounded-lg max-w-full h-auto" } }),
+    ResizableImage,
+    ImageRow,
     TaskList,
     TaskItem.configure({ nested: true }),
     Table.configure({ resizable: true }),

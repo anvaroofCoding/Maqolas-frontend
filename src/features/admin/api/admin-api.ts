@@ -173,6 +173,18 @@ export const adminApi = baseApi.injectEndpoints({
         { type: "Article", id: "LIST" },
       ],
     }),
+    deletePublishedArticle: builder.mutation<{ deleted: boolean }, string>({
+      query: (id) => ({
+        url: `/admin/articles/${id}`,
+        method: "DELETE",
+      }),
+      invalidatesTags: [
+        { type: "Admin", id: "PUBLISHED" },
+        { type: "Article", id: "LIST" },
+        { type: "Article", id: "MINE" },
+        { type: "Article", id: "SAVED" },
+      ],
+    }),
     getAdminCategories: builder.query<{ categories: Category[] }, void>({
       query: () => "/admin/categories",
       providesTags: [{ type: "Category", id: "ADMIN_LIST" }],
@@ -337,6 +349,7 @@ export const {
   useGetAdminArticleQuery,
   useUpdateAdminArticleMutation,
   useTogglePinArticleMutation,
+  useDeletePublishedArticleMutation,
   useGetAdminCategoriesQuery,
   useCreateCategoryMutation,
   useUpdateCategoryMutation,

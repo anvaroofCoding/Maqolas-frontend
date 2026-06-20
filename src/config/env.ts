@@ -4,6 +4,7 @@ const envSchema = z.object({
   NEXT_PUBLIC_APP_URL: z.string().url().default("http://localhost:3000"),
   NEXT_PUBLIC_API_URL: z.string().url().default("http://localhost:8000/api"),
   NEXT_PUBLIC_GOOGLE_CLIENT_ID: z.string().optional().default(""),
+  NEXT_PUBLIC_GOOGLE_GIS_ORIGINS: z.string().optional().default(""),
 });
 
 export type Env = z.infer<typeof envSchema>;
@@ -13,6 +14,7 @@ function parseEnv(): Env {
     NEXT_PUBLIC_APP_URL: process.env.NEXT_PUBLIC_APP_URL,
     NEXT_PUBLIC_API_URL: process.env.NEXT_PUBLIC_API_URL,
     NEXT_PUBLIC_GOOGLE_CLIENT_ID: process.env.NEXT_PUBLIC_GOOGLE_CLIENT_ID,
+    NEXT_PUBLIC_GOOGLE_GIS_ORIGINS: process.env.NEXT_PUBLIC_GOOGLE_GIS_ORIGINS,
   });
 
   if (!parsed.success) {

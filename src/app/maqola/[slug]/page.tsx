@@ -15,7 +15,9 @@ import {
 } from "@/lib/seo/json-ld";
 import { buildArticleKeywords } from "@/lib/seo/keywords";
 import { buildPageMetadata } from "@/lib/seo/metadata";
+import { articleSurfaceClassName } from "@/lib/layout";
 import { articleOgImageUrl, resolveOgImageUrl } from "@/lib/seo/urls";
+import { cn } from "@/lib/utils";
 
 type ArticlePageProps = {
   params: Promise<{ slug: string }>;
@@ -71,7 +73,7 @@ export default async function ArticleDetailPage({ params }: ArticlePageProps) {
   }
 
   const authorName = article.author?.displayName ?? "Noma'lum muallif";
-  const articleBodyHtml = stripArticleLeadFromHtml(article.contentHtml);
+  const articleBodyHtml = stripArticleLeadFromHtml(article.contentHtml ?? "");
   const description = buildArticleDescription({
     title: article.title,
     excerpt: article.excerpt,
@@ -95,7 +97,7 @@ export default async function ArticleDetailPage({ params }: ArticlePageProps) {
   return (
     <>
     <PromoAutoScrollActivator />
-    <main className="mx-auto w-full max-w-3xl px-4 py-6 sm:px-6 sm:py-8 lg:px-8">
+    <main className={cn(articleSurfaceClassName)}>
       <JsonLdScript
         data={[
           buildArticleJsonLd({
@@ -108,7 +110,7 @@ export default async function ArticleDetailPage({ params }: ArticlePageProps) {
             publishedAt: article.publishedAt ?? article.createdAt,
             updatedAt: article.updatedAt ?? article.publishedAt ?? article.createdAt,
             categories: article.categories,
-            wordCount: estimateWordCount(article.contentHtml),
+            wordCount: estimateWordCount(article.contentHtml ?? ""),
           }),
           buildBreadcrumbJsonLd(breadcrumbItems),
         ]}
@@ -117,7 +119,7 @@ export default async function ArticleDetailPage({ params }: ArticlePageProps) {
       <article itemScope itemType="https://schema.org/Article">
         <ArticleDetailHeader
           title={article.title}
-          contentHtml={article.contentHtml}
+          contentHtml={article.contentHtml ?? ""}
           coverImageUrl={article.coverImageUrl}
           authorName={authorName}
           authorUsername={article.author?.username}

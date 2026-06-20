@@ -1,4 +1,6 @@
 import { createSlice, type PayloadAction } from "@reduxjs/toolkit";
+import { isTokenExpired } from "@/lib/auth/token";
+import { wasManualLogout } from "@/lib/auth/logout-client";
 import type { AuthUser, BanInfo } from "@/features/auth/types";
 
 const ACCESS_TOKEN_KEY = "maqolas_access_token";
@@ -15,6 +17,7 @@ export interface AuthState {
   refreshToken: string | null;
   isAuthenticated: boolean;
   silentAuthAttempted: boolean;
+  hydrated: boolean;
   ban: BanInfo | null;
 }
 
@@ -24,6 +27,7 @@ const initialState: AuthState = {
   refreshToken: null,
   isAuthenticated: false,
   silentAuthAttempted: false,
+  hydrated: false,
   ban: null,
 };
 
@@ -32,14 +36,34 @@ const authSlice = createSlice({
   initialState,
   reducers: {
     hydrateAuthFromStorage(state) {
+      if (wasManualLogout()) {
+        state.silentAuthAttempted = true;
+        state.hydrated = true;
+        return;
+      }
+
       const accessToken = readStoredToken(ACCESS_TOKEN_KEY);
       const refreshToken = readStoredToken(REFRESH_TOKEN_KEY);
-      if (!accessToken) return;
+
+      if (!accessToken) {
+        state.hydrated = true;
+        return;
+      }
+
+      if (isTokenExpired(accessToken) && (!refreshToken || isTokenExpired(refreshToken))) {
+        if (typeof window !== "undefined") {
+          localStorage.removeItem(ACCESS_TOKEN_KEY);
+          localStorage.removeItem(REFRESH_TOKEN_KEY);
+        }
+        state.hydrated = true;
+        return;
+      }
 
       state.accessToken = accessToken;
       state.refreshToken = refreshToken;
       state.isAuthenticated = true;
       state.silentAuthAttempted = true;
+      state.hydrated = true;
     },
     setSilentAuthAttempted(state) {
       state.silentAuthAttempted = true;

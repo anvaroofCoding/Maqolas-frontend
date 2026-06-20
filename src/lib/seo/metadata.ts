@@ -31,7 +31,7 @@ function resolveTitle(input: PageMetadataInput): string {
         : siteConfig.title;
     case "profile":
       return input.title
-        ? `${input.title} — Muallif | ${siteConfig.name}`
+        ? `${input.title} | Muallif — ${siteConfig.name}`
         : siteConfig.title;
     case "page":
     default:
@@ -48,6 +48,7 @@ export function buildPageMetadata(input: PageMetadataInput = {}): Metadata {
   const image = input.image
     ? (resolveOgImageUrl(input.image) ?? absoluteUrl(input.image))
     : absoluteUrl(siteConfig.ogImage);
+  const logoUrl = absoluteUrl(siteConfig.logoPath);
   const keywords = dedupeKeywords([
     ...(input.keywords ?? []),
     ...siteConfig.keywords,
@@ -92,7 +93,13 @@ export function buildPageMetadata(input: PageMetadataInput = {}): Metadata {
     keywords,
     metadataBase: new URL(siteConfig.url),
     applicationName: siteConfig.name,
-    creator: siteConfig.name,
+    authors: [
+      {
+        name: siteConfig.creator.name,
+        url: siteConfig.creator.telegramUrl,
+      },
+    ],
+    creator: siteConfig.creator.name,
     publisher: siteConfig.name,
     formatDetection: {
       email: false,
@@ -100,9 +107,12 @@ export function buildPageMetadata(input: PageMetadataInput = {}): Metadata {
       telephone: false,
     },
     icons: {
-      icon: [{ url: "/logo.png", type: "image/png" }],
-      apple: [{ url: "/logo.png", type: "image/png" }],
-      shortcut: "/logo.png",
+      icon: [
+        { url: "/icon", type: "image/png", sizes: "48x48" },
+        { url: logoUrl, type: "image/png", sizes: "180x180" },
+      ],
+      apple: [{ url: "/apple-icon", type: "image/png", sizes: "180x180" }],
+      shortcut: "/icon",
     },
     alternates: {
       canonical,

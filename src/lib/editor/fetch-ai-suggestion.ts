@@ -44,7 +44,10 @@ export async function fetchAiSuggestion(
       return localFallback(text);
     }
 
-    const payload = (await response.json()) as { suggestion?: string };
+    const payload = (await response.json()) as {
+      suggestion?: string;
+      source?: 'ai' | 'local';
+    };
     return payload.suggestion?.trim() || localFallback(text);
   } catch {
     return localFallback(text);

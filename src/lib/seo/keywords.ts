@@ -54,3 +54,27 @@ function dedupeKeywords(keywords: string[]): string[] {
 
   return result;
 }
+
+export function buildProfileKeywords(
+  displayName: string,
+  username: string,
+  bio?: string,
+): string[] {
+  const nameParts = displayName.split(/\s+/).filter(Boolean);
+
+  return dedupeKeywords([
+    displayName,
+    ...nameParts,
+    `@${username}`,
+    username,
+    `${displayName} maqolalari`,
+    `${displayName} Maqolas`,
+    `${displayName} muallif`,
+    "muallif",
+    "maqola",
+    "maqolalar",
+    "o'zbekcha maqolalar",
+    ...(bio ? [bio.slice(0, 80)] : []),
+    ...siteConfig.keywords,
+  ]);
+}

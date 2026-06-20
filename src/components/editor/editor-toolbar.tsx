@@ -13,14 +13,12 @@ import {
   Heading2Icon,
   Heading3Icon,
   HighlighterIcon,
-  ImageIcon,
   ItalicIcon,
   LightbulbIcon,
   LinkIcon,
   ListChecksIcon,
   ListIcon,
   ListOrderedIcon,
-  Loader2Icon,
   MinusIcon,
   PaletteIcon,
   QuoteIcon,
@@ -35,8 +33,8 @@ import {
   Undo2Icon,
   YoutubeIcon,
 } from "lucide-react";
-import { useRef } from "react";
 import { EditorCommandMenu } from "@/components/editor/editor-command-menu";
+import { EditorImageToolbarActions } from "@/components/editor/editor-image-toolbar-actions";
 import { EditorKeyboardShortcuts } from "@/components/editor/editor-keyboard-shortcuts";
 import {
   EditorToolbarButton,
@@ -46,12 +44,8 @@ import { EditorWritingStats } from "@/components/editor/editor-writing-stats";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import type { CalloutVariant } from "@/lib/editor/callout-extension";
 import { insertTableOfContents } from "@/lib/editor/insert-table-of-contents";
-import { useUploadArticleImageMutation } from "@/features/articles/api/articles-api";
 import { toast } from "@/lib/toast";
 import { cn } from "@/lib/utils";
-
-const MAX_SIZE_MB = 8;
-const ACCEPT = "image/jpeg,image/png,image/webp,image/gif";
 
 const TEXT_COLORS = [
   { label: "Standart", value: "" },
@@ -87,9 +81,6 @@ function insertCallout(editor: Editor, variant: CalloutVariant) {
 }
 
 export function EditorToolbar({ editor }: EditorToolbarProps) {
-  const fileInputRef = useRef<HTMLInputElement>(null);
-  const [uploadImage, { isLoading: isUploading }] = useUploadArticleImageMutation();
-
   if (!editor) return null;
 
   const setLink = () => {
@@ -104,7 +95,11 @@ export function EditorToolbar({ editor }: EditorToolbarProps) {
   };
 
   const addImage = () => {
-    fileInputRef.current?.click();
+    document.getElementById("editor-single-image-input")?.click();
+  };
+
+  const addImageRow = () => {
+    document.getElementById("editor-row-image-input")?.click();
   };
 
   const addYoutube = () => {
@@ -122,48 +117,14 @@ export function EditorToolbar({ editor }: EditorToolbarProps) {
     editor.chain().focus().unsetAllMarks().clearNodes().run();
   };
 
-  const handleImageFile = async (file: File) => {
-    if (!file.type.startsWith("image/")) {
-      toast.error("Faqat rasm fayli tanlang");
-      return;
-    }
-
-    if (file.size > MAX_SIZE_MB * 1024 * 1024) {
-      toast.error(`Rasm hajmi ${MAX_SIZE_MB}MB dan oshmasin`);
-      return;
-    }
-
-    const formData = new FormData();
-    formData.append("image", file);
-
-    try {
-      const { url } = await uploadImage(formData).unwrap();
-      editor.chain().focus().setImage({ src: url }).run();
-    } catch {
-      toast.error("Rasm yuklanmadi");
-    } finally {
-      if (fileInputRef.current) {
-        fileInputRef.current.value = "";
-      }
-    }
-  };
-
   return (
     <div className="border-t border-border/60">
-      <input
-        ref={fileInputRef}
-        type="file"
-        accept={ACCEPT}
-        className="sr-only"
-        aria-hidden
-        onChange={(e) => {
-          const file = e.target.files?.[0];
-          if (file) void handleImageFile(file);
-        }}
-      />
-
       <div className="flex flex-wrap items-center gap-0.5 px-3 py-2">
-        <EditorCommandMenu editor={editor} onImageClick={addImage} />
+        <EditorCommandMenu
+          editor={editor}
+          onImageClick={addImage}
+          onImageRowClick={addImageRow}
+        />
 
         <EditorToolbarDivider />
 
@@ -421,17 +382,7 @@ export function EditorToolbar({ editor }: EditorToolbarProps) {
         >
           <LinkIcon />
         </EditorToolbarButton>
-        <EditorToolbarButton
-          label="Rasm yuklash"
-          onClick={addImage}
-          disabled={isUploading}
-        >
-          {isUploading ? (
-            <Loader2Icon className="animate-spin" />
-          ) : (
-            <ImageIcon />
-          )}
-        </EditorToolbarButton>
+        <EditorImageToolbarActions editor={editor} />
         <EditorToolbarButton label="YouTube video" onClick={addYoutube}>
           <YoutubeIcon />
         </EditorToolbarButton>

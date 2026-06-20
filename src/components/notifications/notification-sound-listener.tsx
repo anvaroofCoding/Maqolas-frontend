@@ -14,7 +14,6 @@ export function NotificationSoundListener() {
 
   const { data } = useGetUnreadNotificationCountQuery(undefined, {
     skip: !accessToken,
-    pollingInterval: 15_000,
   });
 
   useEffect(() => {

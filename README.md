@@ -71,9 +71,9 @@ src/
 - **Global metadata:** `src/lib/seo/metadata.ts` → `buildPageMetadata()`
 - **Sahifa:** `export const metadata = buildPageMetadata({ title, path, ... })`
 - **JSON-LD:** `JsonLdScript` + `buildOrganizationJsonLd` / `buildWebSiteJsonLd`
-- **Fayllar:** `app/sitemap.ts`, `app/robots.ts`, `app/manifest.ts`
+- **Fayllar:** `app/sitemap.ts`, `app/robots.ts`, `app/manifest.ts`, `app/icon.tsx`, `app/apple-icon.tsx`
 
-`public/og-default.png` (1200×630) qo‘shing — Open Graph uchun.
+Production uchun `.env` da `NEXT_PUBLIC_APP_URL=https://maqolas.tm2.uz` qo‘ying.
 
 ## shadcn/ui
 

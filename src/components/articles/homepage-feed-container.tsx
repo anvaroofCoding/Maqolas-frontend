@@ -1,0 +1,44 @@
+"use client";
+
+import { useEffect, useState } from "react";
+import { HomepageFeed } from "@/components/articles/homepage-feed";
+import { HomepageFeedSkeleton } from "@/components/articles/homepage-feed-skeleton";
+import { useGetHomepageLayoutQuery } from "@/features/articles/api/articles-api";
+import type { HomepageLayoutResponse } from "@/features/articles/types";
+import { useAppSelector } from "@/lib/store/hooks";
+
+type HomepageFeedContainerProps = {
+  initialData: HomepageLayoutResponse;
+  title: string;
+  emptyMessage: string;
+};
+
+export function HomepageFeedContainer({
+  initialData,
+  title,
+  emptyMessage,
+}: HomepageFeedContainerProps) {
+  const [mounted, setMounted] = useState(false);
+  const accessToken = useAppSelector((state) => state.auth.accessToken);
+
+  useEffect(() => setMounted(true), []);
+
+  const { data, isLoading } = useGetHomepageLayoutQuery(undefined, {
+    skip: !mounted || !accessToken,
+  });
+
+  const activeData = data ?? initialData;
+
+  if (mounted && accessToken && isLoading) {
+    return <HomepageFeedSkeleton title={`${title} yuklanmoqda`} />;
+  }
+
+  return (
+    <HomepageFeed
+      layout={activeData.layout}
+      title={title}
+      emptyMessage={emptyMessage}
+      algorithm={activeData.algorithm}
+    />
+  );
+}

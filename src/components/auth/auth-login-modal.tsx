@@ -11,6 +11,7 @@ import {
 } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 import { getGoogleOAuthUrl } from "@/features/auth/api/auth-api";
+import { clearManualLogout } from "@/lib/auth/logout-client";
 import { cn } from "@/lib/utils";
 
 interface AuthLoginModalProps {
@@ -48,6 +49,7 @@ function GoogleIcon({ className }: { className?: string }) {
 
 export function AuthLoginModal({ open, onOpenChange }: AuthLoginModalProps) {
   const handleGoogleLogin = useCallback(() => {
+    clearManualLogout();
     window.location.href = getGoogleOAuthUrl();
   }, []);
 

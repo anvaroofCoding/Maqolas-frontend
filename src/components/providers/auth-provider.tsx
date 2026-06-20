@@ -8,6 +8,7 @@ import {
 } from "@/features/auth/slice/auth-slice";
 import { useAppDispatch, useAppSelector } from "@/lib/store/hooks";
 import { GoogleAutoSignIn } from "@/components/auth/google-auto-sign-in";
+import { SessionRestore } from "@/components/auth/session-restore";
 import { BannedScreen } from "@/components/layout/banned-screen";
 
 export function AuthProvider({ children }: { children: React.ReactNode }) {
@@ -55,6 +56,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
   return (
     <>
+      <SessionRestore />
       <GoogleAutoSignIn />
       {children}
     </>

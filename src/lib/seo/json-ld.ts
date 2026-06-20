@@ -1,33 +1,111 @@
 import type { ArticleCategory, ArticleSummary } from "@/features/articles/types";
+import type { UserSocialLinks } from "@/features/auth/types";
 import { siteConfig } from "@/config/site";
+import { formatSocialHref } from "@/lib/user";
 import { absoluteUrl, articleUrl, profileUrl, topicUrl } from "@/lib/seo/urls";
 
-const publisherLogo = absoluteUrl(siteConfig.ogImage);
+const publisherLogo = absoluteUrl(siteConfig.logoPath);
+
+function buildCreatorPerson() {
+  return {
+    "@type": "Person" as const,
+    name: siteConfig.creator.name,
+    jobTitle: siteConfig.creator.role,
+    url: siteConfig.creator.telegramUrl,
+    sameAs: [siteConfig.creator.telegramUrl],
+    description: `${siteConfig.creator.name} — ${siteConfig.name} platformasining yaratuvchisi. ${siteConfig.creator.role}. Telegram: ${siteConfig.creator.telegram}`,
+  };
+}
+
+export function buildCreatorJsonLd() {
+  return {
+    "@context": "https://schema.org",
+    ...buildCreatorPerson(),
+  };
+}
+
+export function buildSoftwareApplicationJsonLd() {
+  const creator = buildCreatorPerson();
+
+  return {
+    "@context": "https://schema.org",
+    "@type": "WebApplication",
+    name: siteConfig.name,
+    url: siteConfig.url,
+    description: siteConfig.description,
+    applicationCategory: "MultimediaApplication",
+    operatingSystem: "Any",
+    browserRequirements: "Requires JavaScript",
+    inLanguage: siteConfig.htmlLang,
+    author: creator,
+    creator,
+    publisher: {
+      "@type": "Organization",
+      name: siteConfig.name,
+      url: siteConfig.url,
+      founder: creator,
+      logo: {
+        "@type": "ImageObject",
+        url: publisherLogo,
+        width: 180,
+        height: 180,
+      },
+    },
+  };
+}
 
 export function buildOrganizationJsonLd() {
+  const creator = buildCreatorPerson();
+
   return {
     "@context": "https://schema.org",
     "@type": "Organization",
     name: siteConfig.name,
+    alternateName: [siteConfig.name, siteConfig.host],
     url: siteConfig.url,
-    logo: publisherLogo,
+    founder: creator,
+    logo: {
+      "@type": "ImageObject",
+      url: publisherLogo,
+      width: 180,
+      height: 180,
+    },
+    image: publisherLogo,
     description: siteConfig.description,
-    sameAs: [],
+    sameAs: [siteConfig.creator.telegramUrl],
   };
 }
 
 export function buildWebSiteJsonLd() {
+  const creator = buildCreatorPerson();
+
   return {
     "@context": "https://schema.org",
     "@type": "WebSite",
     name: siteConfig.name,
+    alternateName: [siteConfig.name, siteConfig.host],
     url: siteConfig.url,
     description: siteConfig.description,
-    inLanguage: "uz",
+    inLanguage: siteConfig.htmlLang,
+    author: creator,
     publisher: {
       "@type": "Organization",
       name: siteConfig.name,
-      logo: publisherLogo,
+      founder: creator,
+      logo: {
+        "@type": "ImageObject",
+        url: publisherLogo,
+        width: 180,
+        height: 180,
+      },
+    },
+    potentialAction: {
+      "@type": "SearchAction",
+      target: {
+        "@type": "EntryPoint",
+        urlTemplate: `${siteConfig.url.replace(/\/$/, "")}/?q={search_term_string}`,
+      },
+      "query-input": "required name=search_term_string",
     },
   };
 }
@@ -82,13 +160,15 @@ export function buildArticleJsonLd(input: ArticleJsonLdInput) {
       logo: {
         "@type": "ImageObject",
         url: publisherLogo,
+        width: 180,
+        height: 180,
       },
     },
     articleSection: input.categories?.[0]?.name,
     keywords: input.categories?.map((category) => category.name).join(", "),
     datePublished: input.publishedAt,
     dateModified: input.updatedAt ?? input.publishedAt,
-    inLanguage: "uz",
+    inLanguage: siteConfig.htmlLang,
     ...(input.wordCount ? { wordCount: input.wordCount } : {}),
   };
 }
@@ -114,27 +194,88 @@ export function buildPersonJsonLd(input: {
   bio?: string;
   avatarUrl?: string;
   articlesCount?: number;
+  followersCount?: number;
+  social?: UserSocialLinks;
+  articles?: Array<{ title: string; slug: string }>;
 }) {
+  const url = profileUrl(input.username);
+  const sameAs = collectProfileSameAs(input.social);
+  const interactionStatistic = [];
+
+  if (input.followersCount && input.followersCount > 0) {
+    interactionStatistic.push({
+      "@type": "InteractionCounter",
+      interactionType: "https://schema.org/FollowAction",
+      userInteractionCount: input.followersCount,
+    });
+  }
+
+  if (input.articlesCount && input.articlesCount > 0) {
+    interactionStatistic.push({
+      "@type": "InteractionCounter",
+      interactionType: "https://schema.org/WriteAction",
+      userInteractionCount: input.articlesCount,
+    });
+  }
+
+  const mainEntity: Record<string, unknown> = {
+    "@type": "Person",
+    "@id": `${url}#person`,
+    name: input.displayName,
+    alternateName: [`@${input.username}`, input.username],
+    identifier: {
+      "@type": "PropertyValue",
+      propertyID: "username",
+      value: input.username,
+    },
+    url,
+    description: input.bio,
+    image: input.avatarUrl ? absoluteUrl(input.avatarUrl) : undefined,
+    ...(sameAs.length > 0 ? { sameAs } : {}),
+    ...(interactionStatistic.length > 0 ? { interactionStatistic } : {}),
+  };
+
   return {
     "@context": "https://schema.org",
     "@type": "ProfilePage",
-    mainEntity: {
-      "@type": "Person",
-      name: input.displayName,
-      url: profileUrl(input.username),
-      description: input.bio,
-      image: input.avatarUrl ? absoluteUrl(input.avatarUrl) : undefined,
-      ...(input.articlesCount
-        ? {
-            agentInteractionStatistic: {
-              "@type": "InteractionCounter",
-              interactionType: "https://schema.org/WriteAction",
-              userInteractionCount: input.articlesCount,
-            },
-          }
-        : {}),
+    "@id": `${url}#profilepage`,
+    url,
+    name: `${input.displayName} | Muallif`,
+    isPartOf: {
+      "@type": "WebSite",
+      name: siteConfig.name,
+      url: absoluteUrl("/"),
     },
+    mainEntity,
+    ...(input.articles && input.articles.length > 0
+      ? {
+          hasPart: {
+            "@type": "ItemList",
+            name: `${input.displayName} maqolalari`,
+            numberOfItems: input.articles.length,
+            itemListElement: input.articles.slice(0, 10).map((article, index) => ({
+              "@type": "ListItem",
+              position: index + 1,
+              name: article.title,
+              url: articleUrl(article.slug),
+            })),
+          },
+        }
+      : {}),
   };
+}
+
+function collectProfileSameAs(social?: UserSocialLinks): string[] {
+  if (!social) return [];
+
+  const links = [
+    formatSocialHref("website", social.website),
+    formatSocialHref("linkedin", social.linkedin),
+    formatSocialHref("telegram", social.telegram),
+    formatSocialHref("instagram", social.instagram),
+  ].filter((href): href is string => Boolean(href));
+
+  return [...new Set(links)];
 }
 
 export function buildItemListJsonLd(
@@ -162,9 +303,9 @@ export function buildTopicPageJsonLd(topicLabel: string, slug: string) {
     "@context": "https://schema.org",
     "@type": "CollectionPage",
     name: `${topicLabel} maqolalari`,
-    description: `${topicLabel} bo'yicha o'zbekcha maqolalar`,
+    description: `${topicLabel} bo'yicha o'zbekcha maqolalar — Maqolas platformasida o'qing yoki maqolalaringizni yozing.`,
     url: topicUrl(slug),
-    inLanguage: "uz",
+    inLanguage: siteConfig.htmlLang,
     isPartOf: {
       "@type": "WebSite",
       name: siteConfig.name,

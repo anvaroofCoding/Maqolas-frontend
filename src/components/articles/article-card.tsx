@@ -1,10 +1,16 @@
 import { Eye, Heart, MessageSquare, Pin } from "lucide-react";
-import Image from "next/image";
 import Link from "next/link";
+import {
+  ArticleCardGalleryHero,
+  ArticleCardGalleryThumbnail,
+  ArticleCardImageCarousel,
+} from "@/components/articles/article-card-images";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Card } from "@/components/ui/card";
 import { Separator } from "@/components/ui/separator";
 import type { ArticleSummary } from "@/features/articles/types";
+import { getArticleImageUrls } from "@/lib/articles/images";
+import { formatArticleExcerpt, hasArticleExcerpt } from "@/lib/articles/excerpt";
 import { formatCount, formatRelativeTime } from "@/lib/format";
 import { getUserInitials } from "@/lib/user";
 import { cn } from "@/lib/utils";
@@ -21,6 +27,7 @@ export function ArticleCard({ article }: ArticleCardProps) {
   const href = `/maqola/${article.slug}`;
   const hasComments = (article.commentCount ?? 0) > 0;
   const hasLikes = (article.likeCount ?? 0) > 0;
+  const imageUrls = getArticleImageUrls(article);
 
   return (
     <Card
@@ -86,47 +93,26 @@ export function ArticleCard({ article }: ArticleCardProps) {
           </div>
         )}
 
-        <Link href={href} className="block min-w-0 max-w-full">
-          <div className="flex min-w-0 gap-4 sm:gap-5">
-            <div className="min-w-0 flex-1 overflow-hidden">
-              <h2 className="text-lg font-bold leading-snug tracking-tight text-foreground sm:text-xl">
-                {article.title}
-              </h2>
-              {article.excerpt ? (
-                <p className="mt-2 line-clamp-3 text-sm leading-relaxed text-muted-foreground sm:text-[15px]">
-                  {article.excerpt}
-                </p>
-              ) : null}
-            </div>
-
-            {article.coverImageUrl ? (
-              <div className="relative hidden h-24 w-32 shrink-0 overflow-hidden rounded-lg border bg-muted sm:block sm:h-28 sm:w-36">
-                <Image
-                  src={article.coverImageUrl}
-                  alt={article.title}
-                  fill
-                  sizes="144px"
-                  className="object-cover"
-                  unoptimized
-                />
+        <ArticleCardImageCarousel images={imageUrls} alt={article.title}>
+          <Link href={href} className="block min-w-0 max-w-full">
+            <div className="flex min-w-0 gap-4 sm:gap-5">
+              <div className="min-w-0 flex-1 overflow-hidden">
+                <h2 className="break-words text-lg font-bold leading-snug tracking-tight text-foreground sm:text-xl">
+                  {article.title}
+                </h2>
+                {hasArticleExcerpt(article.title, article.excerpt) ? (
+                  <p className="mt-2 line-clamp-3 break-words text-sm leading-relaxed text-muted-foreground [overflow-wrap:anywhere] sm:text-[15px]">
+                    {formatArticleExcerpt(article.title, article.excerpt)}
+                  </p>
+                ) : null}
               </div>
-            ) : null}
-          </div>
 
-          {article.coverImageUrl ? (
-            <div className="relative mt-4 h-40 w-full overflow-hidden rounded-lg border bg-muted sm:hidden">
-              <Image
-                src={article.coverImageUrl}
-                alt={article.title}
-                fill
-                sizes="100vw"
-                className="object-cover"
-                unoptimized
-              />
+              <ArticleCardGalleryThumbnail />
             </div>
-          ) : null}
 
-          <Separator className="my-4" />
+            <ArticleCardGalleryHero />
+
+            <Separator className="my-4" />
 
           <div className="flex flex-wrap items-center gap-4 text-sm text-muted-foreground">
             <span className="inline-flex items-center gap-1.5" aria-label="Ko'rishlar">
@@ -153,6 +139,7 @@ export function ArticleCard({ article }: ArticleCardProps) {
             ) : null}
           </div>
         </Link>
+        </ArticleCardImageCarousel>
       </div>
     </Card>
   );
