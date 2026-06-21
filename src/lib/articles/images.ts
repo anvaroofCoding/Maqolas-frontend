@@ -13,3 +13,9 @@ export function getArticleImageUrls(article: {
     article.contentHtml,
   ).map((image) => image.src);
 }
+
+export function getPrimaryArticleImageUrl(
+  article: Parameters<typeof getArticleImageUrls>[0],
+): string | undefined {
+  return getArticleImageUrls(article)[0];
+}

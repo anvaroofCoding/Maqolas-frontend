@@ -12,6 +12,7 @@ const STATIC_ROUTES: Array<{
   priority: number;
 }> = [
   { path: "/", changeFrequency: "hourly", priority: 1 },
+  { path: "/maqolalar", changeFrequency: "hourly", priority: 0.95 },
   { path: "/yangi", changeFrequency: "hourly", priority: 0.9 },
   { path: "/mavzular", changeFrequency: "weekly", priority: 0.7 },
   { path: "/dastur-haqida", changeFrequency: "monthly", priority: 0.5 },

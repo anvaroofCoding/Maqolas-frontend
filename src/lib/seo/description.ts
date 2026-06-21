@@ -1,6 +1,16 @@
 import type { ArticleCategory } from "@/features/articles/types";
 import { siteConfig } from "@/config/site";
 
+/** Bosh sahifa meta description — "maqolalar" qidiruv niyatiga mos */
+export function buildHomepageDescription(): string {
+  return "Maqolalar va o'zbekcha maqolalar o'qish uchun eng yaxshi joy. Maqola yozish, turli mavzularda maqolalarni topish va o'z fikrlaringizni nashr etish — barchasi Maqolas platformasida bepul.";
+}
+
+/** /maqolalar hub sahifasi uchun alohida description */
+export function buildMaqolalarHubDescription(): string {
+  return "Barcha o'zbekcha maqolalar bir joyda: texnologiya, startap, AI, marketing va boshqa mavzularda maqolalar. Maqola o'qish yoki yangi maqola yozish uchun Maqolas ga kiring.";
+}
+
 type ArticleDescriptionInput = {
   title: string;
   excerpt?: string;
@@ -31,7 +41,7 @@ export function buildArticleDescription({
 }
 
 export function buildTopicDescription(topicLabel: string): string {
-  return `${topicLabel} bo'yicha eng yaxshi o'zbekcha maqolalar, tahlillar va fikrlar. Maqolas platformasida o'qing yoki ${topicLabel.toLowerCase()} mavzusida maqolalaringizni yozing.`;
+  return `${topicLabel} maqolalari — o'zbekcha maqolalar, tahlillar va fikrlar. ${topicLabel} bo'yicha maqola o'qish yoki o'z maqolangizni yozish uchun Maqolas platformasiga kiring.`;
 }
 
 export function buildProfileDescription(

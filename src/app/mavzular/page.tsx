@@ -3,16 +3,19 @@ import { feedMainClassName } from "@/lib/layout";
 import { buildPageMetadata } from "@/lib/seo/metadata";
 
 export const metadata = buildPageMetadata({
-  title: "Mavzular",
+  title: "Mavzular — maqola mavzulari va o'zbekcha maqolalar",
   description:
-    "Maqolas platformasidagi mavzular: texnologiya, startaplar, AI, marketing va boshqalar. O'qing yoki o'zingizga mos mavzuda maqolalaringizni yozing.",
+    "Maqola mavzulari: texnologiya, startaplar, AI, marketing va boshqalar. Har bir mavzu bo'yicha o'zbekcha maqolalar o'qing yoki o'zingizga mos mavzuda maqola yozing.",
   path: "/mavzular",
   keywords: [
     "maqola mavzulari",
     "maqola mavzusi",
+    "mavzu bo'yicha maqolalar",
     "texnologiya maqolalari",
     "startap maqolalari",
     "maqola",
+    "maqolalar",
+    "o'zbekcha maqolalar",
   ],
 });
 

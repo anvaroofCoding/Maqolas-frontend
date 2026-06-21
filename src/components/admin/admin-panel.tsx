@@ -10,6 +10,7 @@ import {
   Lightbulb,
   Loader2,
   MessageSquare,
+  Mail,
   Pencil,
   Pin,
   PinOff,
@@ -76,6 +77,7 @@ import type {
   ModerationCommentItem,
 } from "@/features/admin/types";
 import { BannersPanel } from "@/components/admin/banners-panel";
+import { EmailsPanel } from "@/components/admin/emails-panel";
 import { WelcomePromoPanel } from "@/components/admin/welcome-promo-panel";
 import { PlatformStatsDashboard } from "@/components/admin/platform-stats-dashboard";
 import { useGetMeQuery } from "@/features/auth/api/auth-api";
@@ -1948,6 +1950,7 @@ const ADMIN_TABS = [
   "comments",
   "reports",
   "users",
+  "emails",
 ] as const;
 
 type AdminTab = (typeof ADMIN_TABS)[number];
@@ -2062,6 +2065,10 @@ export function AdminPanel() {
             <Users2 className="size-4" />
             Foydalanuvchilar
           </TabsTrigger>
+          <TabsTrigger value="emails" className="gap-2">
+            <Mail className="size-4" />
+            Email xabarlar
+          </TabsTrigger>
         </TabsList>
 
         <Separator />
@@ -2100,6 +2107,10 @@ export function AdminPanel() {
 
         <TabsContent value="users">
           <UsersPanel />
+        </TabsContent>
+
+        <TabsContent value="emails">
+          <EmailsPanel />
         </TabsContent>
       </Tabs>
 

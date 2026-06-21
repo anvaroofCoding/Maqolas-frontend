@@ -16,6 +16,7 @@ import {
   useUpdateBannerMutation,
 } from "@/features/banners/api/banners-api";
 import type { PromoBanner } from "@/features/banners/types";
+import { resolveUploadUrl } from "@/lib/articles/resolve-media-url";
 
 function BannerRow({ banner }: { banner: PromoBanner }) {
   const [title, setTitle] = useState(banner.title ?? "");
@@ -26,6 +27,7 @@ function BannerRow({ banner }: { banner: PromoBanner }) {
 
   const [updateBanner, { isLoading: isUpdating }] = useUpdateBannerMutation();
   const [deleteBanner, { isLoading: isDeleting }] = useDeleteBannerMutation();
+  const imageSrc = resolveUploadUrl(banner.imageUrl);
 
   const handleSave = async () => {
     const file = fileRef.current?.files?.[0];
@@ -44,13 +46,15 @@ function BannerRow({ banner }: { banner: PromoBanner }) {
     <Card className="overflow-hidden">
       <CardContent className="grid gap-4 p-4 sm:grid-cols-[140px_1fr_auto] sm:items-start">
         <div className="relative aspect-[4/5] overflow-hidden rounded-xl border bg-muted">
-          <Image
-            src={banner.imageUrl}
-            alt={banner.title ?? "Banner"}
-            fill
-            className="object-cover"
-            unoptimized
-          />
+          {imageSrc ? (
+            <Image
+              src={imageSrc}
+              alt={banner.title ?? "Banner"}
+              fill
+              className="object-cover"
+              unoptimized
+            />
+          ) : null}
         </div>
 
         <div className="space-y-3">

@@ -116,6 +116,22 @@ export interface AdminUsersResponse {
   pagination: ReviewQueueResponse["pagination"];
 }
 
+export type AdminEmailRecipientMode = "all" | "selected";
+
+export interface SendAdminEmailPayload {
+  subject: string;
+  message: string;
+  recipientMode: AdminEmailRecipientMode;
+  userIds?: string[];
+}
+
+export interface SendAdminEmailResponse {
+  success: boolean;
+  sent: number;
+  failed: number;
+  total: number;
+}
+
 export interface CreateBanPayload {
   reason: string;
   durationUnit: BanUnit;

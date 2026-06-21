@@ -44,6 +44,7 @@ export interface MaqolasSettings {
   customAccentColor: string;
   notificationSoundId: NotificationSoundId;
   aiAssistEnabled: boolean;
+  navbarWeatherEnabled: boolean;
 }
 
 export const DEFAULT_SETTINGS: MaqolasSettings = {
@@ -51,6 +52,7 @@ export const DEFAULT_SETTINGS: MaqolasSettings = {
   customAccentColor: "#4f46e5",
   notificationSoundId: "ding",
   aiAssistEnabled: true,
+  navbarWeatherEnabled: true,
 };
 
 export const SETTINGS_STORAGE_KEY = "maqolas_settings";

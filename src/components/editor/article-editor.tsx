@@ -17,6 +17,11 @@ import {
 import { createEditorExtensions } from "@/lib/editor/extensions";
 import { extractTitleFromJson } from "@/lib/editor/extract-title";
 import { fetchAiSuggestion } from "@/lib/editor/fetch-ai-suggestion";
+import {
+  getSubmitBlockReason,
+  getSubmitReadiness,
+} from "@/lib/editor/submit-requirements";
+import { getWritingStats } from "@/lib/editor/writing-stats";
 import { toast } from "@/lib/toast";
 import { useAppSelector } from "@/lib/store/hooks";
 import { articleSurfaceClassName } from "@/lib/layout";
@@ -44,10 +49,16 @@ export function ArticleEditor({
   const pathname = usePathname();
   const [focusMode, setFocusMode] = useState(false);
   const [articleId, setArticleId] = useState<string | undefined>(initialArticleId);
+  const [editorResetKey, setEditorResetKey] = useState(0);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [submitted, setSubmitted] = useState(false);
+  const [canSubmit, setCanSubmit] = useState(false);
+  const [submitBlockReason, setSubmitBlockReason] = useState<string | null>(
+    "kamida 200 ta so'z va kamida 1 ta rasm",
+  );
   const saveTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
   const submittedRef = useRef(false);
+  const articleIdRef = useRef<string | undefined>(initialArticleId);
 
   const [createArticle] = useCreateArticleMutation();
   const [updateArticle] = useUpdateArticleMutation();
@@ -64,34 +75,53 @@ export function ArticleEditor({
     return fetchAiSuggestion(context, accessTokenRef.current);
   }, []);
 
+  useEffect(() => {
+    articleIdRef.current = articleId;
+  }, [articleId]);
+
+  const updateSubmitReadiness = useCallback((ed: Editor) => {
+    const readiness = getSubmitReadiness(ed);
+    setCanSubmit(readiness.canSubmit);
+    setSubmitBlockReason(getSubmitBlockReason(ed));
+  }, []);
+
   const persist = useCallback(async (ed: Editor) => {
       const contentHtml = ed.getHTML();
       const contentJson = ed.getJSON() as Record<string, unknown>;
       const title = extractTitleFromJson(ed.getJSON());
+      const { words } = getWritingStats(ed);
+      const readiness = getSubmitReadiness(ed);
+
+      if (words === 0 && !readiness.hasImage) {
+        return;
+      }
 
       try {
         if (isAdminMode) {
-          if (!articleId) return;
+          const currentArticleId = articleIdRef.current;
+          if (!currentArticleId) return;
           await updateAdminArticle({
-            id: articleId,
+            id: currentArticleId,
             body: { title, contentHtml, contentJson },
           }).unwrap();
           return;
         }
 
         const body = { title, contentHtml, contentJson, status: "draft" as const };
+        const currentArticleId = articleIdRef.current;
 
-        if (articleId) {
-          await updateArticle({ id: articleId, body }).unwrap();
+        if (currentArticleId) {
+          await updateArticle({ id: currentArticleId, body }).unwrap();
         } else {
           const result = await createArticle(body).unwrap();
+          articleIdRef.current = result.article.id;
           setArticleId(result.article.id);
         }
       } catch {
         toast.error("Qoralama saqlanmadi");
       }
     },
-    [articleId, createArticle, isAdminMode, updateAdminArticle, updateArticle],
+    [createArticle, isAdminMode, updateAdminArticle, updateArticle],
   );
 
   const editor = useEditor({
@@ -101,7 +131,7 @@ export function ArticleEditor({
         fetchSuggestion,
       },
     }),
-    content: initialJson ?? initialHtml,
+    content: editorResetKey === 0 ? (initialJson ?? initialHtml) : "",
     immediatelyRender: false,
     editorProps: {
       attributes: {
@@ -109,14 +139,18 @@ export function ArticleEditor({
           "article-editor-content min-h-[55vh] px-6 py-8 focus:outline-none sm:px-10",
       },
     },
+    onCreate: ({ editor: ed }) => {
+      updateSubmitReadiness(ed);
+    },
     onUpdate: ({ editor: ed }) => {
+      updateSubmitReadiness(ed);
       if (submittedRef.current) return;
       if (saveTimer.current) clearTimeout(saveTimer.current);
       saveTimer.current = setTimeout(() => {
         void persist(ed);
       }, 1500);
     },
-  });
+  }, [editorResetKey]);
 
   useEffect(() => {
     aiEnabledRef.current = settings.aiAssistEnabled;
@@ -155,6 +189,13 @@ export function ArticleEditor({
 
   const handleSubmit = async () => {
     if (!editor) return;
+
+    const blockReason = getSubmitBlockReason(editor);
+    if (blockReason) {
+      toast.error(`Ko'rib chiqishga yuborish uchun ${blockReason} kerak`);
+      return;
+    }
+
     const contentHtml = editor.getHTML();
     const contentJson = editor.getJSON() as Record<string, unknown>;
     const title = extractTitleFromJson(editor.getJSON());
@@ -162,10 +203,11 @@ export function ArticleEditor({
 
     setIsSubmitting(true);
     try {
-      let id = articleId;
+      let id = articleIdRef.current;
       if (!id) {
         const created = await createArticle({ ...body, status: "draft" }).unwrap();
         id = created.article.id;
+        articleIdRef.current = id;
         setArticleId(id);
       }
       await submitArticle({ id, body }).unwrap();
@@ -184,9 +226,12 @@ export function ArticleEditor({
     if (saveTimer.current) clearTimeout(saveTimer.current);
     submittedRef.current = false;
     setSubmitted(false);
+    articleIdRef.current = undefined;
     setArticleId(undefined);
     setFocusMode(false);
-    editor?.commands.clearContent();
+    setCanSubmit(false);
+    setSubmitBlockReason("kamida 200 ta so'z va kamida 1 ta rasm");
+    setEditorResetKey((key) => key + 1);
 
     if (pathname !== "/yozish") {
       router.replace("/yozish");
@@ -221,7 +266,12 @@ export function ArticleEditor({
             )}
           >
             <div className="flex flex-wrap items-center justify-end gap-3 py-3">
-              <div className="flex items-center gap-2">
+              <div className="flex flex-wrap items-center justify-end gap-2">
+                {!isAdminMode && !submitted && submitBlockReason ? (
+                  <p className="text-xs text-muted-foreground">
+                    Ko&apos;rib chiqishga yuborish uchun {submitBlockReason} kerak
+                  </p>
+                ) : null}
                 <Button
                   type="button"
                   variant="outline"
@@ -259,7 +309,12 @@ export function ArticleEditor({
                     type="button"
                     size="sm"
                     className={writeButtonClass}
-                    disabled={isSubmitting}
+                    disabled={isSubmitting || !canSubmit}
+                    title={
+                      submitBlockReason
+                        ? `Ko'rib chiqishga yuborish uchun ${submitBlockReason} kerak`
+                        : undefined
+                    }
                     onClick={() => void handleSubmit()}
                   >
                     Ko&apos;rib chiqishga yuborish

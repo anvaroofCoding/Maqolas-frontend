@@ -5,6 +5,7 @@ import { useCallback, useEffect, useRef, useState } from "react";
 import { useAppSelector } from "@/lib/store/hooks";
 import { NotificationBubble } from "@/components/notifications/notification-bubble";
 import { NotificationSkeletonList } from "@/components/notifications/notification-skeleton";
+import { NavbarTooltip } from "@/components/layout/navbar-tooltip";
 import { Button } from "@/components/ui/button";
 import {
   Popover,
@@ -130,37 +131,49 @@ export function NotificationPopover() {
 
   if (!isActive) {
     return (
-      <Button
-        type="button"
-        variant="ghost"
-        size="icon"
-        className={cn("relative", navIconButtonClass)}
-        aria-label="Bildirishnomalar"
-        disabled={!mounted}
-      >
-        <BellIcon />
-      </Button>
-    );
-  }
-
-  return (
-    <Popover open={open} onOpenChange={setOpen}>
-      <PopoverTrigger asChild>
+      <NavbarTooltip label="Bildirishnomalar" hint="Kirish talab qilinadi">
         <Button
           type="button"
           variant="ghost"
           size="icon"
           className={cn("relative", navIconButtonClass)}
           aria-label="Bildirishnomalar"
+          disabled={!mounted}
         >
           <BellIcon />
-          {unreadCount > 0 ? (
-            <span className="absolute top-1 right-1 flex min-w-4 items-center justify-center rounded-full bg-nav-active px-1 py-0.5 text-[10px] font-semibold leading-none text-nav-active-foreground ring-2 ring-background">
-              {unreadCount > 99 ? "99+" : unreadCount}
-            </span>
-          ) : null}
         </Button>
-      </PopoverTrigger>
+      </NavbarTooltip>
+    );
+  }
+
+  return (
+    <Popover open={open} onOpenChange={setOpen}>
+      <NavbarTooltip
+        label="Bildirishnomalar"
+        hint={
+          unreadCount > 0
+            ? `${unreadCount > 99 ? "99+" : unreadCount} ta o'qilmagan`
+            : "Yangiliklar va xabarlar"
+        }
+        disabled={open}
+      >
+        <PopoverTrigger asChild>
+          <Button
+            type="button"
+            variant="ghost"
+            size="icon"
+            className={cn("relative", navIconButtonClass)}
+            aria-label="Bildirishnomalar"
+          >
+            <BellIcon />
+            {unreadCount > 0 ? (
+              <span className="absolute top-1 right-1 flex min-w-4 items-center justify-center rounded-full bg-nav-active px-1 py-0.5 text-[10px] font-semibold leading-none text-nav-active-foreground ring-2 ring-background">
+                {unreadCount > 99 ? "99+" : unreadCount}
+              </span>
+            ) : null}
+          </Button>
+        </PopoverTrigger>
+      </NavbarTooltip>
 
       <PopoverContent
         align="end"

@@ -1,8 +1,12 @@
 import { Eye, Heart, MessageSquare } from "lucide-react";
 import Link from "next/link";
-import { ArticleImageCarousel } from "@/components/articles/article-image-carousel";
+import {
+  HomepageArticleLink,
+  HomepageHoverTitle,
+} from "@/components/articles/homepage-hover-title";
+import { HomepageArticleMedia } from "@/components/articles/homepage-article-media";
+import { HomepageHeroMedia } from "@/components/articles/homepage-hero-media";
 import type { ArticleSummary } from "@/features/articles/types";
-import { getArticleImageUrls } from "@/lib/articles/images";
 import { formatArticleExcerpt, hasArticleExcerpt, truncateToWords } from "@/lib/articles/excerpt";
 import { htmlToPlainText } from "@/lib/articles/plain-text";
 import { formatCount, formatRelativeTime } from "@/lib/format";
@@ -21,6 +25,12 @@ function articleHref(slug: string) {
 
 function articleTime(article: ArticleSummary) {
   return article.publishedAt ?? article.createdAt;
+}
+
+function articleHoverHint(article: ArticleSummary) {
+  const category = article.categories?.[0]?.name ?? "Maqola";
+  const time = articleTime(article);
+  return time ? `${category} · ${formatRelativeTime(time)}` : category;
 }
 
 function articlePopularityScore(article: ArticleSummary) {
@@ -167,9 +177,11 @@ export function HomepageFeed({
         <div className="flex flex-col border-b border-border/70 pb-4 xl:h-full xl:border-b-0 xl:border-t xl:pt-4">
           <div className="flex flex-col gap-5 sm:gap-6">
             {leftLead.map((article, index) => (
-              <Link
+              <HomepageArticleLink
                 key={article.id}
                 href={articleHref(article.slug)}
+                title={article.title}
+                hint={articleHoverHint(article)}
                 className={cn(
                   "group block min-w-0 border-border/70 py-1 transition-colors",
                   index < leftLead.length - 1 && "border-b pb-5",
@@ -186,48 +198,49 @@ export function HomepageFeed({
                   {formatArticleExcerpt(article.title, article.excerpt)}
                 </p>
               ) : null}
-            </Link>
+            </HomepageArticleLink>
             ))}
           </div>
         </div>
 
         <div className="flex h-full flex-col gap-4">
-          <Link
-            href={articleHref(hero.slug)}
-            className="group block shrink-0 overflow-hidden rounded-[1.6rem] border bg-card shadow-sm"
+          <HomepageHoverTitle
+            title={hero.title}
+            hint={articleHoverHint(hero)}
+            className="block shrink-0"
           >
-            <div className="relative h-[240px] overflow-hidden bg-muted sm:h-[320px] xl:h-[360px]">
-              <ArticleImageCarousel
-                images={getArticleImageUrls(hero)}
-                alt={hero.title}
-                priority
-                sizes="(min-width: 1280px) 620px, (min-width: 768px) 60vw, 100vw"
-                imageClassName="transition-transform duration-500 group-hover:scale-[1.03]"
-              />
-            </div>
-          </Link>
+            <HomepageHeroMedia
+              article={hero}
+              href={articleHref(hero.slug)}
+              className="h-[240px] sm:h-[320px] xl:h-[360px]"
+              imageClassName="transition-transform duration-500 group-hover:scale-[1.03]"
+            />
+          </HomepageHoverTitle>
 
           <div className="grid min-h-0 flex-1 gap-4 xl:grid-cols-[minmax(0,0.92fr)_minmax(0,1.08fr)] xl:items-stretch">
             <div className="flex flex-col gap-3">
               {centerList.map((article) => (
-                <Link
+                <HomepageHoverTitle
                   key={article.id}
-                  href={articleHref(article.slug)}
+                  title={article.title}
+                  hint={articleHoverHint(article)}
                   className="group grid grid-cols-[60px_minmax(0,1fr)] items-center gap-3 rounded-2xl border bg-card p-3 shadow-sm transition-colors hover:bg-muted/30 sm:grid-cols-[68px_minmax(0,1fr)]"
                 >
-                  <div className="relative h-[60px] shrink-0 overflow-hidden rounded-xl bg-muted sm:h-[68px]">
-                    <ArticleImageCarousel
-                      images={getArticleImageUrls(article)}
-                      alt={article.title}
-                      sizes="80px"
-                      showDots={false}
-                      imageClassName="transition-transform duration-300 group-hover:scale-[1.03]"
-                    />
-                  </div>
-                  <p className="line-clamp-3 min-w-0 break-words text-[0.95rem] font-semibold leading-5 text-foreground group-hover:text-primary sm:text-base sm:leading-6">
+                  <HomepageArticleMedia
+                    article={article}
+                    href={articleHref(article.slug)}
+                    compactDots
+                    sizes="80px"
+                    className="relative h-[60px] w-[60px] shrink-0 rounded-xl sm:h-[68px] sm:w-[68px]"
+                    imageClassName="transition-transform duration-300 group-hover:scale-[1.03]"
+                  />
+                  <Link
+                    href={articleHref(article.slug)}
+                    className="line-clamp-3 min-w-0 break-words text-[0.95rem] font-semibold leading-5 text-foreground group-hover:text-primary sm:text-base sm:leading-6"
+                  >
                     {article.title}
-                  </p>
-                </Link>
+                  </Link>
+                </HomepageHoverTitle>
               ))}
             </div>
 
@@ -236,8 +249,10 @@ export function HomepageFeed({
                 <p className="shrink-0 text-sm font-bold tracking-tight text-foreground">
                   Ko&apos;pchilik tanlovi
                 </p>
-                <Link
+                <HomepageArticleLink
                   href={articleHref(crowdChoice.slug)}
+                  title={crowdChoice.title}
+                  hint={articleHoverHint(crowdChoice)}
                   className="group mt-3 block space-y-2.5"
                 >
                   <div className="inline-flex items-center gap-2 text-xs text-muted-foreground">
@@ -273,7 +288,7 @@ export function HomepageFeed({
                       <span>{formatCount(crowdChoice.commentCount ?? 0)}</span>
                     </span>
                   </div>
-                </Link>
+                </HomepageArticleLink>
               </div>
             ) : null}
           </div>
@@ -292,7 +307,12 @@ export function HomepageFeed({
                   index < rightLatest.length - 1 && "border-b",
                 )}
               >
-                <Link href={articleHref(article.slug)} className="group block space-y-2">
+                <HomepageArticleLink
+                  href={articleHref(article.slug)}
+                  title={article.title}
+                  hint={articleHoverHint(article)}
+                  className="group block space-y-2"
+                >
                   <p className="line-clamp-3 text-[0.95rem] font-medium leading-6 text-foreground group-hover:text-primary">
                     {article.title}
                   </p>
@@ -305,7 +325,7 @@ export function HomepageFeed({
                       </>
                     ) : null}
                   </div>
-                </Link>
+                </HomepageArticleLink>
               </li>
             ))}
           </ul>
@@ -326,19 +346,22 @@ export function HomepageFeed({
               "md:grid-cols-[minmax(0,1.15fr)_minmax(0,1fr)] md:items-stretch",
           )}
         >
-          <Link
-            href={articleHref(urgentLead.slug)}
+          <HomepageHoverTitle
+            title={urgentLead.title}
+            hint={articleHoverHint(urgentLead)}
             className="group flex h-full flex-col overflow-hidden rounded-[1.6rem] border bg-card shadow-sm"
           >
-            <div className="relative min-h-[230px] flex-1 bg-muted sm:min-h-[300px]">
-              <ArticleImageCarousel
-                images={getArticleImageUrls(urgentLead)}
-                alt={urgentLead.title}
-                sizes="(min-width: 1280px) 700px, 100vw"
-                imageClassName="transition-transform duration-500 group-hover:scale-[1.03]"
-              />
-            </div>
-            <div className="shrink-0 space-y-3 p-5 sm:p-6">
+            <HomepageArticleMedia
+              article={urgentLead}
+              href={articleHref(urgentLead.slug)}
+              sizes="(min-width: 1280px) 700px, 100vw"
+              className="min-h-[230px] flex-1 sm:min-h-[300px]"
+              imageClassName="transition-transform duration-500 group-hover:scale-[1.03]"
+            />
+            <Link
+              href={articleHref(urgentLead.slug)}
+              className="shrink-0 space-y-3 p-5 sm:p-6"
+            >
               <div className="flex items-center gap-2 text-xs text-muted-foreground">
                 <span>{urgentLead.categories?.[0]?.name ?? "Dolzarb"}</span>
                 {articleTime(urgentLead) ? (
@@ -356,26 +379,29 @@ export function HomepageFeed({
                   {formatArticleExcerpt(urgentLead.title, urgentLead.excerpt)}
                 </p>
               ) : null}
-            </div>
-          </Link>
+            </Link>
+          </HomepageHoverTitle>
 
           {urgentGrid.length > 0 ? (
             <div className="grid h-full grid-cols-2 grid-rows-2 gap-4">
               {urgentGrid.map((article) => (
-                <Link
+                <HomepageHoverTitle
                   key={article.id}
-                  href={articleHref(article.slug)}
+                  title={article.title}
+                  hint={articleHoverHint(article)}
                   className="group flex h-full min-h-0 flex-col overflow-hidden rounded-[1.5rem] border bg-card p-3 shadow-sm transition-colors hover:bg-muted/25"
                 >
-                  <div className="relative min-h-[7.5rem] flex-1 overflow-hidden rounded-[1.15rem] bg-muted">
-                    <ArticleImageCarousel
-                      images={getArticleImageUrls(article)}
-                      alt={article.title}
-                      sizes="(min-width: 640px) 280px, 100vw"
-                      imageClassName="transition-transform duration-300 group-hover:scale-[1.03]"
-                    />
-                  </div>
-                  <div className="mt-3 shrink-0 space-y-2">
+                  <HomepageArticleMedia
+                    article={article}
+                    href={articleHref(article.slug)}
+                    sizes="(min-width: 640px) 280px, 100vw"
+                    className="relative min-h-[7.5rem] flex-1 rounded-[1.15rem]"
+                    imageClassName="transition-transform duration-300 group-hover:scale-[1.03]"
+                  />
+                  <Link
+                    href={articleHref(article.slug)}
+                    className="mt-3 shrink-0 space-y-2"
+                  >
                     <div className="flex items-center gap-2 text-xs text-muted-foreground">
                       {articleTime(article) ? (
                         <span>{formatRelativeTime(articleTime(article)!)}</span>
@@ -384,8 +410,8 @@ export function HomepageFeed({
                     <p className="line-clamp-2 text-sm font-bold leading-snug text-foreground group-hover:text-primary sm:text-base">
                       {article.title}
                     </p>
-                  </div>
-                </Link>
+                  </Link>
+                </HomepageHoverTitle>
               ))}
             </div>
           ) : null}
@@ -402,28 +428,31 @@ export function HomepageFeed({
           </div>
           <div className="grid auto-rows-fr gap-4 sm:grid-cols-2 xl:grid-cols-4">
             {showcase.map((article) => (
-              <Link
+              <HomepageHoverTitle
                 key={article.id}
-                href={articleHref(article.slug)}
+                title={article.title}
+                hint={articleHoverHint(article)}
                 className="group flex h-full flex-col overflow-hidden rounded-[1.6rem] border bg-card shadow-sm transition-transform duration-200 hover:-translate-y-1"
               >
-                <div className="relative h-52 shrink-0 bg-muted">
-                  <ArticleImageCarousel
-                    images={getArticleImageUrls(article)}
-                    alt={article.title}
-                    sizes="(min-width: 1280px) 320px, (min-width: 640px) 50vw, 100vw"
-                    imageClassName="transition-transform duration-300 group-hover:scale-[1.03]"
-                  />
-                </div>
-                <div className="flex flex-1 flex-col justify-between space-y-3 bg-slate-900 p-4 text-white dark:bg-slate-950">
+                <HomepageArticleMedia
+                  article={article}
+                  href={articleHref(article.slug)}
+                  sizes="(min-width: 1280px) 320px, (min-width: 640px) 50vw, 100vw"
+                  className="h-52 shrink-0"
+                  imageClassName="transition-transform duration-300 group-hover:scale-[1.03]"
+                />
+                <Link
+                  href={articleHref(article.slug)}
+                  className="flex flex-1 flex-col justify-between space-y-3 bg-slate-900 p-4 text-white dark:bg-slate-950"
+                >
                   <p className="text-xs uppercase tracking-wide text-white/65">
                     {article.categories?.[0]?.name ?? "Saralangan"}
                   </p>
                   <p className="line-clamp-4 text-[1.05rem] font-bold leading-[1.25] sm:text-[1.2rem]">
                     {article.title}
                   </p>
-                </div>
-              </Link>
+                </Link>
+              </HomepageHoverTitle>
             ))}
           </div>
         </div>
@@ -432,21 +461,21 @@ export function HomepageFeed({
       {lowerGrid.length > 0 ? (
         <div className="grid gap-4 lg:grid-cols-2">
           {lowerGrid.map((article) => (
-            <Link
+            <HomepageHoverTitle
               key={article.id}
-              href={articleHref(article.slug)}
+              title={article.title}
+              hint={articleHoverHint(article)}
               className="group flex gap-4 rounded-[1.5rem] border bg-card p-4 shadow-sm transition-colors hover:bg-muted/25"
             >
-              <div className="relative hidden h-36 w-48 shrink-0 overflow-hidden rounded-[1.15rem] bg-muted sm:block">
-                <ArticleImageCarousel
-                  images={getArticleImageUrls(article)}
-                  alt={article.title}
-                  sizes="192px"
-                  showDots={false}
-                  imageClassName="transition-transform duration-300 group-hover:scale-[1.03]"
-                />
-              </div>
-              <div className="min-w-0 space-y-3">
+              <HomepageArticleMedia
+                article={article}
+                href={articleHref(article.slug)}
+                compactDots
+                sizes="192px"
+                className="relative hidden h-36 w-48 shrink-0 rounded-[1.15rem] sm:block"
+                imageClassName="transition-transform duration-300 group-hover:scale-[1.03]"
+              />
+              <Link href={articleHref(article.slug)} className="min-w-0 space-y-3">
                 <div className="flex items-center gap-2 text-xs text-muted-foreground">
                   <span>{article.categories?.[0]?.name ?? "Maqola"}</span>
                   {articleTime(article) ? (
@@ -464,8 +493,8 @@ export function HomepageFeed({
                     {formatArticleExcerpt(article.title, article.excerpt)}
                   </p>
                 ) : null}
-              </div>
-            </Link>
+              </Link>
+            </HomepageHoverTitle>
           ))}
         </div>
       ) : null}

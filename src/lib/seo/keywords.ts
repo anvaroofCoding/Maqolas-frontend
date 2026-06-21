@@ -1,5 +1,6 @@
 import type { ArticleCategory } from "@/features/articles/types";
 import { siteConfig } from "@/config/site";
+import { coreMaqolaKeywords } from "@/lib/seo/core-keywords";
 
 export function buildArticleKeywords(
   title: string,
@@ -22,8 +23,10 @@ export function buildArticleKeywords(
     "maqola",
     "maqolalar",
     "o'zbekcha maqola",
+    "uzbek maqola",
     ...categoryKeywords,
     ...authorKeywords,
+    ...coreMaqolaKeywords,
     ...siteConfig.keywords,
   ]);
 }
@@ -32,11 +35,22 @@ export function buildTopicKeywords(topicLabel: string, slug: string): string[] {
   return dedupeKeywords([
     `${topicLabel} maqolalari`,
     `${topicLabel} bo'yicha maqola`,
+    `${topicLabel} maqolasi`,
+    `${topicLabel} haqida maqola`,
     topicLabel,
     slug,
-    "maqola",
+    ...coreMaqolaKeywords,
+    ...siteConfig.keywords,
+  ]);
+}
+
+export function buildMaqolalarHubKeywords(): string[] {
+  return dedupeKeywords([
     "maqolalar",
-    "o'zbekcha maqolalar",
+    "barcha maqolalar",
+    "maqolalar ro'yxati",
+    "maqolalar katalogi",
+    ...coreMaqolaKeywords,
     ...siteConfig.keywords,
   ]);
 }

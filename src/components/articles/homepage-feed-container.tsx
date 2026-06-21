@@ -3,6 +3,7 @@
 import { useEffect, useState } from "react";
 import { HomepageFeed } from "@/components/articles/homepage-feed";
 import { HomepageFeedSkeleton } from "@/components/articles/homepage-feed-skeleton";
+import { HomepageSeoIntroSkeleton } from "@/components/seo/homepage-seo-intro-skeleton";
 import { useGetHomepageLayoutQuery } from "@/features/articles/api/articles-api";
 import type { HomepageLayoutResponse } from "@/features/articles/types";
 import { useAppSelector } from "@/lib/store/hooks";
@@ -30,7 +31,12 @@ export function HomepageFeedContainer({
   const activeData = data ?? initialData;
 
   if (mounted && accessToken && isLoading) {
-    return <HomepageFeedSkeleton title={`${title} yuklanmoqda`} />;
+    return (
+      <>
+        <HomepageSeoIntroSkeleton label={`${title} yuklanmoqda`} />
+        <HomepageFeedSkeleton title={`${title} yuklanmoqda`} showIntro={false} />
+      </>
+    );
   }
 
   return (

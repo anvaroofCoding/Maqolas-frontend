@@ -2,6 +2,7 @@
 
 import {
   BellIcon,
+  CloudSunIcon,
   PaletteIcon,
   RotateCcwIcon,
   SparklesIcon,
@@ -38,8 +39,8 @@ export function SettingsModal() {
         <DialogHeader>
           <DialogTitle>Sozlamalar</DialogTitle>
           <DialogDescription>
-            Sayt ko&apos;rinishi, bildirishnoma ovozlari va yozish yordamchisini
-            sozlang.
+            Sayt ko&apos;rinishi, navbar animatsiyalari, bildirishnoma ovozlari
+            va yozish yordamchisini sozlang.
           </DialogDescription>
         </DialogHeader>
 
@@ -125,6 +126,48 @@ export function SettingsModal() {
                     </button>
                   );
                 })}
+              </div>
+            </section>
+
+            <section className="rounded-xl border p-4">
+              <div className="flex items-start justify-between gap-4">
+                <div className="space-y-1">
+                  <Label
+                    htmlFor="navbar-weather"
+                    className="inline-flex items-center gap-1.5 text-sm font-medium"
+                  >
+                    <CloudSunIcon className="size-3.5" />
+                    Navbar ob-havo animatsiyasi
+                  </Label>
+                  <p className="text-xs text-muted-foreground">
+                    Random tugmasi oldida joriy ob-havoga mos kichik animatsiya
+                    ko&apos;rsatiladi.
+                  </p>
+                </div>
+                <button
+                  id="navbar-weather"
+                  type="button"
+                  role="switch"
+                  aria-checked={settings.navbarWeatherEnabled}
+                  onClick={() =>
+                    updateSettings({
+                      navbarWeatherEnabled: !settings.navbarWeatherEnabled,
+                    })
+                  }
+                  className={cn(
+                    "relative inline-flex h-6 w-11 shrink-0 cursor-pointer rounded-full border-2 border-transparent transition-colors",
+                    settings.navbarWeatherEnabled ? "bg-nav-active" : "bg-muted",
+                  )}
+                >
+                  <span
+                    className={cn(
+                      "pointer-events-none block size-5 rounded-full bg-background shadow-sm transition-transform",
+                      settings.navbarWeatherEnabled
+                        ? "translate-x-5"
+                        : "translate-x-0",
+                    )}
+                  />
+                </button>
               </div>
             </section>
 

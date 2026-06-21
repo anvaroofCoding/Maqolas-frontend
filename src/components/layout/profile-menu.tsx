@@ -13,6 +13,7 @@ import {
 import { useRouter } from "next/navigation";
 import { forwardRef, useEffect, useState } from "react";
 import { AuthLoginModal } from "@/components/auth/auth-login-modal";
+import { NavbarTooltip } from "@/components/layout/navbar-tooltip";
 import { useSettings } from "@/components/providers/settings-provider";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
@@ -76,6 +77,7 @@ export function ProfileMenu() {
   const router = useRouter();
   const [mounted, setMounted] = useState(false);
   const [loginOpen, setLoginOpen] = useState(false);
+  const [menuOpen, setMenuOpen] = useState(false);
 
   const isAuthenticated = useAppSelector((state) => state.auth.isAuthenticated);
   const user = useAppSelector((state) => state.auth.user);
@@ -106,47 +108,57 @@ export function ProfileMenu() {
 
   if (!mounted) {
     return (
-      <Button
-        type="button"
-        variant="ghost"
-        size="icon"
-        className={profileTriggerClass}
-        aria-label="Profil"
-        disabled
-      >
-        <Avatar size="sm">
-          <AvatarFallback className="bg-muted text-xs">···</AvatarFallback>
-        </Avatar>
-      </Button>
+      <NavbarTooltip label="Profil" disabled>
+        <Button
+          type="button"
+          variant="ghost"
+          size="icon"
+          className={profileTriggerClass}
+          aria-label="Profil"
+          disabled
+        >
+          <Avatar size="sm">
+            <AvatarFallback className="bg-muted text-xs">···</AvatarFallback>
+          </Avatar>
+        </Button>
+      </NavbarTooltip>
     );
   }
 
   if (!isLoggedIn) {
     return (
       <>
-        <Button
-          type="button"
-          variant="ghost"
-          size="sm"
-          className={cn("gap-2 px-2.5", navIconButtonClass)}
-          aria-label="Kirish"
-          onClick={() => setLoginOpen(true)}
-        >
-          <span className="text-sm font-medium text-foreground">Kirish</span>
-        </Button>
+        <NavbarTooltip label="Kirish" hint="Hisobingizga kiring">
+          <Button
+            type="button"
+            variant="ghost"
+            size="sm"
+            className={cn("gap-2 px-2.5", navIconButtonClass)}
+            aria-label="Kirish"
+            onClick={() => setLoginOpen(true)}
+          >
+            <span className="text-sm font-medium text-foreground">Kirish</span>
+          </Button>
+        </NavbarTooltip>
         <AuthLoginModal open={loginOpen} onOpenChange={setLoginOpen} />
       </>
     );
   }
 
   return (
-    <DropdownMenu>
-      <DropdownMenuTrigger asChild>
-        <ProfileAvatarTrigger
-          avatarUrl={activeUser?.avatarUrl}
-          displayName={activeUser?.displayName}
-        />
-      </DropdownMenuTrigger>
+    <DropdownMenu open={menuOpen} onOpenChange={setMenuOpen}>
+      <NavbarTooltip
+        label="Profil menyusi"
+        hint={activeUser?.displayName ?? "Hisobingiz"}
+        disabled={menuOpen}
+      >
+        <DropdownMenuTrigger asChild>
+          <ProfileAvatarTrigger
+            avatarUrl={activeUser?.avatarUrl}
+            displayName={activeUser?.displayName}
+          />
+        </DropdownMenuTrigger>
+      </NavbarTooltip>
       <DropdownMenuContent align="end" className="w-60">
         <DropdownMenuLabel className="font-normal">
           <p className="truncate text-sm font-medium">

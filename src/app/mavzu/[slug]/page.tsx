@@ -37,7 +37,7 @@ export async function generateMetadata({ params }: TopicPageProps) {
   }
 
   return buildPageMetadata({
-    title: `${topic.name} maqolalari`,
+    title: `${topic.name} maqolalari — o'zbekcha maqolalar`,
     description: buildTopicDescription(topic.name),
     path: `/mavzu/${slug}`,
     keywords: buildTopicKeywords(topic.name, slug),

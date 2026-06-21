@@ -3,6 +3,7 @@
 import { SearchIcon } from "lucide-react";
 import { useEffect, useState } from "react";
 import { ArticleSearchDialog } from "@/components/layout/article-search-dialog";
+import { NavbarTooltip } from "@/components/layout/navbar-tooltip";
 import { Button } from "@/components/ui/button";
 import { navIconButtonClass } from "@/lib/layout";
 import { cn } from "@/lib/utils";
@@ -31,16 +32,18 @@ export function ArticleSearchTrigger() {
 
   return (
     <>
-      <Button
-        type="button"
-        variant="ghost"
-        size="icon"
-        className={cn(navIconButtonClass)}
-        aria-label="Maqolalarni qidirish"
-        onClick={() => setOpen(true)}
-      >
-        <SearchIcon />
-      </Button>
+      <NavbarTooltip label="Qidiruv" hint="Ctrl + K">
+        <Button
+          type="button"
+          variant="ghost"
+          size="icon"
+          className={cn(navIconButtonClass)}
+          aria-label="Maqolalarni qidirish"
+          onClick={() => setOpen(true)}
+        >
+          <SearchIcon />
+        </Button>
+      </NavbarTooltip>
 
       {mounted ? (
         <ArticleSearchDialog open={open} onOpenChange={setOpen} />

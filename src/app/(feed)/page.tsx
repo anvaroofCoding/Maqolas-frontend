@@ -1,22 +1,19 @@
 import { connection } from "next/server";
 import { HomepageFeedWithPagination } from "@/components/articles/homepage-feed-with-pagination";
+import { HomepageSeoIntro } from "@/components/seo/homepage-seo-intro";
 import { JsonLdScript } from "@/components/seo/json-ld-script";
 import { fetchArticleFeed } from "@/lib/articles/server";
-import { buildItemListJsonLd } from "@/lib/seo/json-ld";
+import { buildHomepageDescription } from "@/lib/seo/description";
+import { buildFaqJsonLd, buildItemListJsonLd } from "@/lib/seo/json-ld";
 import { buildPageMetadata } from "@/lib/seo/metadata";
+import { coreMaqolaKeywords } from "@/lib/seo/core-keywords";
 import { feedMainClassName } from "@/lib/layout";
 
 export const metadata = buildPageMetadata({
   titleFormat: "site",
+  description: buildHomepageDescription(),
   path: "/",
-  keywords: [
-    "maqola",
-    "maqolalar",
-    "o'zbekcha maqolalar",
-    "maqola o'qish",
-    "maqola yozish",
-    "eng yaxshi maqolalar",
-  ],
+  keywords: [...coreMaqolaKeywords],
 });
 
 export default async function HomePage() {
@@ -27,12 +24,16 @@ export default async function HomePage() {
   return (
     <main className={feedMainClassName}>
       <JsonLdScript
-        data={buildItemListJsonLd(
-          "Ommabop o'zbekcha maqolalar",
-          "/",
-          feed.articles,
-        )}
+        data={[
+          buildItemListJsonLd(
+            "Ommabop o'zbekcha maqolalar",
+            "/",
+            feed.articles,
+          ),
+          buildFaqJsonLd(),
+        ]}
       />
+      <HomepageSeoIntro variant="home" />
       <HomepageFeedWithPagination
         feed={feed}
         latestFeed={latestFeed}

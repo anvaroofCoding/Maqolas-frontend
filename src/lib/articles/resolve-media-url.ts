@@ -19,6 +19,31 @@ export function resolveMediaUrl(url?: string | null): string | null {
   return `${getApiOrigin()}/${trimmed}`;
 }
 
+/** Backend uploads — frontend orqali proxy qilinadi (next.config rewrites) */
+export function resolveUploadUrl(url?: string | null): string | null {
+  if (!url?.trim()) return null;
+
+  const trimmed = url.trim();
+  if (trimmed.startsWith("blob:") || trimmed.startsWith("data:")) {
+    return trimmed;
+  }
+
+  if (trimmed.startsWith("/uploads/")) {
+    return trimmed;
+  }
+
+  try {
+    const parsed = new URL(trimmed);
+    if (parsed.pathname.startsWith("/uploads/")) {
+      return parsed.pathname + parsed.search;
+    }
+  } catch {
+    /* not an absolute URL */
+  }
+
+  return resolveMediaUrl(trimmed);
+}
+
 const PRIVATE_IPV4 =
   /^(127\.|10\.|192\.168\.|169\.254\.|0\.|172\.(1[6-9]|2\d|3[0-1])\.)/;
 

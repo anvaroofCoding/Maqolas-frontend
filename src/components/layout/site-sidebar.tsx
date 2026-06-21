@@ -64,7 +64,7 @@ export function SiteSidebar() {
       className={cn("w-full shrink-0 bg-transparent", sidebarWidthClass)}
       aria-label="Yon menyu"
     >
-      <nav className="flex flex-col gap-1 pb-4 pr-2">
+      <nav className="flex flex-col gap-1 pb-4 pr-2 pt-0">
         {mainNavItems.map((item) => (
           <SidebarNavItem
             key={item.href}

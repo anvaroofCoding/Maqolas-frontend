@@ -22,7 +22,7 @@ export function PopularCommentsWidget({
 
   return (
     <Card className="overflow-hidden rounded-2xl border-border/70 shadow-sm">
-      <CardHeader className="px-4 pb-2 pt-4">
+      <CardHeader className="px-4 py-3">
         <CardTitle className="text-base font-semibold tracking-tight">
           Mashxur izohlar
         </CardTitle>

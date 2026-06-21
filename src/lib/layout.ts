@@ -10,8 +10,11 @@ export const articleSurfaceClassName =
 export const feedMainClassName =
   "w-full min-w-0 max-w-full px-3 py-0 md:px-4 lg:px-5";
 
-/** Feed sahifalarida uch ustunni bir xil balandlikda boshlash */
+/** Feed sahifalarida ustunlar bir xil balandlikda boshlanadi */
 export const feedColumnTopPaddingClass = "md:pt-6 md:pb-6";
+
+/** Sidebar, asosiy kontent va o'ng panel bir xil tepadan boshlanishi */
+export const feedColumnAlignClassName = "flex flex-col md:pt-6 md:pb-6";
 
 /** Feed ustunlari — mustaqil scroll, yashirin scrollbar */
 export const feedColumnScrollClassName =

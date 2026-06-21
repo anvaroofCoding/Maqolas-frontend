@@ -4,10 +4,10 @@
  */
 export const siteConfig = {
   name: "Maqolas",
-  title: "Maqolas — O'zbekcha maqolalar platformasi",
-  tagline: "Maqolas platformasida maqolalaringizni yozing",
+  title: "Maqolalar — O'zbekcha maqolalar o'qish va yozish | Maqolas",
+  tagline: "O'zbekcha maqolalar — o'qing, yozing, ulashing",
   description:
-    "Maqolas platformasida maqolalaringizni yozing. O'zbekcha maqolalar o'qish va nashr etish uchun zamonaviy platforma. Yaratuvchi: Islomjon Anvarov (Full stack developer). Telegram: @rivoqchi.",
+    "Maqolalar va o'zbekcha maqolalar uchun №1 platforma. Maqola o'qish, maqola yozish va turli mavzularda maqolalarni bepul toping. Texnologiya, startap, AI va boshqa mavzularda eng yaxshi maqolalar — Maqolas.",
   url: process.env.NEXT_PUBLIC_APP_URL ?? "http://localhost:3000",
   host: process.env.NEXT_PUBLIC_SITE_HOST ?? "maqolas.tm2.uz",
   /** HTML lang atributi (BCP 47) */
@@ -31,17 +31,20 @@ export const siteConfig = {
     "maqola",
     "maqolalar",
     "o'zbekcha maqolalar",
+    "uzbek maqolalar",
+    "uzbekcha maqolalar",
     "maqola o'qish",
     "maqola yozish",
-    "maqolas platformasida maqolalaringizni yozing",
+    "maqola platformasi",
+    "eng yaxshi maqolalar",
+    "maqola mavzulari",
     "maqolas platformasi",
-    "Islomjon Anvarov",
-    "Maqolas yaratuvchisi",
-    "rivoqchi",
-    "bilim platformasi",
-    "yangiliklar",
-    "o'zbek tili",
+    "bilim maqolalari",
+    "o'zbek tili maqolalari",
+    "yangi maqolalar",
     "maqolas",
+    "Islomjon Anvarov",
+    "rivoqchi",
   ] as const,
 } as const;
 

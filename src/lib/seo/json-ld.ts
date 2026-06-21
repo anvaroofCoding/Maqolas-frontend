@@ -61,7 +61,12 @@ export function buildOrganizationJsonLd() {
     "@context": "https://schema.org",
     "@type": "Organization",
     name: siteConfig.name,
-    alternateName: [siteConfig.name, siteConfig.host],
+    alternateName: [
+      "Maqolalar",
+      "O'zbekcha maqolalar",
+      siteConfig.name,
+      siteConfig.host,
+    ],
     url: siteConfig.url,
     founder: creator,
     logo: {
@@ -83,7 +88,14 @@ export function buildWebSiteJsonLd() {
     "@context": "https://schema.org",
     "@type": "WebSite",
     name: siteConfig.name,
-    alternateName: [siteConfig.name, siteConfig.host],
+    alternateName: [
+      "Maqolalar",
+      "Maqola",
+      "O'zbekcha maqolalar",
+      "Uzbek maqolalar",
+      siteConfig.name,
+      siteConfig.host,
+    ],
     url: siteConfig.url,
     description: siteConfig.description,
     inLanguage: siteConfig.htmlLang,
@@ -103,7 +115,7 @@ export function buildWebSiteJsonLd() {
       "@type": "SearchAction",
       target: {
         "@type": "EntryPoint",
-        urlTemplate: `${siteConfig.url.replace(/\/$/, "")}/?q={search_term_string}`,
+        urlTemplate: `${siteConfig.url.replace(/\/$/, "")}/maqolalar?q={search_term_string}`,
       },
       "query-input": "required name=search_term_string",
     },
@@ -303,8 +315,67 @@ export function buildTopicPageJsonLd(topicLabel: string, slug: string) {
     "@context": "https://schema.org",
     "@type": "CollectionPage",
     name: `${topicLabel} maqolalari`,
-    description: `${topicLabel} bo'yicha o'zbekcha maqolalar — Maqolas platformasida o'qing yoki maqolalaringizni yozing.`,
+    description: `${topicLabel} bo'yicha o'zbekcha maqolalar — maqola o'qish va yozish uchun Maqolas platformasi.`,
     url: topicUrl(slug),
+    inLanguage: siteConfig.htmlLang,
+    isPartOf: {
+      "@type": "WebSite",
+      name: siteConfig.name,
+      url: siteConfig.url,
+    },
+    about: {
+      "@type": "Thing",
+      name: `${topicLabel} maqolalari`,
+    },
+  };
+}
+
+const FAQ_ENTRIES = [
+  {
+    question: "Maqolalar qayerda o'qish mumkin?",
+    answer:
+      "Maqolas platformasida minglab o'zbekcha maqolalar mavjud. Bosh sahifada ommabop maqolalar, /maqolalar sahifasida barcha mavzular va /yangi sahifasida eng so'nggi maqolalarni topasiz.",
+  },
+  {
+    question: "O'zbekcha maqola qanday yoziladi?",
+    answer:
+      "Maqolas ga ro'yxatdan o'ting, «Maqola yozish» tugmasini bosing va matningizni yozing. Maqolangiz moderatsiyadan o'tgach nashr etiladi va qidiruv tizimlarida ko'rinadi.",
+  },
+  {
+    question: "Maqola va maqolalar farqi nima?",
+    answer:
+      "Maqola — bitta maqola (insho, tahlil, fikr). Maqolalar — bir nechta maqolalar to'plami. Maqolas ikkala holatda ham o'zbekcha kontent o'qish va yozish uchun xizmat qiladi.",
+  },
+  {
+    question: "Qaysi mavzularda maqolalar bor?",
+    answer:
+      "Texnologiya, startaplar, sun'iy intellekt, marketing, ta'lim va boshqa ko'plab mavzularda maqolalar mavjud. /mavzular sahifasidan barcha mavzularni ko'rishingiz mumkin.",
+  },
+] as const;
+
+export function buildFaqJsonLd() {
+  return {
+    "@context": "https://schema.org",
+    "@type": "FAQPage",
+    mainEntity: FAQ_ENTRIES.map((entry) => ({
+      "@type": "Question",
+      name: entry.question,
+      acceptedAnswer: {
+        "@type": "Answer",
+        text: entry.answer,
+      },
+    })),
+  };
+}
+
+export function buildMaqolalarHubJsonLd() {
+  return {
+    "@context": "https://schema.org",
+    "@type": "CollectionPage",
+    name: "Maqolalar — o'zbekcha maqolalar",
+    description:
+      "Barcha mavzulardagi o'zbekcha maqolalar katalogi. Maqola o'qish va yozish uchun Maqolas platformasi.",
+    url: absoluteUrl("/maqolalar"),
     inLanguage: siteConfig.htmlLang,
     isPartOf: {
       "@type": "WebSite",

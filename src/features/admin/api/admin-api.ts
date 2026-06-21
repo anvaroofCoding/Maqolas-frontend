@@ -9,6 +9,8 @@ import type {
   CreateBanPayload,
   Category,
   ReportsResponse,
+  SendAdminEmailPayload,
+  SendAdminEmailResponse,
   CreateCategoryPayload,
   ModerationArticle,
   PublishedArticlesResponse,
@@ -330,6 +332,16 @@ export const adminApi = baseApi.injectEndpoints({
       }),
       invalidatesTags: [{ type: "Admin", id: "ARTICLE_REQUESTS" }],
     }),
+    sendAdminEmail: builder.mutation<
+      SendAdminEmailResponse,
+      SendAdminEmailPayload
+    >({
+      query: (body) => ({
+        url: "/admin/emails/send",
+        method: "POST",
+        body,
+      }),
+    }),
   }),
 });
 
@@ -361,4 +373,5 @@ export const {
   useListArticleRequestsForModerationQuery,
   useApproveArticleRequestMutation,
   useRejectArticleRequestMutation,
+  useSendAdminEmailMutation,
 } = adminApi;

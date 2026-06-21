@@ -43,17 +43,42 @@ function updateCommentInTree(
   });
 }
 
+function patchCommentLikeInTree(
+  comments: ArticleComment[],
+  commentId: string,
+  liked: boolean,
+  likeCount: number,
+): boolean {
+  for (const comment of comments) {
+    if (comment.id === commentId) {
+      comment.likedByMe = liked;
+      comment.likeCount = likeCount;
+      return true;
+    }
+
+    if (comment.replies?.length) {
+      const updated = patchCommentLikeInTree(
+        comment.replies,
+        commentId,
+        liked,
+        likeCount,
+      );
+      if (updated) {
+        return true;
+      }
+    }
+  }
+
+  return false;
+}
+
 function patchCommentLike(
   draft: ArticleCommentsResponse,
   commentId: string,
   liked: boolean,
   likeCount: number,
 ) {
-  draft.comments = updateCommentInTree(draft.comments, commentId, (comment) => ({
-    ...comment,
-    likedByMe: liked,
-    likeCount,
-  }));
+  patchCommentLikeInTree(draft.comments, commentId, liked, likeCount);
 }
 
 export const articlesApi = baseApi.injectEndpoints({

@@ -5,6 +5,7 @@
   "packageManager": "pnpm@11.5.1",
   "scripts": {
     "dev": "next dev --turbopack",
+    "dev:stable": "next dev",
     "build": "next build",
     "start": "next start",
     "lint": "eslint",

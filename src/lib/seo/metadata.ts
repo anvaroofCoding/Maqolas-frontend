@@ -27,7 +27,7 @@ function resolveTitle(input: PageMetadataInput): string {
       return siteConfig.title;
     case "article":
       return input.title
-        ? `${input.title} — Maqola | ${siteConfig.name}`
+        ? `${input.title} — Maqola | O'zbekcha maqolalar`
         : siteConfig.title;
     case "profile":
       return input.title

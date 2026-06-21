@@ -62,6 +62,10 @@ export function loadSettings(): MaqolasSettings {
         typeof parsed.aiAssistEnabled === "boolean"
           ? parsed.aiAssistEnabled
           : DEFAULT_SETTINGS.aiAssistEnabled,
+      navbarWeatherEnabled:
+        typeof parsed.navbarWeatherEnabled === "boolean"
+          ? parsed.navbarWeatherEnabled
+          : DEFAULT_SETTINGS.navbarWeatherEnabled,
     };
   } catch {
     return DEFAULT_SETTINGS;

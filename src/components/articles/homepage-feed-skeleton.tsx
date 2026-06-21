@@ -1,10 +1,16 @@
 import { cn } from "@/lib/utils";
+import { HomepageSeoIntroSkeleton } from "@/components/seo/homepage-seo-intro-skeleton";
 
 type HomepageFeedSkeletonProps = {
   title?: string;
+  /** SEO intro skeleton ko'rsatish (bosh sahifa uchun) */
+  showIntro?: boolean;
 };
 
-export function HomepageFeedSkeleton({ title }: HomepageFeedSkeletonProps) {
+export function HomepageFeedSkeleton({
+  title,
+  showIntro = false,
+}: HomepageFeedSkeletonProps) {
   return (
     <section
       aria-label={title ?? "Maqolalar yuklanmoqda"}
@@ -12,7 +18,11 @@ export function HomepageFeedSkeleton({ title }: HomepageFeedSkeletonProps) {
       role="status"
       className="space-y-8"
     >
-      <span className="sr-only">Maqolalar yuklanmoqda</span>
+      <span className="sr-only">{title ?? "Maqolalar yuklanmoqda"}</span>
+
+      {showIntro ? (
+        <HomepageSeoIntroSkeleton label={title ?? "Maqolalar yuklanmoqda"} />
+      ) : null}
 
       <div className="grid gap-6 xl:grid-cols-[minmax(280px,1.08fr)_minmax(420px,1.35fr)_minmax(260px,0.88fr)]">
         <div className="space-y-4">

@@ -7,8 +7,8 @@ import { SiteMobileNav } from "@/components/layout/site-mobile-nav";
 import { SiteRightSidebar } from "@/components/layout/site-right-sidebar";
 import { SiteSidebar } from "@/components/layout/site-sidebar";
 import {
+  feedColumnAlignClassName,
   feedColumnScrollClassName,
-  feedColumnTopPaddingClass,
   rightSidebarWidthClass,
   sidebarWidthClass,
 } from "@/lib/layout";
@@ -94,13 +94,13 @@ export function AppShell({ children }: { children: React.ReactNode }) {
             sidebarWidthClass,
           )}
         >
-          <div className={feedColumnTopPaddingClass}>
+          <div className={feedColumnAlignClassName}>
             <SiteSidebar />
           </div>
         </div>
 
         <div className={feedColumnScrollClassName}>
-          <div className={cn(useFeedTopPadding && feedColumnTopPaddingClass)}>
+          <div className={cn(useFeedTopPadding && feedColumnAlignClassName)}>
             {showMobileNav ? (
               <div className="md:hidden">
                 <SiteMobileNav />
@@ -118,7 +118,7 @@ export function AppShell({ children }: { children: React.ReactNode }) {
               rightSidebarWidthClass,
             )}
           >
-            <div className={feedColumnTopPaddingClass}>
+            <div className={feedColumnAlignClassName}>
               <SiteRightSidebar />
             </div>
           </div>

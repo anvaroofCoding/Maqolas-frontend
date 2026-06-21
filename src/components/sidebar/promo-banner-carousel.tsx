@@ -5,6 +5,7 @@ import { useEffect, useState } from "react";
 import { Card } from "@/components/ui/card";
 import { Skeleton } from "@/components/ui/skeleton";
 import { useGetBannersQuery } from "@/features/banners/api/banners-api";
+import { resolveUploadUrl } from "@/lib/articles/resolve-media-url";
 import { cn } from "@/lib/utils";
 
 const ROTATE_MS = 6000;
@@ -44,6 +45,11 @@ export function PromoBannerCarousel() {
   }
 
   const activeBanner = banners[activeIndex] ?? banners[0];
+  const imageSrc = resolveUploadUrl(activeBanner.imageUrl);
+
+  if (!imageSrc) {
+    return null;
+  }
 
   return (
     <Card className="overflow-hidden rounded-2xl border-border/70 shadow-sm">
@@ -55,7 +61,7 @@ export function PromoBannerCarousel() {
         aria-label={activeBanner.title ?? "Reklama banneri"}
       >
         <Image
-          src={activeBanner.imageUrl}
+          src={imageSrc}
           alt={activeBanner.title ?? "Reklama"}
           fill
           sizes="288px"

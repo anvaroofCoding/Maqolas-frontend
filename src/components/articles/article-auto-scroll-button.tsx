@@ -3,6 +3,7 @@
 import { ChevronsDownIcon } from "lucide-react";
 import { useCallback, useEffect, useRef, useState } from "react";
 import { Button } from "@/components/ui/button";
+import { DelayedHoverTooltip } from "@/components/ui/delayed-hover-tooltip";
 import { cn } from "@/lib/utils";
 
 const SCROLL_SPEED_LEVELS = [
@@ -196,38 +197,60 @@ export function ArticleAutoScrollButton({
 
   return (
     <>
-      <Button
-        type="button"
-        size="sm"
-        variant="outline"
-        className="h-10 min-w-10 rounded-full px-2.5 text-xs font-semibold"
-        aria-label={`Scroll tezligi: ${currentSpeed.label}. Bosib tezlikni oshiring`}
+      <DelayedHoverTooltip
+        label={`Tezlik: ${currentSpeed.label}`}
+        hint="Bosib scroll tezligini oshiring"
+        placement="below"
+        delayMs={0}
+        className="inline-flex"
         disabled={disabled}
-        onClick={cycleSpeed}
       >
-        {currentSpeed.label}
-      </Button>
+        <Button
+          type="button"
+          size="sm"
+          variant="outline"
+          className="h-10 min-w-10 rounded-full px-2.5 text-xs font-semibold"
+          aria-label={`Scroll tezligi: ${currentSpeed.label}. Bosib tezlikni oshiring`}
+          disabled={disabled}
+          onClick={cycleSpeed}
+        >
+          {currentSpeed.label}
+        </Button>
+      </DelayedHoverTooltip>
 
-      <Button
-        ref={anchorRef}
-        type="button"
-        size="icon"
-        variant={active ? "default" : "outline"}
-        className={cn(
-          "size-10 rounded-full",
-          active &&
-            "bg-nav-active text-nav-active-foreground hover:bg-nav-active-hover hover:text-nav-active-foreground",
-        )}
-        aria-label={active ? "Avto-scrollni o'chirish" : "Avto-scrollni yoqish"}
-        aria-pressed={active}
+      <DelayedHoverTooltip
+        label={active ? "To'xtatish" : "Avto-scroll"}
+        hint={
+          active
+            ? "Avtomatik scrollni to'xtatish"
+            : "Maqolani avtomatik pastga scroll qilish"
+        }
+        placement="below"
+        delayMs={0}
+        className="inline-flex"
         disabled={disabled}
-        onClick={() => setActive((previous) => !previous)}
       >
-        <ChevronsDownIcon
-          className={cn("size-4", active && "animate-pulse")}
-          aria-hidden
-        />
-      </Button>
+        <Button
+          ref={anchorRef}
+          type="button"
+          size="icon"
+          variant={active ? "default" : "outline"}
+          className={cn(
+            "size-10 rounded-full",
+            active &&
+              "bg-nav-active text-nav-active-foreground hover:bg-nav-active-hover hover:text-nav-active-foreground",
+          )}
+          aria-label={active ? "Avto-scrollni o'chirish" : "Avto-scrollni yoqish"}
+          aria-pressed={active}
+          disabled={disabled}
+          onClick={() => setActive((previous) => !previous)}
+        >
+          <ChevronsDownIcon
+            className={cn("size-4", active && "animate-pulse")}
+            aria-hidden
+          />
+        </Button>
+      </DelayedHoverTooltip>
     </>
   );
 }
