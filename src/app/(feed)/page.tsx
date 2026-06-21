@@ -2,7 +2,7 @@ import { connection } from "next/server";
 import { HomepageFeedWithPagination } from "@/components/articles/homepage-feed-with-pagination";
 import { HomepageSeoIntro } from "@/components/seo/homepage-seo-intro";
 import { JsonLdScript } from "@/components/seo/json-ld-script";
-import { fetchHomepageLayout } from "@/lib/articles/server";
+import { fetchArticleFeed, fetchHomepageLayout } from "@/lib/articles/server";
 import { buildHomepageDescription } from "@/lib/seo/description";
 import { buildFaqJsonLd, buildItemListJsonLd } from "@/lib/seo/json-ld";
 import { buildPageMetadata } from "@/lib/seo/metadata";
@@ -18,7 +18,10 @@ export const metadata = buildPageMetadata({
 
 export default async function HomePage() {
   await connection();
-  const homepage = await fetchHomepageLayout();
+  const [homepage, latestFeed] = await Promise.all([
+    fetchHomepageLayout(),
+    fetchArticleFeed({ sort: "newest", limit: 12 }),
+  ]);
 
   return (
     <main className={feedMainClassName}>
@@ -35,6 +38,7 @@ export default async function HomePage() {
       <HomepageSeoIntro variant="home" />
       <HomepageFeedWithPagination
         layoutData={homepage}
+        latestArticles={latestFeed.articles}
         sort={homepage.algorithm}
         title="Siz uchun"
         emptyMessage="Hozircha maqolalar yo'q. Tez orada yangi kontent paydo bo'ladi."

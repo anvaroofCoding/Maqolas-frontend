@@ -16,9 +16,36 @@ import { cn } from "@/lib/utils";
 type HomepageFeedProps = {
   layout: HomepageLayout;
   algorithm?: "popular" | "forYou";
+  /** So'nggi maqolalar ustuni — alohida newest feed */
+  latestArticles?: ArticleSummary[];
+  /** Bo'sh qolsa, feed dan zaxira */
+  fallbackArticles?: ArticleSummary[];
   title: string;
   emptyMessage: string;
 };
+
+function uniqueArticlesById(items: ArticleSummary[]): ArticleSummary[] {
+  const seen = new Set<string>();
+  return items.filter((article) => {
+    if (seen.has(article.id)) return false;
+    seen.add(article.id);
+    return true;
+  });
+}
+
+function pickLatestForSidebar(
+  layoutLatest: ArticleSummary[],
+  latestArticles: ArticleSummary[] | undefined,
+  fallbackArticles: ArticleSummary[] | undefined,
+): ArticleSummary[] {
+  const pool = uniqueArticlesById([
+    ...(latestArticles ?? []),
+    ...layoutLatest,
+    ...(fallbackArticles ?? []),
+  ]);
+
+  return pool.slice(0, 8);
+}
 
 function articleHref(slug: string) {
   return `/maqola/${slug}`;
@@ -49,6 +76,8 @@ function crowdChoiceBody(article: ArticleSummary) {
 
 export function HomepageFeed({
   layout,
+  latestArticles,
+  fallbackArticles,
   title,
   emptyMessage,
 }: HomepageFeedProps) {
@@ -69,7 +98,7 @@ export function HomepageFeed({
     centerList,
     centerFill,
     editorChoice: crowdChoice,
-    latest: rightLatest,
+    latest: layoutLatest,
     urgentLead,
     urgentGrid,
     showcase,
@@ -78,6 +107,11 @@ export function HomepageFeed({
 
   const crowdChoiceText = crowdChoice ? crowdChoiceBody(crowdChoice) : "";
   const centerArticles = [...centerList, ...centerFill];
+  const rightLatest = pickLatestForSidebar(
+    layoutLatest,
+    latestArticles,
+    fallbackArticles,
+  );
 
   return (
     <section aria-label={title} className="space-y-10">
@@ -208,6 +242,7 @@ export function HomepageFeed({
           <h2 className="shrink-0 text-[1.65rem] font-bold tracking-tight text-foreground">
             So&apos;nggi maqolalar
           </h2>
+          {rightLatest.length > 0 ? (
           <ul className="mt-4 flex min-h-0 flex-1 flex-col justify-between">
             {rightLatest.map((article, index) => (
               <li
@@ -239,6 +274,11 @@ export function HomepageFeed({
               </li>
             ))}
           </ul>
+          ) : (
+            <p className="mt-4 text-sm text-muted-foreground">
+              Hozircha yangi maqolalar yo&apos;q.
+            </p>
+          )}
         </aside>
       </div>
 

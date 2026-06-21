@@ -23,6 +23,7 @@ declare global {
     auto_select?: boolean;
     cancel_on_tap_outside?: boolean;
     itp_support?: boolean;
+    context?: "signin" | "signup" | "use";
   }
 
   interface Window {
@@ -34,6 +35,7 @@ declare global {
             momentListener?: (notification: PromptMomentNotification) => void,
           ) => void;
           cancel: () => void;
+          disableAutoSelect: () => void;
         };
       };
     };

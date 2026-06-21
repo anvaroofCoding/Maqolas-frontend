@@ -5,6 +5,7 @@ import type { HomepageLayoutResponse } from "@/features/articles/types";
 
 type HomepageFeedWithPaginationProps = {
   layoutData: HomepageLayoutResponse;
+  latestArticles?: HomepageLayoutResponse["feed"]["articles"];
   sort?: "popular" | "newest" | "forYou";
   category?: string;
   title: string;
@@ -13,6 +14,7 @@ type HomepageFeedWithPaginationProps = {
 
 export function HomepageFeedWithPagination({
   layoutData,
+  latestArticles,
   sort = "popular",
   category,
   title,
@@ -28,6 +30,8 @@ export function HomepageFeedWithPagination({
       <HomepageFeed
         layout={layout}
         algorithm={algorithm}
+        latestArticles={latestArticles}
+        fallbackArticles={feed.articles}
         title={title}
         emptyMessage={emptyMessage}
       />

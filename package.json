@@ -6,6 +6,7 @@
   "scripts": {
     "dev": "next dev --turbopack",
     "dev:stable": "next dev",
+    "prebuild": "tsc --noEmit",
     "build": "next build",
     "start": "next start",
     "lint": "eslint",
