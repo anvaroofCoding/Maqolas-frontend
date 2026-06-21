@@ -2,7 +2,7 @@ import { connection } from "next/server";
 import { HomepageFeedWithPagination } from "@/components/articles/homepage-feed-with-pagination";
 import { HomepageSeoIntro } from "@/components/seo/homepage-seo-intro";
 import { JsonLdScript } from "@/components/seo/json-ld-script";
-import { fetchArticleFeed } from "@/lib/articles/server";
+import { fetchHomepageLayout } from "@/lib/articles/server";
 import { buildHomepageDescription } from "@/lib/seo/description";
 import { buildFaqJsonLd, buildItemListJsonLd } from "@/lib/seo/json-ld";
 import { buildPageMetadata } from "@/lib/seo/metadata";
@@ -18,8 +18,7 @@ export const metadata = buildPageMetadata({
 
 export default async function HomePage() {
   await connection();
-  const feed = await fetchArticleFeed({ sort: "popular" });
-  const latestFeed = await fetchArticleFeed({ sort: "newest" });
+  const homepage = await fetchHomepageLayout();
 
   return (
     <main className={feedMainClassName}>
@@ -28,16 +27,15 @@ export default async function HomePage() {
           buildItemListJsonLd(
             "Ommabop o'zbekcha maqolalar",
             "/",
-            feed.articles,
+            homepage.feed.articles,
           ),
           buildFaqJsonLd(),
         ]}
       />
       <HomepageSeoIntro variant="home" />
       <HomepageFeedWithPagination
-        feed={feed}
-        latestFeed={latestFeed}
-        sort="popular"
+        layoutData={homepage}
+        sort={homepage.algorithm}
         title="Siz uchun"
         emptyMessage="Hozircha maqolalar yo'q. Tez orada yangi kontent paydo bo'ladi."
       />

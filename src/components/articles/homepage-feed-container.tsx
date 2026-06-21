@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { HomepageFeed } from "@/components/articles/homepage-feed";
+import { HomepageFeedWithPagination } from "@/components/articles/homepage-feed-with-pagination";
 import { HomepageFeedSkeleton } from "@/components/articles/homepage-feed-skeleton";
 import { HomepageSeoIntroSkeleton } from "@/components/seo/homepage-seo-intro-skeleton";
 import { useGetHomepageLayoutQuery } from "@/features/articles/api/articles-api";
@@ -40,11 +40,11 @@ export function HomepageFeedContainer({
   }
 
   return (
-    <HomepageFeed
-      layout={activeData.layout}
+    <HomepageFeedWithPagination
+      layoutData={activeData}
+      sort={activeData.algorithm}
       title={title}
       emptyMessage={emptyMessage}
-      algorithm={activeData.algorithm}
     />
   );
 }

@@ -1,38 +1,39 @@
 import { HomepageFeed } from "@/components/articles/homepage-feed";
 import { HomepageWriteInviteBanner } from "@/components/articles/homepage-write-invite-banner";
 import { ArticleFeedLoadMore } from "@/components/articles/article-feed-load-more";
-import type { ArticleFeedResponse } from "@/features/articles/types";
+import type { HomepageLayoutResponse } from "@/features/articles/types";
 
 type HomepageFeedWithPaginationProps = {
-  feed: ArticleFeedResponse;
-  latestFeed?: ArticleFeedResponse;
-  sort?: "popular" | "newest";
+  layoutData: HomepageLayoutResponse;
+  sort?: "popular" | "newest" | "forYou";
   category?: string;
   title: string;
   emptyMessage: string;
 };
 
 export function HomepageFeedWithPagination({
-  feed,
-  latestFeed,
+  layoutData,
   sort = "popular",
   category,
   title,
   emptyMessage,
 }: HomepageFeedWithPaginationProps) {
+  const { layout, algorithm, feed } = layoutData;
   const hasMore = feed.pagination.page < feed.pagination.totalPages;
+  const feedSort: "popular" | "newest" | "forYou" =
+    algorithm === "forYou" ? "forYou" : sort;
 
   return (
     <div className="relative space-y-8 pb-28 md:space-y-10 md:pb-32">
       <HomepageFeed
-        articles={feed.articles}
-        latestArticles={latestFeed?.articles}
+        layout={layout}
+        algorithm={algorithm}
         title={title}
         emptyMessage={emptyMessage}
       />
       {feed.articles.length > 0 && hasMore ? (
         <ArticleFeedLoadMore
-          sort={sort}
+          sort={feedSort}
           category={category}
           startPage={feed.pagination.page + 1}
           hasMore={hasMore}

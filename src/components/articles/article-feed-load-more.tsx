@@ -16,7 +16,7 @@ type FeedVariant = "feed" | "saved" | "user";
 
 type ArticleFeedLoadMoreProps = {
   variant?: FeedVariant;
-  sort?: "popular" | "newest";
+  sort?: "popular" | "newest" | "forYou";
   category?: string;
   username?: string;
   startPage: number;

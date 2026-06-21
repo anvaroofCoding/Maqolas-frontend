@@ -6,15 +6,16 @@ import {
 } from "@/components/articles/homepage-hover-title";
 import { HomepageArticleMedia } from "@/components/articles/homepage-article-media";
 import { HomepageHeroMedia } from "@/components/articles/homepage-hero-media";
-import type { ArticleSummary } from "@/features/articles/types";
+import type { ArticleSummary, HomepageLayout } from "@/features/articles/types";
+import { isHomepageLayoutEmpty } from "@/lib/articles/homepage-layout";
 import { formatArticleExcerpt, hasArticleExcerpt, truncateToWords } from "@/lib/articles/excerpt";
 import { htmlToPlainText } from "@/lib/articles/plain-text";
 import { formatCount, formatRelativeTime } from "@/lib/format";
 import { cn } from "@/lib/utils";
 
 type HomepageFeedProps = {
-  articles: ArticleSummary[];
-  latestArticles?: ArticleSummary[];
+  layout: HomepageLayout;
+  algorithm?: "popular" | "forYou";
   title: string;
   emptyMessage: string;
 };
@@ -33,14 +34,6 @@ function articleHoverHint(article: ArticleSummary) {
   return time ? `${category} · ${formatRelativeTime(time)}` : category;
 }
 
-function articlePopularityScore(article: ArticleSummary) {
-  return (
-    (article.likeCount ?? 0) * 5 +
-    (article.commentCount ?? 0) * 4 +
-    (article.viewCount ?? 0)
-  );
-}
-
 const CROWD_CHOICE_PREVIEW_WORDS = 40;
 
 function crowdChoiceBody(article: ArticleSummary) {
@@ -54,36 +47,12 @@ function crowdChoiceBody(article: ArticleSummary) {
   return truncateToWords(withoutTitle, CROWD_CHOICE_PREVIEW_WORDS);
 }
 
-function uniqueById(items: ArticleSummary[]) {
-  const seen = new Set<string>();
-  return items.filter((item) => {
-    if (seen.has(item.id)) return false;
-    seen.add(item.id);
-    return true;
-  });
-}
-
-function pickArticles(
-  preferred: ArticleSummary[],
-  fallback: ArticleSummary[],
-  limit: number,
-  excludedIds: string[] = [],
-) {
-  const excluded = new Set(excludedIds);
-  return uniqueById([...preferred, ...fallback]).filter((article) => {
-    if (excluded.has(article.id)) return false;
-    excluded.add(article.id);
-    return true;
-  }).slice(0, limit);
-}
-
 export function HomepageFeed({
-  articles,
-  latestArticles = [],
+  layout,
   title,
   emptyMessage,
 }: HomepageFeedProps) {
-  if (articles.length === 0) {
+  if (isHomepageLayoutEmpty(layout)) {
     return (
       <section
         aria-label={title}
@@ -94,82 +63,21 @@ export function HomepageFeed({
     );
   }
 
-  const hero = articles[0];
-  const pool = uniqueById([...articles.slice(1), ...latestArticles]);
-  const leftLead = pickArticles(articles.slice(1, 5), pool, 4);
-  const centerList = pickArticles(
-    articles.slice(5, 9),
-    pool,
-    4,
-    [hero.id, ...leftLead.map((article) => article.id)],
-  );
-  const crowdChoiceCandidates = pickArticles(
-    pool,
-    articles.slice(1),
-    Math.max(pool.length, 1),
-    [
-      hero.id,
-      ...leftLead.map((article) => article.id),
-      ...centerList.map((article) => article.id),
-    ],
-  );
-  const crowdChoice =
-    [...crowdChoiceCandidates].sort(
-      (a, b) => articlePopularityScore(b) - articlePopularityScore(a),
-    )[0] ?? null;
+  const {
+    hero,
+    leftLead,
+    centerList,
+    centerFill,
+    editorChoice: crowdChoice,
+    latest: rightLatest,
+    urgentLead,
+    urgentGrid,
+    showcase,
+    lowerGrid,
+  } = layout;
+
   const crowdChoiceText = crowdChoice ? crowdChoiceBody(crowdChoice) : "";
-  const rightLatest = pickArticles(
-    latestArticles.length > 0 ? latestArticles : articles.slice(1),
-    articles.slice(1),
-    8,
-    [hero.id],
-  );
-
-  const topSectionIds = [
-    hero.id,
-    ...leftLead.map((article) => article.id),
-    ...centerList.map((article) => article.id),
-    ...(crowdChoice ? [crowdChoice.id] : []),
-    ...rightLatest.map((article) => article.id),
-  ];
-
-  const urgentLead =
-    pickArticles(articles.slice(2, 3), pool, 1, topSectionIds)[0] ??
-    pickArticles(articles.slice(1), pool, 1, [hero.id])[0] ??
-    hero;
-
-  let urgentGrid = pickArticles(
-    articles.slice(8, 12),
-    pool,
-    4,
-    [...topSectionIds, urgentLead.id],
-  );
-
-  if (urgentGrid.length < 4) {
-    const urgentExcluded = [urgentLead.id, ...urgentGrid.map((article) => article.id)];
-    const remaining = uniqueById([...articles, ...latestArticles]).filter(
-      (article) =>
-        !urgentExcluded.includes(article.id) &&
-        !topSectionIds.includes(article.id),
-    );
-    urgentGrid = [
-      ...urgentGrid,
-      ...pickArticles(remaining, pool, 4 - urgentGrid.length, urgentExcluded),
-    ];
-  }
-
-  const showcase = pickArticles(articles.slice(4, 8), pool, 4, topSectionIds);
-  const lowerGrid = pickArticles(
-    articles.slice(8, 10),
-    pool,
-    2,
-    [
-      ...topSectionIds,
-      urgentLead.id,
-      ...urgentGrid.map((article) => article.id),
-      ...showcase.map((article) => article.id),
-    ],
-  );
+  const centerArticles = [...centerList, ...centerFill];
 
   return (
     <section aria-label={title} className="space-y-10">
@@ -204,22 +112,24 @@ export function HomepageFeed({
         </div>
 
         <div className="flex h-full flex-col gap-4">
-          <HomepageHoverTitle
-            title={hero.title}
-            hint={articleHoverHint(hero)}
-            className="block shrink-0"
-          >
-            <HomepageHeroMedia
-              article={hero}
-              href={articleHref(hero.slug)}
-              className="h-[240px] sm:h-[320px] xl:h-[360px]"
-              imageClassName="transition-transform duration-500 group-hover:scale-[1.03]"
-            />
-          </HomepageHoverTitle>
+          {hero ? (
+            <HomepageHoverTitle
+              title={hero.title}
+              hint={articleHoverHint(hero)}
+              className="block shrink-0"
+            >
+              <HomepageHeroMedia
+                article={hero}
+                href={articleHref(hero.slug)}
+                className="h-[240px] sm:h-[320px] xl:h-[360px]"
+                imageClassName="transition-transform duration-500 group-hover:scale-[1.03]"
+              />
+            </HomepageHoverTitle>
+          ) : null}
 
           <div className="grid min-h-0 flex-1 gap-4 xl:grid-cols-[minmax(0,0.92fr)_minmax(0,1.08fr)] xl:items-stretch">
             <div className="flex flex-col gap-3">
-              {centerList.map((article) => (
+              {centerArticles.map((article) => (
                 <HomepageHoverTitle
                   key={article.id}
                   title={article.title}
@@ -332,6 +242,7 @@ export function HomepageFeed({
         </aside>
       </div>
 
+      {urgentLead ? (
       <div className="space-y-5">
         <div className="flex items-center justify-between gap-3">
           <h2 className="text-[2rem] font-bold tracking-tight text-foreground sm:text-[2.35rem]">
@@ -417,6 +328,7 @@ export function HomepageFeed({
           ) : null}
         </div>
       </div>
+      ) : null}
 
       {showcase.length > 0 ? (
         <div className="space-y-5">
