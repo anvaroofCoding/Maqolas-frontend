@@ -18,6 +18,7 @@ import { getUserInitials } from "@/lib/user";
 type ArticleDetailHeaderProps = {
   title: string;
   contentHtml: string;
+  contentJson?: Record<string, unknown> | null;
   coverImageUrl?: string;
   authorName: string;
   authorUsername?: string;
@@ -29,6 +30,7 @@ type ArticleDetailHeaderProps = {
 export function ArticleDetailHeader({
   title,
   contentHtml,
+  contentJson,
   coverImageUrl,
   authorName,
   authorUsername,
@@ -172,6 +174,7 @@ export function ArticleDetailHeader({
         onOpenChange={setFocusReaderOpen}
         title={title}
         contentHtml={contentHtml}
+        contentJson={contentJson}
         coverImageUrl={coverImageUrl}
       />
     </>

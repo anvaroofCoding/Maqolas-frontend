@@ -14,6 +14,7 @@ type ArticleFocusReaderProps = {
   onOpenChange: (open: boolean) => void;
   title: string;
   contentHtml: string;
+  contentJson?: Record<string, unknown> | null;
   coverImageUrl?: string;
 };
 
@@ -22,6 +23,7 @@ export function ArticleFocusReader({
   onOpenChange,
   title,
   contentHtml,
+  contentJson,
   coverImageUrl,
 }: ArticleFocusReaderProps) {
   const focusContentHtml = useMemo(
@@ -85,6 +87,7 @@ export function ArticleFocusReader({
 
           <ArticleContent
             html={focusContentHtml}
+            contentJson={contentJson}
             className={coverImageUrl ? "article-focus-content mt-8" : "article-focus-content mt-8 sm:mt-10"}
           />
         </article>

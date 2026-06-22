@@ -1,3 +1,5 @@
+import { resolveUploadUrl } from "@/lib/articles/resolve-media-url";
+
 const OPTIMIZED_IMAGE_HOSTS = new Set([
   "localhost",
   "127.0.0.1",
@@ -10,9 +12,13 @@ const OPTIMIZED_IMAGE_HOSTS = new Set([
   "tse1.mm.bing.net",
 ]);
 
+export function normalizeArticleImageSrc(src: string): string {
+  return resolveUploadUrl(src) ?? src;
+}
+
 export function canOptimizeRemoteImage(src: string): boolean {
   try {
-    const { hostname } = new URL(src);
+    const { hostname } = new URL(src, "http://localhost");
     if (OPTIMIZED_IMAGE_HOSTS.has(hostname)) {
       return true;
     }
@@ -27,8 +33,13 @@ export function articleImageProps(
   src: string,
   options: { priority?: boolean } = {},
 ) {
+  const normalizedSrc = normalizeArticleImageSrc(src);
   const priority = options.priority ?? false;
-  const unoptimized = !canOptimizeRemoteImage(src);
+  const unoptimized =
+    normalizedSrc.startsWith("/uploads/") ||
+    normalizedSrc.startsWith("/")
+      ? false
+      : !canOptimizeRemoteImage(normalizedSrc);
 
   if (priority) {
     return {

@@ -1,3 +1,5 @@
+import type { CSSProperties } from "react";
+
 /** Mobil/planshet/desktop: 100% kenglik */
 export const containerClassName =
   "mx-auto w-full min-w-0 max-w-full overflow-x-hidden px-0 md:px-4 xl:px-6 2xl:px-8";
@@ -22,6 +24,15 @@ export const feedColumnScrollClassName =
 
 export const sidebarWidthClass = "w-56";
 export const rightSidebarWidthClass = "w-72";
+
+/** App shell — chap sidebar, kontent, o'ng panel */
+export const appShellGridClassName =
+  "md:grid-cols-[var(--sidebar-width)_minmax(0,1fr)] lg:grid-cols-[var(--sidebar-width)_minmax(0,1fr)_var(--right-sidebar-width)]";
+
+export const appShellGridStyle: CSSProperties = {
+  "--sidebar-width": "14rem",
+  "--right-sidebar-width": "18rem",
+} as CSSProperties;
 
 /** Navbar icon tugmalari — light/dark hover */
 export const navIconButtonClass =

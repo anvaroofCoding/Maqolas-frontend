@@ -79,6 +79,7 @@ import type {
 import { BannersPanel } from "@/components/admin/banners-panel";
 import { EmailsPanel } from "@/components/admin/emails-panel";
 import { WelcomePromoPanel } from "@/components/admin/welcome-promo-panel";
+import { ArticleContent } from "@/components/articles/article-content";
 import { PlatformStatsDashboard } from "@/components/admin/platform-stats-dashboard";
 import { useGetMeQuery } from "@/features/auth/api/auth-api";
 import { useAppSelector } from "@/lib/store/hooks";
@@ -104,6 +105,7 @@ function ReviewQueuePanel() {
     null,
   );
   const [selectedCategoryIds, setSelectedCategoryIds] = useState<string[]>([]);
+  const [sendEmailNotification, setSendEmailNotification] = useState(false);
 
   const articles = data?.articles ?? [];
   const categories = categoriesData?.categories ?? [];
@@ -112,16 +114,41 @@ function ReviewQueuePanel() {
   function openApproveDialog(article: ModerationArticle) {
     setApproveTarget(article);
     setSelectedCategoryIds([]);
+    setSendEmailNotification(false);
   }
 
   async function handleApprove() {
     if (!approveTarget || selectedCategoryIds.length === 0) return;
-    await approveArticle({
-      id: approveTarget.id,
-      categoryIds: selectedCategoryIds,
-    });
-    setApproveTarget(null);
-    setSelectedCategoryIds([]);
+    try {
+      await approveArticle({
+        id: approveTarget.id,
+        categoryIds: selectedCategoryIds,
+        sendEmailNotification,
+      }).unwrap();
+      toast.success(
+        sendEmailNotification
+          ? "Maqola tasdiqlandi va email yuborildi"
+          : "Maqola tasdiqlandi",
+      );
+      setApproveTarget(null);
+      setSelectedCategoryIds([]);
+      setSendEmailNotification(false);
+    } catch (error) {
+      const message =
+        error &&
+        typeof error === "object" &&
+        "data" in error &&
+        error.data &&
+        typeof error.data === "object" &&
+        "message" in error.data
+          ? String(
+              Array.isArray((error.data as { message: unknown }).message)
+                ? (error.data as { message: string[] }).message.join(", ")
+                : (error.data as { message: string }).message,
+            )
+          : "Maqolani tasdiqlashda xatolik";
+      toast.error(message);
+    }
   }
 
   function toggleCategory(categoryId: string) {
@@ -257,9 +284,10 @@ function ReviewQueuePanel() {
             </DialogDescription>
           </DialogHeader>
           {previewArticle ? (
-            <div
-              className="article-editor-content max-h-[50vh] overflow-y-auto rounded-lg border bg-muted/20 p-4"
-              dangerouslySetInnerHTML={{ __html: previewArticle.contentHtml }}
+            <ArticleContent
+              className="max-h-[50vh] overflow-y-auto rounded-lg border bg-muted/20 p-4"
+              html={previewArticle.contentHtml}
+              contentJson={previewArticle.contentJson}
             />
           ) : null}
         </DialogContent>
@@ -271,6 +299,7 @@ function ReviewQueuePanel() {
           if (!open) {
             setApproveTarget(null);
             setSelectedCategoryIds([]);
+            setSendEmailNotification(false);
           }
         }}
       >
@@ -306,6 +335,26 @@ function ReviewQueuePanel() {
             </div>
           </div>
 
+          <label className="flex cursor-pointer items-start gap-3 rounded-lg border border-border bg-muted/20 p-3">
+            <input
+              type="checkbox"
+              checked={sendEmailNotification}
+              onChange={(event) => setSendEmailNotification(event.target.checked)}
+              className="mt-0.5 size-4 shrink-0 rounded border-input"
+            />
+            <span className="space-y-1">
+              <span className="flex items-center gap-2 text-sm font-medium text-foreground">
+                <Mail className="size-4 text-muted-foreground" aria-hidden />
+                Barcha foydalanuvchilarga email yuborilsin
+              </span>
+              <span className="block text-xs text-muted-foreground">
+                Belgilansa, ro&apos;yxatdan o&apos;tgan foydalanuvchilarga yangi
+                maqola haqida xabar yuboriladi. Belgilamasangiz, faqat
+                nashr etiladi.
+              </span>
+            </span>
+          </label>
+
           <DialogFooter>
             <Button
               type="button"
@@ -313,6 +362,7 @@ function ReviewQueuePanel() {
               onClick={() => {
                 setApproveTarget(null);
                 setSelectedCategoryIds([]);
+                setSendEmailNotification(false);
               }}
             >
               Bekor qilish

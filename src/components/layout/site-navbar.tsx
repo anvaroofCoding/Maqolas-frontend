@@ -4,6 +4,7 @@ import { PenLineIcon } from "lucide-react";
 import Link from "next/link";
 import { NotificationPopover } from "@/components/notifications/notification-popover";
 import { ArticleSearchTrigger } from "@/components/layout/article-search-trigger";
+import { NavbarMobileMenu } from "@/components/layout/navbar-mobile-menu";
 import { ProfileMenu } from "@/components/layout/profile-menu";
 import { NavbarWeather } from "@/components/layout/navbar-weather";
 import { NavbarTooltip } from "@/components/layout/navbar-tooltip";
@@ -48,44 +49,48 @@ export function SiteNavbar() {
           className="flex items-center gap-0.5 overflow-visible sm:gap-1"
           aria-label="Asosiy navigatsiya"
         >
-          <NavbarWeather />
-          <PromoReaderTrigger />
-          <ThemeToggle className={navIconButtonClass} />
+          <div className="hidden items-center gap-0.5 sm:gap-1 md:flex">
+            <NavbarWeather />
+            <PromoReaderTrigger />
+            <ThemeToggle className={navIconButtonClass} />
 
-          <ArticleSearchTrigger />
+            <ArticleSearchTrigger />
 
-          <NavbarTooltip
-            label="Yangi maqola yozish"
-            hint="Maqola yaratish sahifasi"
-            className="ml-1 hidden sm:inline-flex"
-          >
-            <Button
-              variant="default"
-              size="sm"
-              className={writeButtonClass}
-              asChild
+            <NavbarTooltip
+              label="Yangi maqola yozish"
+              hint="Maqola yaratish sahifasi"
+              className="ml-1 hidden sm:inline-flex"
             >
-              <Link href="/yozish">
-                <PenLineIcon data-icon="inline-start" />
-                Yozish
-              </Link>
-            </Button>
-          </NavbarTooltip>
-          <NavbarTooltip label="Yangi maqola yozish" className="sm:hidden">
-            <Button
-              variant="ghost"
-              size="icon"
-              className={navIconButtonClass}
-              aria-label="Yozish"
-              asChild
-            >
-              <Link href="/yozish">
-                <PenLineIcon />
-              </Link>
-            </Button>
-          </NavbarTooltip>
+              <Button
+                variant="default"
+                size="sm"
+                className={writeButtonClass}
+                asChild
+              >
+                <Link href="/yozish">
+                  <PenLineIcon data-icon="inline-start" />
+                  Yozish
+                </Link>
+              </Button>
+            </NavbarTooltip>
+            <NavbarTooltip label="Yangi maqola yozish" className="sm:hidden">
+              <Button
+                variant="ghost"
+                size="icon"
+                className={navIconButtonClass}
+                aria-label="Yozish"
+                asChild
+              >
+                <Link href="/yozish">
+                  <PenLineIcon />
+                </Link>
+              </Button>
+            </NavbarTooltip>
 
-          <NotificationPopover />
+            <NotificationPopover />
+          </div>
+
+          <NavbarMobileMenu className="md:hidden" />
 
           <ProfileMenu />
         </nav>

@@ -84,14 +84,22 @@ export function EditorToolbar({ editor }: EditorToolbarProps) {
   if (!editor) return null;
 
   const setLink = () => {
+    const { from, to, empty } = editor.state.selection;
+    if (empty) return;
+
     const prev = editor.getAttributes("link").href as string | undefined;
     const url = window.prompt("Havola URL", prev ?? "https://");
     if (url === null) return;
     if (url === "") {
-      editor.chain().focus().extendMarkRange("link").unsetLink().run();
+      editor.chain().focus().unsetLink().run();
       return;
     }
-    editor.chain().focus().extendMarkRange("link").setLink({ href: url }).run();
+    editor
+      .chain()
+      .focus()
+      .setTextSelection({ from, to })
+      .setLink({ href: url })
+      .run();
   };
 
   const addImage = () => {
@@ -227,6 +235,7 @@ export function EditorToolbar({ editor }: EditorToolbarProps) {
               type="button"
               aria-label="Matn rangi"
               title="Matn rangi"
+              onMouseDown={(event) => event.preventDefault()}
               className={cn(
                 "inline-flex size-8 shrink-0 items-center justify-center rounded-md text-muted-foreground hover:bg-muted hover:text-foreground",
               )}
@@ -264,6 +273,7 @@ export function EditorToolbar({ editor }: EditorToolbarProps) {
               type="button"
               aria-label="Ajratish"
               title="Ajratish (highlight)"
+              onMouseDown={(event) => event.preventDefault()}
               className={cn(
                 "inline-flex size-8 shrink-0 items-center justify-center rounded-md text-muted-foreground hover:bg-muted hover:text-foreground",
                 editor.isActive("highlight") && "bg-muted text-foreground",

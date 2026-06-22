@@ -27,6 +27,7 @@ export function EditorToolbarButton({
       variant="ghost"
       size="icon-sm"
       disabled={disabled}
+      onMouseDown={(event) => event.preventDefault()}
       onClick={onClick}
       aria-label={label}
       title={label}

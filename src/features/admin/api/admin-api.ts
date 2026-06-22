@@ -30,12 +30,15 @@ export const adminApi = baseApi.injectEndpoints({
     }),
     approveArticle: builder.mutation<
       { article: ModerationArticle },
-      { id: string; categoryIds: string[] }
+      { id: string; categoryIds: string[]; sendEmailNotification?: boolean }
     >({
-      query: ({ id, categoryIds }) => ({
+      query: ({ id, categoryIds, sendEmailNotification }) => ({
         url: `/admin/articles/${id}/approve`,
         method: "POST",
-        body: { categoryIds },
+        body: {
+          categoryIds,
+          ...(sendEmailNotification ? { sendEmailNotification: true } : {}),
+        },
       }),
       invalidatesTags: [
         { type: "Admin", id: "REVIEW_QUEUE" },

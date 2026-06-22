@@ -120,6 +120,7 @@ export default async function ArticleDetailPage({ params }: ArticlePageProps) {
         <ArticleDetailHeader
           title={article.title}
           contentHtml={article.contentHtml ?? ""}
+          contentJson={article.contentJson}
           coverImageUrl={article.coverImageUrl}
           authorName={authorName}
           authorUsername={article.author?.username}
@@ -137,6 +138,7 @@ export default async function ArticleDetailPage({ params }: ArticlePageProps) {
           authorAvatarUrl={article.author?.avatarUrl}
           categoryName={article.categories?.[0]?.name}
           contentHtml={articleBodyHtml}
+          contentJson={article.contentJson}
           contentClassName="mt-6"
           itemProp="articleBody"
         />

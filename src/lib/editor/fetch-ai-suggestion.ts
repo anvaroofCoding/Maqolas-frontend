@@ -1,5 +1,8 @@
 import { env } from "@/config/env";
 
+const AI_UNAVAILABLE_COOLDOWN_MS = 15 * 60 * 1000;
+let aiUnavailableUntil = 0;
+
 function localFallback(text: string): string {
   const trimmed = text.trimEnd();
   const wordCount = trimmed.split(/\s+/).filter(Boolean).length;
@@ -30,6 +33,10 @@ export async function fetchAiSuggestion(
 ): Promise<string> {
   if (!accessToken) return localFallback(text);
 
+  if (Date.now() < aiUnavailableUntil) {
+    return localFallback(text);
+  }
+
   try {
     const response = await fetch(`${env.NEXT_PUBLIC_API_URL}/ai/complete`, {
       method: "POST",
@@ -46,8 +53,14 @@ export async function fetchAiSuggestion(
 
     const payload = (await response.json()) as {
       suggestion?: string;
-      source?: 'ai' | 'local';
+      source?: "ai" | "local";
+      aiUnavailable?: boolean;
     };
+
+    if (payload.aiUnavailable) {
+      aiUnavailableUntil = Date.now() + AI_UNAVAILABLE_COOLDOWN_MS;
+    }
+
     return payload.suggestion?.trim() || localFallback(text);
   } catch {
     return localFallback(text);

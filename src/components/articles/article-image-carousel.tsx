@@ -9,7 +9,7 @@ import {
   useState,
   type PointerEvent as ReactPointerEvent,
 } from "react";
-import { articleImageProps } from "@/lib/images/next-image";
+import { articleImageProps, normalizeArticleImageSrc } from "@/lib/images/next-image";
 import { cn } from "@/lib/utils";
 
 type ArticleImageCarouselProps = {
@@ -228,21 +228,25 @@ export function ArticleImageCarousel({
         className="flex h-full w-full transition-transform duration-700 ease-in-out"
         style={{ transform: `translateX(-${activeIndex * 100}%)` }}
       >
-        {uniqueImages.map((src, index) => (
-          <div key={`${src}-${index}`} className="relative h-full min-w-full shrink-0">
+        {uniqueImages.map((src, index) => {
+          const imageSrc = normalizeArticleImageSrc(src);
+
+          return (
+          <div key={`${imageSrc}-${index}`} className="relative h-full min-w-full shrink-0">
             <Image
-              src={src}
+              src={imageSrc}
               alt={`${alt} (${index + 1}/${uniqueImages.length})`}
               fill
               sizes={sizes}
               className={cn("object-cover", imageClassName)}
               draggable={false}
-              {...articleImageProps(src, {
+              {...articleImageProps(imageSrc, {
                 priority: priority && index === 0,
               })}
             />
           </div>
-        ))}
+          );
+        })}
       </div>
 
       {showDots ? (

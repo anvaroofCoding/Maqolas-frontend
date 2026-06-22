@@ -1,6 +1,6 @@
 import { cache } from "react";
 import { env } from "@/config/env";
-import type { ArticleFeedResponse, ArticleSummary, HomepageLayoutResponse } from "@/features/articles/types";
+import type { ArticleDetail, ArticleFeedResponse, ArticleSummary, HomepageLayoutResponse } from "@/features/articles/types";
 import type { UserSocialLinks } from "@/features/auth/types";
 import type { CategoriesResponse } from "@/features/categories/types";
 import { ARTICLE_FEED_PAGE_SIZE } from "@/lib/articles/constants";
@@ -112,10 +112,11 @@ export async function fetchArticleFeed(
 }
 
 export const fetchArticleBySlug = cache(
-  async (slug: string, options?: { meta?: boolean }): Promise<ArticleSummary | null> => {
+  async (slug: string, options?: { meta?: boolean }): Promise<ArticleDetail | null> => {
     const metaParam = options?.meta ? "?meta=1" : "";
-    const data = await fetchJson<{ article: ArticleSummary }>(
+    const data = await fetchJson<{ article: ArticleDetail }>(
       `${env.NEXT_PUBLIC_API_URL}/articles/slug/${encodeURIComponent(slug)}${metaParam}`,
+      0,
     );
 
     return data?.article ?? null;

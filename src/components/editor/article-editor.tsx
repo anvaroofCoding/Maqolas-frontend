@@ -7,6 +7,7 @@ import { usePathname, useRouter } from "next/navigation";
 import { useCallback, useEffect, useRef, useState } from "react";
 import { useSettings } from "@/components/providers/settings-provider";
 import { EditorToolbar } from "@/components/editor/editor-toolbar";
+import { EditorContextMenu } from "@/components/editor/editor-context-menu";
 import { Button } from "@/components/ui/button";
 import { useUpdateAdminArticleMutation } from "@/features/admin/api/admin-api";
 import {
@@ -14,6 +15,7 @@ import {
   useSubmitArticleMutation,
   useUpdateArticleMutation,
 } from "@/features/articles/api/articles-api";
+import { syncFigureLayoutInHtml } from "@/lib/articles/sync-figure-layout-html";
 import { createEditorExtensions } from "@/lib/editor/extensions";
 import { extractTitleFromJson } from "@/lib/editor/extract-title";
 import { fetchAiSuggestion } from "@/lib/editor/fetch-ai-suggestion";
@@ -24,7 +26,8 @@ import {
 import { getWritingStats } from "@/lib/editor/writing-stats";
 import { toast } from "@/lib/toast";
 import { useAppSelector } from "@/lib/store/hooks";
-import { articleSurfaceClassName } from "@/lib/layout";
+import { articleSurfaceClassName, appShellGridClassName, appShellGridStyle, containerClassName } from "@/lib/layout";
+import { WriteLayoutSpacer } from "@/components/layout/write-layout-spacer";
 import { cn } from "@/lib/utils";
 
 const writeButtonClass =
@@ -86,8 +89,8 @@ export function ArticleEditor({
   }, []);
 
   const persist = useCallback(async (ed: Editor) => {
-      const contentHtml = ed.getHTML();
       const contentJson = ed.getJSON() as Record<string, unknown>;
+      const contentHtml = syncFigureLayoutInHtml(ed.getHTML(), contentJson);
       const title = extractTitleFromJson(ed.getJSON());
       const { words } = getWritingStats(ed);
       const readiness = getSubmitReadiness(ed);
@@ -196,8 +199,8 @@ export function ArticleEditor({
       return;
     }
 
-    const contentHtml = editor.getHTML();
     const contentJson = editor.getJSON() as Record<string, unknown>;
+    const contentHtml = syncFigureLayoutInHtml(editor.getHTML(), contentJson);
     const title = extractTitleFromJson(editor.getJSON());
     const body = { title, contentHtml, contentJson };
 
@@ -238,110 +241,121 @@ export function ArticleEditor({
     }
   };
 
-  return (
-    <div
-      className={cn(
-        focusMode &&
-          "fixed inset-0 z-[100] flex h-dvh w-full flex-col bg-background",
-      )}
-    >
+  const editorPanel = (
+    <div className={cn("flex min-h-0 w-full flex-1 flex-col", articleSurfaceClassName)}>
       <div
         className={cn(
-          "flex w-full flex-1 flex-col",
-          focusMode
-            ? "h-full min-h-0 max-w-none px-4 py-3"
-            : articleSurfaceClassName,
+          "flex min-h-0 flex-1 flex-col",
         )}
       >
         <div
           className={cn(
-            "flex flex-col",
-            focusMode && "min-h-0 flex-1 overflow-hidden",
+            "sticky z-40 -mx-4 border-b border-border bg-background/95 px-4 backdrop-blur supports-[backdrop-filter]:bg-background/80 sm:-mx-6 sm:px-6 top-0",
           )}
         >
-          <div
-            className={cn(
-              "sticky z-40 -mx-4 border-b border-border bg-background/95 px-4 backdrop-blur supports-[backdrop-filter]:bg-background/80 sm:-mx-6 sm:px-6",
-              focusMode ? "top-0" : "top-14",
-            )}
-          >
-            <div className="flex flex-wrap items-center justify-end gap-3 py-3">
-              <div className="flex flex-wrap items-center justify-end gap-2">
-                {!isAdminMode && !submitted && submitBlockReason ? (
-                  <p className="text-xs text-muted-foreground">
-                    Ko&apos;rib chiqishga yuborish uchun {submitBlockReason} kerak
-                  </p>
-                ) : null}
+          <div className="flex flex-wrap items-center justify-end gap-3 py-3">
+            <div className="flex flex-wrap items-center justify-end gap-2">
+              {!isAdminMode && !submitted && submitBlockReason ? (
+                <p className="text-xs text-muted-foreground">
+                  Ko&apos;rib chiqishga yuborish uchun {submitBlockReason} kerak
+                </p>
+              ) : null}
+              <Button
+                type="button"
+                variant="outline"
+                size="sm"
+                className="gap-1.5"
+                onClick={() => setFocusMode((v) => !v)}
+              >
+                {focusMode ? (
+                  <Minimize2Icon className="size-4" />
+                ) : (
+                  <Maximize2Icon className="size-4" />
+                )}
+                Fokus
+              </Button>
+              {isAdminMode ? (
                 <Button
                   type="button"
-                  variant="outline"
                   size="sm"
-                  className="gap-1.5"
-                  onClick={() => setFocusMode((v) => !v)}
+                  variant="outline"
+                  onClick={() => router.push("/admin")}
                 >
-                  {focusMode ? (
-                    <Minimize2Icon className="size-4" />
-                  ) : (
-                    <Maximize2Icon className="size-4" />
-                  )}
-                  Fokus
+                  Admin panelga qaytish
                 </Button>
-                {isAdminMode ? (
-                  <Button
-                    type="button"
-                    size="sm"
-                    variant="outline"
-                    onClick={() => router.push("/admin")}
-                  >
-                    Admin panelga qaytish
-                  </Button>
-                ) : submitted ? (
-                  <Button
-                    type="button"
-                    size="sm"
-                    className={writeButtonClass}
-                    onClick={handleStartNewArticle}
-                  >
-                    Yangi maqola yozish
-                  </Button>
-                ) : (
-                  <Button
-                    type="button"
-                    size="sm"
-                    className={writeButtonClass}
-                    disabled={isSubmitting || !canSubmit}
-                    title={
-                      submitBlockReason
-                        ? `Ko'rib chiqishga yuborish uchun ${submitBlockReason} kerak`
-                        : undefined
-                    }
-                    onClick={() => void handleSubmit()}
-                  >
-                    Ko&apos;rib chiqishga yuborish
-                  </Button>
-                )}
-              </div>
+              ) : submitted ? (
+                <Button
+                  type="button"
+                  size="sm"
+                  className={writeButtonClass}
+                  onClick={handleStartNewArticle}
+                >
+                  Yangi maqola yozish
+                </Button>
+              ) : (
+                <Button
+                  type="button"
+                  size="sm"
+                  className={writeButtonClass}
+                  disabled={isSubmitting || !canSubmit}
+                  title={
+                    submitBlockReason
+                      ? `Ko'rib chiqishga yuborish uchun ${submitBlockReason} kerak`
+                      : undefined
+                  }
+                  onClick={() => void handleSubmit()}
+                >
+                  Ko&apos;rib chiqishga yuborish
+                </Button>
+              )}
             </div>
-
-            <EditorToolbar editor={editor} />
           </div>
 
-          {reviewNote ? (
-            <div className="mx-4 mb-4 rounded-lg border border-destructive/30 bg-destructive/5 px-4 py-3 text-sm text-destructive sm:mx-6">
-              <span className="font-medium">Rad etish sababi: </span>
-              {reviewNote}
-            </div>
-          ) : null}
+          <EditorToolbar editor={editor} />
+        </div>
 
+        {reviewNote ? (
+          <div className="mx-4 mb-4 rounded-lg border border-destructive/30 bg-destructive/5 px-4 py-3 text-sm text-destructive sm:mx-6">
+            <span className="font-medium">Rad etish sababi: </span>
+            {reviewNote}
+          </div>
+        ) : null}
+
+        <div
+          className={cn(
+            focusMode &&
+              "min-h-0 flex-1 overflow-y-auto [&_.ProseMirror]:min-h-full",
+          )}
+        >
+          <EditorContent editor={editor} />
+          <EditorContextMenu editor={editor} />
+        </div>
+      </div>
+    </div>
+  );
+
+  if (focusMode) {
+    return (
+      <div className="fixed inset-0 z-[100] flex h-dvh flex-col bg-background">
+        <div className={cn("mx-auto h-full w-full min-h-0", containerClassName)}>
           <div
-            className={cn(
-              focusMode && "min-h-0 flex-1 overflow-y-auto [&_.ProseMirror]:min-h-full",
-            )}
+            className={cn("grid h-full min-h-0 w-full", appShellGridClassName)}
+            style={appShellGridStyle}
           >
-            <EditorContent editor={editor} />
+            <WriteLayoutSpacer side="left" />
+            <div className="flex min-h-0 flex-col overflow-hidden">
+              {editorPanel}
+            </div>
+            <WriteLayoutSpacer side="right" />
           </div>
         </div>
       </div>
+    );
+  }
+
+  return (
+    <div className="flex min-h-0 w-full flex-1 flex-col">
+      {editorPanel}
     </div>
   );
 }

@@ -203,6 +203,11 @@ html:not(.dark) {
 
 .article-editor-content p {
   @apply my-3 leading-7;
+  overflow: visible;
+}
+
+.article-editor-content .ProseMirror {
+  overflow: visible;
 }
 
 .article-editor-content h1 {
@@ -278,62 +283,128 @@ html:not(.dark) {
 }
 
 .article-editor-content img {
-  @apply max-w-full rounded-lg border border-border;
+  @apply h-auto max-w-full;
 }
 
 .article-editor-content .article-image-row {
-  @apply my-4 flex flex-wrap items-stretch gap-3;
+  @apply my-4 flex flex-wrap items-stretch gap-3 clear-both;
 }
 
-.article-editor-content .article-image-row[data-cols="2"] .article-image-node,
+.article-editor-content .article-image-row[data-cols="2"] .article-figure,
+.article-editor-content .article-image-row[data-cols="2"] > figure,
 .article-editor-content .article-image-row[data-cols="2"] > img {
   @apply min-w-0 flex-[1_1_calc(50%-0.375rem)];
 }
 
-.article-editor-content .article-image-row[data-cols="3"] .article-image-node,
+.article-editor-content .article-image-row[data-cols="3"] .article-figure,
+.article-editor-content .article-image-row[data-cols="3"] > figure,
 .article-editor-content .article-image-row[data-cols="3"] > img {
   @apply min-w-0 flex-[1_1_calc(33.333%-0.5rem)];
 }
 
-.article-editor-content .article-image-row[data-cols="4"] .article-image-node,
+.article-editor-content .article-image-row[data-cols="4"] .article-figure,
+.article-editor-content .article-image-row[data-cols="4"] > figure,
 .article-editor-content .article-image-row[data-cols="4"] > img {
   @apply min-w-0 flex-[1_1_calc(25%-0.5625rem)];
 }
 
-.article-editor-content .article-image-node {
-  @apply relative my-4 max-w-full;
+.article-editor-content .article-figure,
+.article-editor-content figure.article-figure {
+  @apply relative my-2 max-w-full rounded-lg border border-border bg-muted/30 p-1.5;
 }
 
-.article-editor-content .article-image-node--left {
-  @apply mr-auto ml-0;
+.article-editor-content .article-figure--align-left,
+.article-editor-content .article-image--align-left,
+.article-editor-content figure.article-figure[data-align="left"]:not(.article-figure--in-row) {
+  float: left;
+  clear: left;
+  margin: 0.25rem 1.25rem 0.75rem 0;
 }
 
-.article-editor-content .article-image-node--center {
-  @apply mx-auto;
+.article-editor-content .article-figure--align-center,
+.article-editor-content .article-image--align-center,
+.article-editor-content figure.article-figure[data-align="center"]:not(.article-figure--in-row) {
+  @apply mx-auto my-4 block w-fit clear-both;
 }
 
-.article-editor-content .article-image-node--right {
-  @apply mr-0 ml-auto;
+.article-editor-content .article-figure--align-right,
+.article-editor-content .article-image--align-right,
+.article-editor-content figure.article-figure[data-align="right"]:not(.article-figure--in-row) {
+  float: right;
+  clear: right;
+  margin: 0.25rem 0 0.75rem 1.25rem;
 }
 
-.article-editor-content .article-image-node.is-selected .article-image {
+.article-editor-content .article-figure--in-row,
+.article-editor-content .article-image--in-row {
+  @apply float-none clear-none my-0 border-0 bg-transparent p-0;
+}
+
+.article-editor-content .article-figure.is-selected {
   @apply ring-2 ring-primary ring-offset-2 ring-offset-background;
 }
 
+.article-editor-content .article-figure .article-image,
+.article-editor-content figure.article-figure img {
+  @apply block h-auto w-full rounded-md border-0 bg-transparent p-0;
+}
+
+.article-editor-content .article-figure__drag-handle {
+  @apply mb-1.5 flex w-full cursor-grab items-center justify-center gap-1 rounded-md border border-border/70 bg-background/80 px-2 py-1 text-[10px] font-medium text-muted-foreground active:cursor-grabbing;
+}
+
+.article-editor-content .article-figure.is-resizing {
+  @apply ring-2 ring-primary/40;
+}
+
+body.is-image-dragging {
+  cursor: grabbing !important;
+  user-select: none;
+}
+
+body.is-image-dragging * {
+  cursor: grabbing !important;
+}
+
+.article-editor-content .article-figure__resize-handle {
+  @apply absolute right-1 bottom-1 z-20 size-5 cursor-ns-resize rounded-sm border-2 border-primary bg-primary shadow-md;
+}
+
+.article-editor-content .article-figure__resize-handle::after {
+  content: "";
+  @apply absolute inset-1 border-r border-b border-primary-foreground/80;
+}
+
+/* Eski maqolalar — img tagidagi klasslar */
+.article-editor-content .article-image-node {
+  @apply relative my-2 max-w-full rounded-lg border border-border bg-muted/30 p-1.5;
+}
+
+.article-editor-content .article-image-node--left {
+  float: left;
+  clear: left;
+  margin: 0.25rem 1.25rem 0.75rem 0;
+}
+
+.article-editor-content .article-image-node--center {
+  @apply mx-auto my-4 block w-fit clear-both;
+}
+
+.article-editor-content .article-image-node--right {
+  float: right;
+  clear: right;
+  margin: 0.25rem 0 0.75rem 1.25rem;
+}
+
 .article-editor-content .article-image {
-  @apply block h-auto max-w-full rounded-lg border border-border;
+  @apply block h-auto w-full max-w-full rounded-md;
 }
 
-.article-editor-content .article-image--align-left {
-  @apply mr-auto ml-0;
-}
-
-.article-editor-content .article-image--align-center {
-  @apply mx-auto;
-}
-
-.article-editor-content .article-image--align-right {
-  @apply mr-0 ml-auto;
+.article-editor-content .article-editor-html-part::after,
+.article-editor-content.ProseMirror::after {
+  content: "";
+  display: table;
+  clear: both;
 }
 
 .article-editor-content .article-image-toolbar {
@@ -509,8 +580,35 @@ html:not(.dark) .code-block-shell pre {
 }
 
 .article-focus-content img,
+.article-focus-content .article-figure,
+.article-focus-content figure.article-figure,
 .article-focus-content .article-image {
-  @apply my-6 rounded-xl border border-border;
+  @apply my-2 rounded-xl border border-border bg-muted/30 p-1.5;
+}
+
+.article-focus-content .article-figure--align-left,
+.article-focus-content .article-image--align-left,
+.article-focus-content .article-image-node--left,
+.article-focus-content figure.article-figure[data-align="left"]:not(.article-figure--in-row) {
+  float: left;
+  clear: left;
+  margin: 0.25rem 1.25rem 0.75rem 0;
+}
+
+.article-focus-content .article-figure--align-right,
+.article-focus-content .article-image--align-right,
+.article-focus-content .article-image-node--right,
+.article-focus-content figure.article-figure[data-align="right"]:not(.article-figure--in-row) {
+  float: right;
+  clear: right;
+  margin: 0.25rem 0 0.75rem 1.25rem;
+}
+
+.article-focus-content .article-figure--align-center,
+.article-focus-content .article-image--align-center,
+.article-focus-content .article-image-node--center,
+.article-focus-content figure.article-figure[data-align="center"]:not(.article-figure--in-row) {
+  @apply mx-auto my-4 block w-fit clear-both;
 }
 
 .article-focus-content .article-image-row {
@@ -518,22 +616,26 @@ html:not(.dark) .code-block-shell pre {
 }
 
 .article-focus-content .article-image-row[data-cols="2"] img,
+.article-focus-content .article-image-row[data-cols="2"] .article-figure,
 .article-focus-content .article-image-row[data-cols="2"] .article-image-node {
   @apply min-w-0 flex-[1_1_calc(50%-0.375rem)];
 }
 
 .article-focus-content .article-image-row[data-cols="3"] img,
+.article-focus-content .article-image-row[data-cols="3"] .article-figure,
 .article-focus-content .article-image-row[data-cols="3"] .article-image-node {
   @apply min-w-0 flex-[1_1_calc(33.333%-0.5rem)];
 }
 
 .article-focus-content .article-image-row[data-cols="4"] img,
+.article-focus-content .article-image-row[data-cols="4"] .article-figure,
 .article-focus-content .article-image-row[data-cols="4"] .article-image-node {
   @apply min-w-0 flex-[1_1_calc(25%-0.5625rem)];
 }
 
 .article-focus-content .article-image-row img,
-.article-focus-content .article-image-row .article-image {
+.article-focus-content .article-image-row .article-image,
+.article-focus-content .article-image-row .article-figure {
   @apply my-0 w-full;
 }
 

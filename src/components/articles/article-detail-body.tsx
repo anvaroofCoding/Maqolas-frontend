@@ -16,6 +16,7 @@ type ArticleDetailBodyProps = {
   authorAvatarUrl?: string;
   categoryName?: string;
   contentHtml: string;
+  contentJson?: Record<string, unknown> | null;
   contentClassName?: string;
   itemProp?: string;
 };
@@ -23,6 +24,7 @@ type ArticleDetailBodyProps = {
 export function ArticleDetailBody({
   title,
   contentHtml,
+  contentJson,
   contentClassName,
   itemProp,
 }: ArticleDetailBodyProps) {
@@ -73,6 +75,7 @@ export function ArticleDetailBody({
           className={contentClassName}
           itemProp={itemProp}
           html={contentHtml}
+          contentJson={contentJson}
         />
       </div>
 

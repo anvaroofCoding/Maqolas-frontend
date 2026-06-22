@@ -75,6 +75,12 @@ export type ArticleSummary = Omit<
   previewText?: string;
 };
 
+/** To'liq maqola sahifasi — layout uchun contentJson ham keladi */
+export type ArticleDetail = ArticleSummary & {
+  contentHtml: string;
+  contentJson?: Record<string, unknown>;
+};
+
 export interface ArticleFeedResponse {
   articles: ArticleSummary[];
   pagination: {

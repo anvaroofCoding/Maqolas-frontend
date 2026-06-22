@@ -36,7 +36,7 @@ export function EditorImageToolbarActions({
       .focus()
       .insertContent({
         type: "image",
-        attrs: { src: urls[0], width: "100", align: "center" },
+        attrs: { src: urls[0], width: "50", align: "right" },
       })
       .run();
   };

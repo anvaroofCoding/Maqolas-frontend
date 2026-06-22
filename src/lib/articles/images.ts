@@ -1,4 +1,5 @@
 import { extractGalleryImages } from "@/lib/articles/extract-gallery-images";
+import { resolveUploadUrl } from "@/lib/articles/resolve-media-url";
 
 export function getArticleImageUrls(article: {
   imageUrls?: string[];
@@ -11,7 +12,9 @@ export function getArticleImageUrls(article: {
     article.coverImageUrl,
     article.title ?? "Maqola",
     article.contentHtml,
-  ).map((image) => image.src);
+  )
+    .map((image) => resolveUploadUrl(image.src) ?? image.src)
+    .filter(Boolean);
 }
 
 export function getPrimaryArticleImageUrl(

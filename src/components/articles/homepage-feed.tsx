@@ -62,6 +62,7 @@ function articleHoverHint(article: ArticleSummary) {
 }
 
 const CROWD_CHOICE_PREVIEW_WORDS = 40;
+const CENTER_CARD_COUNT = 5;
 
 function crowdChoiceBody(article: ArticleSummary) {
   const text =
@@ -106,7 +107,10 @@ export function HomepageFeed({
   } = layout;
 
   const crowdChoiceText = crowdChoice ? crowdChoiceBody(crowdChoice) : "";
-  const centerArticles = [...centerList, ...centerFill];
+  const centerArticles = uniqueArticlesById([
+    ...centerList,
+    ...centerFill,
+  ]).slice(0, CENTER_CARD_COUNT);
   const rightLatest = pickLatestForSidebar(
     layoutLatest,
     latestArticles,

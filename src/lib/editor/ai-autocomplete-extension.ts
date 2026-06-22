@@ -27,7 +27,7 @@ export const AiAutocompleteExtension = Extension.create<AiAutocompleteOptions>({
   addOptions() {
     return {
       enabled: true,
-      debounceMs: 650,
+      debounceMs: 1200,
       fetchSuggestion: async () => "",
     };
   },
@@ -54,7 +54,7 @@ export const AiAutocompleteExtension = Extension.create<AiAutocompleteOptions>({
         if (!empty) return;
 
         const context = getTextContext(state.doc, from).trim();
-        if (context.length < 3) return;
+        if (context.length < 10) return;
 
         const currentRequest = ++requestId;
 
