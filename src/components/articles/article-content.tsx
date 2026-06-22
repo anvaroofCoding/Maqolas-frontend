@@ -2,6 +2,7 @@
 
 import { useEffect, useMemo, useState } from "react";
 import { CodeBlockShell } from "@/components/articles/code-block-shell";
+import { stripArticleLeadFromHtml, stripLeadImageFromHtml } from "@/lib/articles/content";
 import {
   isTipTapDoc,
   resolveArticleHtml,
@@ -14,6 +15,10 @@ type ArticleContentProps = {
   contentJson?: Record<string, unknown> | null;
   className?: string;
   itemProp?: string;
+  /** Sarlavha alohida ko'rsatilganda kontentdagi birinchi h1 ni olib tashlaydi */
+  stripLead?: boolean;
+  /** Muqova alohida ko'rsatilganda kontentdagi birinchi rasmni olib tashlaydi */
+  stripLeadImage?: boolean;
 };
 
 export function ArticleContent({
@@ -21,6 +26,8 @@ export function ArticleContent({
   contentJson,
   className,
   itemProp,
+  stripLead = false,
+  stripLeadImage = false,
 }: ArticleContentProps) {
   const syncedHtml = useMemo(
     () => resolveArticleHtml(html, contentJson),
@@ -50,9 +57,20 @@ export function ArticleContent({
     };
   }, [contentJson, html]);
 
+  const displayHtml = useMemo(() => {
+    let result = resolvedHtml;
+    if (stripLead) {
+      result = stripArticleLeadFromHtml(result);
+    }
+    if (stripLeadImage) {
+      result = stripLeadImageFromHtml(result);
+    }
+    return result;
+  }, [resolvedHtml, stripLead, stripLeadImage]);
+
   const parts = useMemo(
-    () => splitHtmlByCodeBlocks(resolvedHtml),
-    [resolvedHtml],
+    () => splitHtmlByCodeBlocks(displayHtml),
+    [displayHtml],
   );
 
   return (

@@ -76,6 +76,7 @@ export function ArticleDetailBody({
           itemProp={itemProp}
           html={contentHtml}
           contentJson={contentJson}
+          stripLead
         />
       </div>
 

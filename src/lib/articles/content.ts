@@ -24,6 +24,11 @@ export function stripArticleLeadFromHtml(html: string): string {
   return stripSharedArticleLead(html);
 }
 
+/** Muqova alohida ko'rsatilganda kontentdagi birinchi rasmni olib tashlash */
+export function stripLeadImageFromHtml(html: string): string {
+  return stripLeadImage(html);
+}
+
 /** Fokus rejimida matn ichidagi rasmlarni saqlab qolish */
 export function stripArticleLeadForFocus(
   html: string,
@@ -33,6 +38,5 @@ export function stripArticleLeadForFocus(
 
   if (!coverImageUrl) return result;
 
-  // Muqova alohida ko'rsatilganda, kontentdagi takrorlangan birinchi rasmni olib tashlash
   return stripLeadImage(result);
 }

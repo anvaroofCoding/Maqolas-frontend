@@ -88,6 +88,8 @@ export function ArticleFocusReader({
           <ArticleContent
             html={focusContentHtml}
             contentJson={contentJson}
+            stripLead
+            stripLeadImage={Boolean(coverImageUrl)}
             className={coverImageUrl ? "article-focus-content mt-8" : "article-focus-content mt-8 sm:mt-10"}
           />
         </article>
