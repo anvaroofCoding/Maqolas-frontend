@@ -12,12 +12,6 @@ import {
 import { TopicSupportButton } from "@/components/topics/topic-support-button";
 import { useAppSelector } from "@/lib/store/hooks";
 
-function truncateTitle(title: string, maxLength = 42) {
-  const normalized = title.trim();
-  if (normalized.length <= maxLength) return normalized;
-  return `${normalized.slice(0, maxLength).trimEnd()}…`;
-}
-
 export function SuggestedTopicsWidget() {
   const [loginOpen, setLoginOpen] = useState(false);
   const accessToken = useAppSelector((state) => state.auth.accessToken);
@@ -38,13 +32,13 @@ export function SuggestedTopicsWidget() {
 
   return (
     <>
-      <Card className="overflow-hidden rounded-2xl border-border/70 shadow-sm">
-        <CardHeader className="px-4 pb-2 pt-4">
-          <CardTitle className="text-base font-semibold tracking-tight">
+      <Card className="min-w-0 overflow-hidden rounded-2xl border-border/70 shadow-sm">
+        <CardHeader className="px-3 pb-2 pt-3 sm:px-4 sm:pt-4">
+          <CardTitle className="text-sm font-semibold tracking-tight sm:text-base">
             Ko&apos;p so&apos;ralgan mavzular
           </CardTitle>
         </CardHeader>
-        <CardContent className="space-y-1 px-2 pb-3">
+        <CardContent className="space-y-1 px-1.5 pb-2.5 sm:px-2 sm:pb-3">
           {isLoading ? (
             Array.from({ length: 5 }).map((_, index) => (
               <div key={index} className="flex items-center gap-2 px-2 py-2">
@@ -60,7 +54,7 @@ export function SuggestedTopicsWidget() {
             requests.map((request) => (
               <div
                 key={request.id}
-                className="flex items-start gap-1 rounded-xl px-2 py-2 transition-colors hover:bg-muted/40"
+                className="flex min-w-0 items-start gap-1 rounded-xl px-2 py-1.5 transition-colors hover:bg-muted/40 sm:py-2"
               >
                 <TopicSupportButton
                   size="compact"
@@ -72,10 +66,10 @@ export function SuggestedTopicsWidget() {
                 <div className="min-w-0 flex-1">
                   <Link
                     href="/mavzular"
-                    className="block text-sm leading-snug text-foreground hover:text-nav-active"
+                    className="line-clamp-2 break-words text-xs leading-snug text-foreground [overflow-wrap:anywhere] hover:text-nav-active sm:text-sm"
                     title={request.title}
                   >
-                    {truncateTitle(request.title)}
+                    {request.title}
                   </Link>
                 </div>
               </div>

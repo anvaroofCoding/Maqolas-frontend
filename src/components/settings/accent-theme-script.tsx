@@ -1,9 +1,19 @@
 import { THEME_PRESETS } from "@/lib/settings/theme-presets";
+import { RADIUS_PRESETS } from "@/lib/settings/radius-presets";
 import {
   DEFAULT_SETTINGS,
   SETTINGS_STORAGE_KEY,
+  type RadiusPresetId,
   type ThemePresetId,
 } from "@/lib/settings/types";
+
+const VALID_RADIUS_PRESET_IDS = new Set<RadiusPresetId>([
+  "default",
+  "none",
+  "small",
+  "medium",
+  "large",
+]);
 
 const VALID_PRESET_IDS = new Set<ThemePresetId>([
   "indigo",
@@ -26,15 +36,22 @@ const presetColors = Object.fromEntries(
   ]),
 );
 
+const radiusValues = Object.fromEntries(
+  RADIUS_PRESETS.map((preset) => [preset.id, preset.value]),
+);
+
 function buildAccentThemeInitScript() {
   return `
 (function () {
   try {
     var presets = ${JSON.stringify(presetColors)};
+    var radiusValues = ${JSON.stringify(radiusValues)};
     var storageKey = ${JSON.stringify(SETTINGS_STORAGE_KEY)};
     var defaultPreset = ${JSON.stringify(DEFAULT_SETTINGS.themePresetId)};
+    var defaultRadiusPreset = ${JSON.stringify(DEFAULT_SETTINGS.borderRadiusPresetId)};
     var defaultCustom = ${JSON.stringify(DEFAULT_SETTINGS.customAccentColor)};
     var validPresets = ${JSON.stringify([...VALID_PRESET_IDS])};
+    var validRadiusPresets = ${JSON.stringify([...VALID_RADIUS_PRESET_IDS])};
 
     function hexToRgb(hex) {
       var normalized = hex.replace("#", "").trim();
@@ -109,6 +126,20 @@ function buildAccentThemeInitScript() {
       parsed && isValidHexColor(parsed.customAccentColor)
         ? parsed.customAccentColor
         : defaultCustom;
+    var radiusPresetId =
+      parsed &&
+      parsed.borderRadiusPresetId &&
+      validRadiusPresets.indexOf(parsed.borderRadiusPresetId) !== -1
+        ? parsed.borderRadiusPresetId
+        : defaultRadiusPreset;
+
+    var root = document.documentElement;
+    var radiusValue = radiusValues[radiusPresetId];
+    if (radiusValue === null || radiusValue === undefined) {
+      root.style.removeProperty("--radius");
+    } else {
+      root.style.setProperty("--radius", radiusValue);
+    }
 
     if (presetId === "indigo") return;
 
@@ -123,7 +154,6 @@ function buildAccentThemeInitScript() {
       colors = isDark ? preset.dark : preset.light;
     }
 
-    var root = document.documentElement;
     root.style.setProperty("--primary", colors.primary);
     root.style.setProperty("--ring", colors.ring);
     root.style.setProperty("--nav-active", colors.navActive);

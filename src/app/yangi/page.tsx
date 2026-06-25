@@ -3,7 +3,7 @@ import { ArticleFeedWithPagination } from "@/components/articles/article-feed-wi
 import { JsonLdScript } from "@/components/seo/json-ld-script";
 import { feedMainClassName } from "@/lib/layout";
 import { fetchArticleFeed } from "@/lib/articles/server";
-import { buildItemListJsonLd } from "@/lib/seo/json-ld";
+import { buildItemListJsonLd, buildYangiPageJsonLd } from "@/lib/seo/json-ld";
 import { buildPageMetadata } from "@/lib/seo/metadata";
 
 export const metadata = buildPageMetadata({
@@ -27,7 +27,10 @@ export default async function NewArticlesPage() {
   return (
     <main className={feedMainClassName}>
       <JsonLdScript
-        data={buildItemListJsonLd("Yangi maqolalar", "/yangi", feed.articles)}
+        data={[
+          buildYangiPageJsonLd(),
+          buildItemListJsonLd("Yangi maqolalar", "/yangi", feed.articles),
+        ]}
       />
       <ArticleFeedWithPagination
         feed={feed}

@@ -1,6 +1,5 @@
 import { connection } from "next/server";
 import { ArticleFeedWithPagination } from "@/components/articles/article-feed-with-pagination";
-import { HomepageSeoIntro } from "@/components/seo/homepage-seo-intro";
 import { MaqolalarTopicLinks } from "@/components/seo/maqolalar-topic-links";
 import { JsonLdScript } from "@/components/seo/json-ld-script";
 import { feedMainClassName } from "@/lib/layout";
@@ -37,7 +36,6 @@ export default async function MaqolalarHubPage() {
           buildItemListJsonLd("Maqolalar", "/maqolalar", feed.articles),
         ]}
       />
-      <HomepageSeoIntro variant="maqolalar" />
       <MaqolalarTopicLinks categories={categories} />
       <ArticleFeedWithPagination
         feed={feed}

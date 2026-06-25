@@ -8,6 +8,7 @@ import {
   ClockIcon,
   CpuIcon,
   LayersIcon,
+  LibraryIcon,
   MegaphoneIcon,
   MessageCircleIcon,
   NewspaperIcon,
@@ -37,7 +38,9 @@ export function isMainNavActive(pathname: string, href: string): boolean {
 
 export const mainNavItems: NavItem[] = [
   { label: "Siz uchun", href: "/", icon: ThumbsUpIcon },
+  { label: "Maqolalar", href: "/maqolalar", icon: LibraryIcon },
   { label: "Yangi", href: "/yangi", icon: ClockIcon },
+  { label: "Mavzular", href: "/mavzular", icon: TagIcon },
   { label: "Mening maqolam", href: "/lenta", icon: NewspaperIcon },
 ];
 

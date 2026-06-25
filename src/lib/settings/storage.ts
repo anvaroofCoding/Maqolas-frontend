@@ -3,6 +3,7 @@ import {
   SETTINGS_STORAGE_KEY,
   type MaqolasSettings,
   type NotificationSoundId,
+  type RadiusPresetId,
   type ThemePresetId,
 } from "@/lib/settings/types";
 
@@ -17,6 +18,14 @@ const VALID_SOUND_IDS = new Set<NotificationSoundId>([
   "bubble",
   "alert",
   "melody",
+]);
+
+const VALID_RADIUS_PRESET_IDS = new Set<RadiusPresetId>([
+  "default",
+  "none",
+  "small",
+  "medium",
+  "large",
 ]);
 
 const VALID_PRESET_IDS = new Set<ThemePresetId>([
@@ -50,6 +59,11 @@ export function loadSettings(): MaqolasSettings {
         parsed.themePresetId && VALID_PRESET_IDS.has(parsed.themePresetId)
           ? parsed.themePresetId
           : DEFAULT_SETTINGS.themePresetId,
+      borderRadiusPresetId:
+        parsed.borderRadiusPresetId &&
+        VALID_RADIUS_PRESET_IDS.has(parsed.borderRadiusPresetId)
+          ? parsed.borderRadiusPresetId
+          : DEFAULT_SETTINGS.borderRadiusPresetId,
       customAccentColor: isValidHexColor(parsed.customAccentColor)
         ? parsed.customAccentColor
         : DEFAULT_SETTINGS.customAccentColor,

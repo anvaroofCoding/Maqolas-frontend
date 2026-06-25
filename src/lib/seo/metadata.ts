@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import { siteConfig } from "@/config/site";
+import { extractProfileTagline, splitDisplayName } from "@/lib/seo/profile";
 import { absoluteUrl, resolveOgImageUrl } from "@/lib/seo/urls";
 
 export type TitleFormat = "site" | "page" | "article" | "profile";
@@ -12,7 +13,9 @@ export type PageMetadataInput = {
   noIndex?: boolean;
   keywords?: string[];
   titleFormat?: TitleFormat;
-  type?: "website" | "article";
+  type?: "website" | "article" | "profile";
+  profileUsername?: string;
+  profileBio?: string;
   publishedTime?: string;
   modifiedTime?: string;
   authors?: string[];
@@ -29,10 +32,20 @@ function resolveTitle(input: PageMetadataInput): string {
       return input.title
         ? `${input.title} — Maqola | O'zbekcha maqolalar`
         : siteConfig.title;
-    case "profile":
+    case "profile": {
+      const name = input.title ?? siteConfig.name;
+      const username = input.profileUsername;
+      const tagline = extractProfileTagline(input.profileBio);
+
+      if (username) {
+        const taglinePart = tagline ? ` | ${tagline}` : "";
+        return `${name}${taglinePart} (@${username}) — ${siteConfig.name}`;
+      }
+
       return input.title
         ? `${input.title} | Muallif — ${siteConfig.name}`
         : siteConfig.title;
+    }
     case "page":
     default:
       return input.title
@@ -77,15 +90,28 @@ export function buildPageMetadata(input: PageMetadataInput = {}): Metadata {
           authors: input.authors,
           tags: input.tags,
         }
-      : {
-          type: "website",
-          locale: siteConfig.locale,
-          url: canonical,
-          siteName: siteConfig.name,
-          title,
-          description,
-          images: [{ url: image, width: 1200, height: 630, alt: title }],
-        };
+      : input.type === "profile" && input.profileUsername
+        ? {
+            type: "profile",
+            locale: siteConfig.locale,
+            url: canonical,
+            siteName: siteConfig.name,
+            title,
+            description,
+            images: [{ url: image, width: 1200, height: 630, alt: title }],
+            ...splitDisplayName(input.title ?? input.profileUsername),
+            username: input.profileUsername,
+          }
+        : {
+            type: "website",
+            locale: siteConfig.locale,
+            url: canonical,
+            siteName: siteConfig.name,
+            title,
+            description,
+            images: [{ url: image, width: 1200, height: 630, alt: title }],
+            ...(input.modifiedTime ? { modifiedTime: input.modifiedTime } : {}),
+          };
 
   return {
     title,

@@ -1,6 +1,5 @@
 import { connection } from "next/server";
 import { HomepageFeedWithPagination } from "@/components/articles/homepage-feed-with-pagination";
-import { HomepageSeoIntro } from "@/components/seo/homepage-seo-intro";
 import { JsonLdScript } from "@/components/seo/json-ld-script";
 import { fetchArticleFeed, fetchHomepageLayout } from "@/lib/articles/server";
 import { buildHomepageDescription } from "@/lib/seo/description";
@@ -35,7 +34,6 @@ export default async function HomePage() {
           buildFaqJsonLd(),
         ]}
       />
-      <HomepageSeoIntro variant="home" />
       <HomepageFeedWithPagination
         layoutData={homepage}
         latestArticles={latestFeed.articles}

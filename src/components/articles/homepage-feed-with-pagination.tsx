@@ -26,7 +26,7 @@ export function HomepageFeedWithPagination({
     algorithm === "forYou" ? "forYou" : sort;
 
   return (
-    <div className="relative space-y-8 pb-28 md:space-y-10 md:pb-32">
+    <div className="relative space-y-6 pb-28 md:space-y-8 md:pb-32 2xl:space-y-10">
       <HomepageFeed
         layout={layout}
         algorithm={algorithm}

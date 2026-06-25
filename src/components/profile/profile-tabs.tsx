@@ -7,11 +7,14 @@ import { MyArticlesList } from "@/components/profile/my-articles-list";
 import { RequestedArticlesList } from "@/components/profile/requested-articles-list";
 import { UserArticlesList } from "@/components/profile/user-articles-list";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import type { ArticleFeedResponse, ArticleSummary } from "@/features/articles/types";
 
 type ProfileTabsProps = {
   username: string;
   displayName?: string;
   isOwnProfile?: boolean;
+  initialArticles?: ArticleSummary[];
+  initialPagination?: ArticleFeedResponse["pagination"];
 };
 
 function resolveDefaultTab(
@@ -28,6 +31,8 @@ export function ProfileTabs({
   username,
   displayName = "Foydalanuvchi",
   isOwnProfile = false,
+  initialArticles,
+  initialPagination,
 }: ProfileTabsProps) {
   const searchParams = useSearchParams();
   const defaultTab = resolveDefaultTab(searchParams.get("tab"), isOwnProfile);
@@ -59,7 +64,12 @@ export function ProfileTabs({
         </TabsContent>
       ) : (
         <TabsContent value="articles" className="pt-1">
-          <UserArticlesList username={username} displayName={displayName} />
+          <UserArticlesList
+            username={username}
+            displayName={displayName}
+            initialArticles={initialArticles}
+            initialPagination={initialPagination}
+          />
         </TabsContent>
       )}
 

@@ -13,9 +13,24 @@ import {
   feedColumnScrollClassName,
   rightSidebarWidthClass,
   sidebarWidthClass,
+  writeColumnAlignClassName,
 } from "@/lib/layout";
 import { cn } from "@/lib/utils";
 import { WriteLayoutSpacer } from "@/components/layout/write-layout-spacer";
+import { SiteSeoFooter } from "@/components/seo/site-seo-footer";
+import { useWriteChrome } from "@/components/editor/write-chrome-context";
+
+function shouldShowSeoFooter(pathname: string | null) {
+  if (!pathname) return false;
+  return (
+    pathname === "/" ||
+    pathname === "/maqolalar" ||
+    pathname === "/yangi" ||
+    pathname === "/mavzular" ||
+    pathname.startsWith("/mavzu/") ||
+    isLegalInfoRoute(pathname)
+  );
+}
 
 function isLegalInfoRoute(pathname: string | null) {
   if (!pathname) return false;
@@ -47,6 +62,7 @@ function shouldShowRightSidebar(pathname: string | null) {
   if (!pathname || isWriteRoute(pathname)) return false;
   return (
     pathname === "/" ||
+    pathname === "/maqolalar" ||
     pathname === "/yangi" ||
     pathname === "/lenta" ||
     pathname === "/mavzular" ||
@@ -57,6 +73,8 @@ function shouldShowRightSidebar(pathname: string | null) {
 
 export function AppShell({ children }: { children: React.ReactNode }) {
   const pathname = usePathname();
+  const { chromeHidden } = useWriteChrome();
+  const showSeoFooter = shouldShowSeoFooter(pathname);
   const isAdminRoute = pathname?.startsWith("/admin");
   const isWriting = isWriteRoute(pathname);
   const showMobileNav = shouldShowMobileNav(pathname);
@@ -65,10 +83,12 @@ export function AppShell({ children }: { children: React.ReactNode }) {
   const useWriteLayout = isWriting;
   const isFeedLayout = showMobileNav;
   const useFeedTopPadding = isFeedLayout || isLegalInfoRoute(pathname);
+  const writeTopOffset =
+    isWriting && chromeHidden ? "pt-2" : "pt-14";
 
   if (isAdminRoute) {
     return (
-      <SiteContainer className="min-h-[calc(100vh-3.5rem)] px-4 py-6 sm:px-6 sm:py-8 md:px-4 xl:px-6 2xl:px-8">
+      <SiteContainer className="min-h-screen px-4 pb-6 pt-[calc(3.5rem+1.5rem)] sm:px-6 sm:pb-8 md:px-4 xl:px-6 2xl:px-8">
         {children}
       </SiteContainer>
     );
@@ -78,7 +98,7 @@ export function AppShell({ children }: { children: React.ReactNode }) {
     <SiteContainer>
       <div
         className={cn(
-          "grid min-h-[calc(100vh-3.5rem)] min-w-0 items-start overflow-x-hidden bg-background md:h-[calc(100vh-3.5rem)] md:overflow-hidden",
+          "grid min-h-screen min-w-0 items-start overflow-x-hidden bg-background md:h-screen md:overflow-hidden",
           useWriteLayout || showRightSidebar
             ? appShellGridClassName
             : "md:grid-cols-[var(--sidebar-width)_minmax(0,1fr)]",
@@ -103,14 +123,15 @@ export function AppShell({ children }: { children: React.ReactNode }) {
 
         <div
           className={cn(
-            feedColumnScrollClassName,
+            "scrollbar-hidden min-w-0 md:h-full md:overflow-y-auto md:overscroll-contain",
+            writeTopOffset,
             isWriting && "md:h-full",
           )}
         >
           <div
             className={cn(
               useFeedTopPadding && feedColumnAlignClassName,
-              isWriting && cn(feedColumnAlignClassName, "flex h-full min-h-0 flex-col"),
+              isWriting && writeColumnAlignClassName,
             )}
           >
             {showMobileNav ? (
@@ -119,6 +140,7 @@ export function AppShell({ children }: { children: React.ReactNode }) {
               </div>
             ) : null}
             {children}
+            {showSeoFooter ? <SiteSeoFooter /> : null}
           </div>
         </div>
 

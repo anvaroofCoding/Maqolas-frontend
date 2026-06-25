@@ -54,7 +54,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     url: `${base}/profil/${entry.username}`,
     lastModified: new Date(entry.updatedAt),
     changeFrequency: "weekly",
-    priority: 0.75,
+    priority: 0.8,
   }));
 
   return [...staticPages, ...topicPages, ...articlePages, ...profilePages];

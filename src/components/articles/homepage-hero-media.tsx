@@ -28,7 +28,7 @@ export function HomepageHeroMedia({
   return (
     <Link
       href={href}
-      className="group block shrink-0 overflow-hidden rounded-[1.6rem] border bg-card shadow-sm"
+      className="group block shrink-0 overflow-hidden rounded-card-xl border bg-card shadow-sm"
     >
       <div
         className={cn(

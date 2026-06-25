@@ -69,9 +69,9 @@ export function ArticleCardGalleryThumbnail() {
       activeIndex={carousel.activeIndex}
       onActiveIndexChange={carousel.setActiveIndex}
       autoPlay={false}
-      sizes="144px"
+      sizes="112px"
       compactDots={carousel.images.length > 1}
-      className="hidden h-24 w-32 shrink-0 rounded-lg border bg-muted sm:block sm:h-28 sm:w-36"
+      className="hidden h-16 w-20 shrink-0 rounded-lg border bg-muted xl:block xl:h-[4.5rem] xl:w-[5.5rem] 2xl:h-20 2xl:w-24"
     />
   );
 }
@@ -88,7 +88,7 @@ export function ArticleCardGalleryHero() {
       onActiveIndexChange={carousel.setActiveIndex}
       autoPlay={false}
       sizes="100vw"
-      className="mt-4 h-40 w-full sm:hidden"
+      className="mt-3 h-32 w-full rounded-lg border sm:h-36 xl:hidden"
     />
   );
 }

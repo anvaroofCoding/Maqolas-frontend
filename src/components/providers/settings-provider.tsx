@@ -12,6 +12,7 @@ import {
   type ReactNode,
 } from "react";
 import { applyAccentTheme } from "@/lib/settings/apply-theme";
+import { applyBorderRadius } from "@/lib/settings/apply-radius";
 import { loadSettings, saveSettings } from "@/lib/settings/storage";
 import {
   DEFAULT_SETTINGS,
@@ -50,6 +51,7 @@ export function SettingsProvider({ children }: { children: ReactNode }) {
     if (!mounted) return;
     const isDark = resolvedTheme === "dark";
     applyAccentTheme(settings, isDark);
+    applyBorderRadius(settings.borderRadiusPresetId);
   }, [mounted, settings, resolvedTheme]);
 
   const updateSettings = useCallback((patch: Partial<MaqolasSettings>) => {

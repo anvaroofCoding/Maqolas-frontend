@@ -2,6 +2,8 @@
 
 import { PenLineIcon } from "lucide-react";
 import Link from "next/link";
+import { usePathname } from "next/navigation";
+import { useWriteChrome } from "@/components/editor/write-chrome-context";
 import { NotificationPopover } from "@/components/notifications/notification-popover";
 import { ArticleSearchTrigger } from "@/components/layout/article-search-trigger";
 import { NavbarMobileMenu } from "@/components/layout/navbar-mobile-menu";
@@ -21,13 +23,16 @@ const writeButtonClass =
   "bg-nav-active text-nav-active-foreground hover:bg-nav-active-hover hover:text-nav-active-foreground";
 
 export function SiteNavbar() {
+  const pathname = usePathname();
+  const { chromeHidden, focusMode } = useWriteChrome();
+  const hideOnWrite = pathname?.startsWith("/yozish") && (chromeHidden || focusMode);
+
   return (
     <header
       className={cn(
-        "fixed inset-x-0 top-0 z-50 overflow-visible border-b border-navbar-border",
-        "bg-navbar/90 backdrop-blur-xl backdrop-saturate-150",
-        "supports-[backdrop-filter]:bg-navbar/75",
-        "shadow-[0_1px_0_0_var(--navbar-shadow)]",
+        "site-navbar fixed inset-x-0 top-0 z-50 overflow-visible transition-transform duration-300",
+        "border-b border-navbar-border",
+        hideOnWrite && "-translate-y-full pointer-events-none",
       )}
     >
       <SiteContainer className="flex h-14 w-full max-w-none items-center justify-between gap-3 px-4 md:gap-4 md:px-4 xl:px-6">

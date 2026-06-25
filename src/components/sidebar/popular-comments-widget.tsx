@@ -21,13 +21,13 @@ export function PopularCommentsWidget({
   const comments = data?.comments ?? [];
 
   return (
-    <Card className="overflow-hidden rounded-2xl border-border/70 shadow-sm">
-      <CardHeader className="px-4 py-3">
-        <CardTitle className="text-base font-semibold tracking-tight">
+    <Card className="min-w-0 overflow-hidden rounded-2xl border-border/70 shadow-sm">
+      <CardHeader className="px-3 py-2.5 sm:px-4 sm:py-3">
+        <CardTitle className="text-sm font-semibold tracking-tight sm:text-base">
           Mashxur izohlar
         </CardTitle>
       </CardHeader>
-      <CardContent className="space-y-4 px-4 pb-4">
+      <CardContent className="space-y-3 px-3 pb-3 sm:space-y-4 sm:px-4 sm:pb-4">
         {isLoading ? (
           Array.from({ length: 5 }).map((_, index) => (
             <div key={index} className="flex gap-3">
@@ -55,7 +55,7 @@ export function PopularCommentsWidget({
               <Link
                 key={comment.id}
                 href={`/maqola/${comment.article.slug}#comments`}
-                className="group flex gap-3 rounded-xl p-1 transition-colors hover:bg-muted/40"
+                className="group flex min-w-0 gap-2.5 rounded-xl p-1 transition-colors hover:bg-muted/40 sm:gap-3"
               >
                 <Avatar size="sm" className="mt-0.5 shrink-0">
                   {comment.author?.avatarUrl ? (
@@ -70,13 +70,13 @@ export function PopularCommentsWidget({
                 <div className="min-w-0 flex-1">
                   <p
                     className={cn(
-                      "truncate text-sm font-semibold",
+                      "truncate text-xs font-semibold sm:text-sm",
                       isOwn ? "text-nav-active" : "text-foreground",
                     )}
                   >
                     {authorName}
                   </p>
-                  <p className="mt-0.5 line-clamp-2 text-sm leading-snug text-muted-foreground group-hover:text-foreground/80">
+                  <p className="mt-0.5 line-clamp-2 text-xs leading-snug text-muted-foreground group-hover:text-foreground/80 sm:text-sm">
                     {commentPreviewText(comment.content)}
                   </p>
                   <div className="mt-1 flex items-center gap-2 text-xs text-muted-foreground">

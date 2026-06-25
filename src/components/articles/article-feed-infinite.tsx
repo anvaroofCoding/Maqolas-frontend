@@ -12,6 +12,7 @@ import {
 import type { ArticleFeedResponse, ArticleSummary } from "@/features/articles/types";
 import { useLazyGetUserArticlesQuery } from "@/features/users/api/users-api";
 import { ARTICLE_FEED_PAGE_SIZE } from "@/lib/articles/constants";
+import { articleFeedGridClassName } from "@/lib/layout";
 import type { RootState } from "@/lib/store";
 import { cn } from "@/lib/utils";
 
@@ -66,8 +67,8 @@ export function ArticleFeedInfinite({
 
   const canUseInitialData =
     Boolean(initialArticles && initialPagination) &&
-    effectiveSort === sort &&
-    variant === "feed";
+    ((variant === "feed" && effectiveSort === sort) ||
+      (variant === "user" && Boolean(username)));
 
   const [articles, setArticles] = useState<ArticleSummary[]>(
     canUseInitialData ? initialArticles! : [],
@@ -207,8 +208,8 @@ export function ArticleFeedInfinite({
       {title ? <h1 className="sr-only">{title}</h1> : null}
       <div
         className={cn(
-          "flex flex-col gap-4",
-          compact ? "pt-0 pb-2" : "pb-4 pt-2 md:gap-5 md:pb-6 md:pt-0",
+          articleFeedGridClassName,
+          compact ? "pt-0 pb-2" : "pb-4 pt-2 md:pb-6 md:pt-0",
         )}
       >
         {articles.map((article) => (

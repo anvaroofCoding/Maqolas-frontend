@@ -1,6 +1,8 @@
 import type { ArticleCategory, ArticleSummary } from "@/features/articles/types";
 import type { UserSocialLinks } from "@/features/auth/types";
+import { primarySeoNavLinks } from "@/config/seo-navigation";
 import { siteConfig } from "@/config/site";
+import { extractProfileTagline } from "@/lib/seo/profile";
 import { formatSocialHref } from "@/lib/user";
 import { absoluteUrl, articleUrl, profileUrl, topicUrl } from "@/lib/seo/urls";
 
@@ -81,12 +83,31 @@ export function buildOrganizationJsonLd() {
   };
 }
 
+const websiteId = `${siteConfig.url.replace(/\/$/, "")}/#website`;
+
+export function buildSiteNavigationJsonLd() {
+  return {
+    "@context": "https://schema.org",
+    "@type": "SiteNavigationElement",
+    "@id": `${siteConfig.url.replace(/\/$/, "")}/#main-navigation`,
+    name: `${siteConfig.name} asosiy menyu`,
+    isPartOf: { "@id": websiteId },
+    hasPart: primarySeoNavLinks.map((link) => ({
+      "@type": "WebPage",
+      name: link.label,
+      description: link.description,
+      url: absoluteUrl(link.href),
+    })),
+  };
+}
+
 export function buildWebSiteJsonLd() {
   const creator = buildCreatorPerson();
 
   return {
     "@context": "https://schema.org",
     "@type": "WebSite",
+    "@id": websiteId,
     name: siteConfig.name,
     alternateName: [
       "Maqolalar",
@@ -212,6 +233,7 @@ export function buildPersonJsonLd(input: {
 }) {
   const url = profileUrl(input.username);
   const sameAs = collectProfileSameAs(input.social);
+  const tagline = extractProfileTagline(input.bio);
   const interactionStatistic = [];
 
   if (input.followersCount && input.followersCount > 0) {
@@ -243,6 +265,12 @@ export function buildPersonJsonLd(input: {
     url,
     description: input.bio,
     image: input.avatarUrl ? absoluteUrl(input.avatarUrl) : undefined,
+    ...(tagline ? { jobTitle: tagline } : {}),
+    worksFor: {
+      "@type": "Organization",
+      name: siteConfig.name,
+      url: absoluteUrl("/"),
+    },
     ...(sameAs.length > 0 ? { sameAs } : {}),
     ...(interactionStatistic.length > 0 ? { interactionStatistic } : {}),
   };
@@ -365,6 +393,40 @@ export function buildFaqJsonLd() {
         text: entry.answer,
       },
     })),
+  };
+}
+
+export function buildYangiPageJsonLd() {
+  return {
+    "@context": "https://schema.org",
+    "@type": "CollectionPage",
+    name: "Yangi maqolalar",
+    description:
+      "Eng so'nggi nashr etilgan o'zbekcha maqolalar va yangi kontent — Maqolas.",
+    url: absoluteUrl("/yangi"),
+    inLanguage: siteConfig.htmlLang,
+    isPartOf: {
+      "@type": "WebSite",
+      name: siteConfig.name,
+      url: siteConfig.url,
+    },
+  };
+}
+
+export function buildMavzularPageJsonLd() {
+  return {
+    "@context": "https://schema.org",
+    "@type": "CollectionPage",
+    name: "Maqola mavzulari",
+    description:
+      "Texnologiya, startaplar, AI, marketing va boshqa mavzularda o'zbekcha maqolalar.",
+    url: absoluteUrl("/mavzular"),
+    inLanguage: siteConfig.htmlLang,
+    isPartOf: {
+      "@type": "WebSite",
+      name: siteConfig.name,
+      url: siteConfig.url,
+    },
   };
 }
 

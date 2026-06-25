@@ -2,12 +2,13 @@
 
 import type { Editor } from "@tiptap/core";
 import { EditorContent, useEditor } from "@tiptap/react";
-import { Maximize2Icon, Minimize2Icon } from "lucide-react";
+import { Maximize2Icon, Minimize2Icon, PanelTopCloseIcon, PanelTopOpenIcon } from "lucide-react";
 import { usePathname, useRouter } from "next/navigation";
 import { useCallback, useEffect, useRef, useState } from "react";
 import { useSettings } from "@/components/providers/settings-provider";
 import { EditorToolbar } from "@/components/editor/editor-toolbar";
 import { EditorContextMenu } from "@/components/editor/editor-context-menu";
+import { useWriteChrome } from "@/components/editor/write-chrome-context";
 import { Button } from "@/components/ui/button";
 import { useUpdateAdminArticleMutation } from "@/features/admin/api/admin-api";
 import {
@@ -26,8 +27,7 @@ import {
 import { getWritingStats } from "@/lib/editor/writing-stats";
 import { toast } from "@/lib/toast";
 import { useAppSelector } from "@/lib/store/hooks";
-import { articleSurfaceClassName, appShellGridClassName, appShellGridStyle, containerClassName } from "@/lib/layout";
-import { WriteLayoutSpacer } from "@/components/layout/write-layout-spacer";
+import { articleSurfaceClassName, writeSurfaceClassName } from "@/lib/layout";
 import { cn } from "@/lib/utils";
 
 const writeButtonClass =
@@ -50,7 +50,9 @@ export function ArticleEditor({
 }: ArticleEditorProps) {
   const router = useRouter();
   const pathname = usePathname();
-  const [focusMode, setFocusMode] = useState(false);
+  const { chromeHidden, setChromeHidden, toggleChromeHidden, focusMode, setFocusMode } =
+    useWriteChrome();
+  const isAuthorWritePage = mode === "author";
   const [articleId, setArticleId] = useState<string | undefined>(initialArticleId);
   const [editorResetKey, setEditorResetKey] = useState(0);
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -139,7 +141,7 @@ export function ArticleEditor({
     editorProps: {
       attributes: {
         class:
-          "article-editor-content min-h-[55vh] px-6 py-8 focus:outline-none sm:px-10",
+          "article-editor-content min-h-[50vh] px-4 py-4 focus:outline-none sm:px-8 sm:py-5",
       },
     },
     onCreate: ({ editor: ed }) => {
@@ -186,7 +188,7 @@ export function ArticleEditor({
   useEffect(() => {
     if (!editor) return;
     const el = editor.view.dom;
-    el.classList.toggle("min-h-[55vh]", !focusMode);
+    el.classList.toggle("min-h-[50vh]", !focusMode);
     el.classList.toggle("min-h-full", focusMode);
   }, [focusMode, editor]);
 
@@ -232,6 +234,7 @@ export function ArticleEditor({
     articleIdRef.current = undefined;
     setArticleId(undefined);
     setFocusMode(false);
+    setChromeHidden(false);
     setCanSubmit(false);
     setSubmitBlockReason("kamida 200 ta so'z va kamida 1 ta rasm");
     setEditorResetKey((key) => key + 1);
@@ -241,8 +244,12 @@ export function ArticleEditor({
     }
   };
 
+  const surfaceClassName = isAuthorWritePage
+    ? writeSurfaceClassName
+    : articleSurfaceClassName;
+
   const editorPanel = (
-    <div className={cn("flex min-h-0 w-full flex-1 flex-col", articleSurfaceClassName)}>
+    <div className={cn("flex min-h-0 w-full flex-1 flex-col", surfaceClassName)}>
       <div
         className={cn(
           "flex min-h-0 flex-1 flex-col",
@@ -253,19 +260,43 @@ export function ArticleEditor({
             "sticky z-40 -mx-4 border-b border-border bg-background/95 px-4 backdrop-blur supports-[backdrop-filter]:bg-background/80 sm:-mx-6 sm:px-6 top-0",
           )}
         >
-          <div className="flex flex-wrap items-center justify-end gap-3 py-3">
+          <div className="flex flex-wrap items-center justify-end gap-2 py-2 sm:gap-3">
             <div className="flex flex-wrap items-center justify-end gap-2">
               {!isAdminMode && !submitted && submitBlockReason ? (
                 <p className="text-xs text-muted-foreground">
                   Ko&apos;rib chiqishga yuborish uchun {submitBlockReason} kerak
                 </p>
               ) : null}
+              {isAuthorWritePage ? (
+                <Button
+                  type="button"
+                  variant="outline"
+                  size="sm"
+                  className="gap-1.5"
+                  onClick={toggleChromeHidden}
+                  aria-pressed={chromeHidden}
+                >
+                  {chromeHidden ? (
+                    <PanelTopOpenIcon className="size-4" />
+                  ) : (
+                    <PanelTopCloseIcon className="size-4" />
+                  )}
+                  Menyu
+                </Button>
+              ) : null}
               <Button
                 type="button"
                 variant="outline"
                 size="sm"
                 className="gap-1.5"
-                onClick={() => setFocusMode((v) => !v)}
+                onClick={() => {
+                  const next = !focusMode;
+                  if (isAuthorWritePage) {
+                    setChromeHidden(next);
+                  }
+                  setFocusMode(next);
+                }}
+                aria-pressed={focusMode}
               >
                 {focusMode ? (
                   <Minimize2Icon className="size-4" />
@@ -337,18 +368,7 @@ export function ArticleEditor({
   if (focusMode) {
     return (
       <div className="fixed inset-0 z-[100] flex h-dvh flex-col bg-background">
-        <div className={cn("mx-auto h-full w-full min-h-0", containerClassName)}>
-          <div
-            className={cn("grid h-full min-h-0 w-full", appShellGridClassName)}
-            style={appShellGridStyle}
-          >
-            <WriteLayoutSpacer side="left" />
-            <div className="flex min-h-0 flex-col overflow-hidden">
-              {editorPanel}
-            </div>
-            <WriteLayoutSpacer side="right" />
-          </div>
-        </div>
+        {editorPanel}
       </div>
     );
   }

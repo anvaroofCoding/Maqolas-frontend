@@ -1,5 +1,6 @@
 import type { ArticleCategory } from "@/features/articles/types";
 import { siteConfig } from "@/config/site";
+import { formatCount } from "@/lib/format";
 
 /** Bosh sahifa meta description — "maqolalar" qidiruv niyatiga mos */
 export function buildHomepageDescription(): string {
@@ -53,27 +54,36 @@ export function buildProfileDescription(
 ): string {
   const statsParts: string[] = [];
 
-  if (articlesCount && articlesCount > 0) {
-    statsParts.push(`${articlesCount} ta maqola`);
+  if (typeof articlesCount === "number" && articlesCount > 0) {
+    statsParts.push(`${formatCount(articlesCount)} ta maqola`);
   }
 
-  if (followersCount && followersCount > 0) {
-    statsParts.push(`${followersCount} ta obunachi`);
+  if (typeof followersCount === "number" && followersCount > 0) {
+    statsParts.push(`${formatCount(followersCount)} obunachi`);
   }
 
-  const statsLine = statsParts.length > 0 ? `${statsParts.join(" · ")}. ` : "";
-  const handlePart = username ? `@${username}. ` : "";
+  const statsLine = statsParts.length > 0 ? statsParts.join(" · ") : "";
+  const handlePart = username ? `@${username}` : "";
   const trimmedBio = bio?.trim();
+  const lead = [statsLine, handlePart].filter(Boolean).join(" · ");
 
   if (trimmedBio) {
-    const combined = `${statsLine}${trimmedBio}`;
-    if (combined.length <= 320) {
-      return combined;
+    const bioShort =
+      trimmedBio.length > 150
+        ? `${trimmedBio.slice(0, 147).trimEnd()}…`
+        : trimmedBio;
+
+    if (lead) {
+      return `${lead} — ${bioShort}. ${displayName} profili Maqolas da.`;
     }
 
-    const budget = Math.max(120, 300 - statsLine.length);
-    return `${statsLine}${trimmedBio.slice(0, budget).trimEnd()}…`;
+    return `${bioShort}. ${displayName} — Maqolas muallifi.`;
   }
 
-  return `${statsLine}${handlePart}${displayName} — Maqolas platformasidagi muallif. O'zbekcha maqolalar, fikrlar va bilimlar.`;
+  if (lead) {
+    return `${lead}. ${displayName} — Maqolas platformasidagi muallif. Profil va maqolalarni ko'ring.`;
+  }
+
+  const handleSuffix = username ? ` (@${username})` : "";
+  return `${displayName}${handleSuffix} — Maqolas platformasidagi muallif. O'zbekcha maqolalar, fikrlar va bilimlar.`;
 }

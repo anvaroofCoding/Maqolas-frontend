@@ -1,6 +1,7 @@
 import { Newspaper } from "lucide-react";
 import { ArticleCard } from "@/components/articles/article-card";
 import type { ArticleSummary } from "@/features/articles/types";
+import { articleFeedGridClassName } from "@/lib/layout";
 import { cn } from "@/lib/utils";
 
 type ArticleFeedProps = {
@@ -32,8 +33,8 @@ export function ArticleFeed({
       ) : null}
       <div
         className={cn(
-          "flex flex-col gap-4",
-          compact ? "pt-0 pb-2" : "pb-4 pt-0 md:gap-5 md:pb-6",
+          articleFeedGridClassName,
+          compact ? "pt-0 pb-2" : "pb-4 pt-0",
         )}
       >
         {articles.map((article) => (

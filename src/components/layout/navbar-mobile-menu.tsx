@@ -76,22 +76,30 @@ export function NavbarMobileMenu({ className }: { className?: string }) {
     action();
   }
 
+  const menuButton = (
+    <Button
+      type="button"
+      variant="ghost"
+      size="icon"
+      className={cn(navIconButtonClass, className)}
+      aria-label="Menyu"
+    >
+      <MenuIcon />
+    </Button>
+  );
+
   return (
     <>
+      {!mounted ? (
+        menuButton
+      ) : (
       <Sheet open={open} onOpenChange={setOpen}>
         <SheetTrigger asChild>
-          <Button
-            type="button"
-            variant="ghost"
-            size="icon"
-            className={cn(navIconButtonClass, className)}
-            aria-label="Menyu"
-          >
-            <MenuIcon />
-          </Button>
+          {menuButton}
         </SheetTrigger>
 
         <SheetContent
+          id="navbar-mobile-menu"
           side="right"
           showCloseButton={view === "main"}
           className="gap-0 p-0"
@@ -222,6 +230,7 @@ export function NavbarMobileMenu({ className }: { className?: string }) {
           )}
         </SheetContent>
       </Sheet>
+      )}
 
       <PromoReaderModal open={promoOpen} onOpenChange={setPromoOpen} />
       {mounted ? (

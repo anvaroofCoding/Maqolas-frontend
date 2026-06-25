@@ -23,6 +23,13 @@ export type ThemePresetId =
   | "slate"
   | "custom";
 
+export type RadiusPresetId =
+  | "default"
+  | "none"
+  | "small"
+  | "medium"
+  | "large";
+
 export interface AccentColors {
   primary: string;
   ring: string;
@@ -41,6 +48,7 @@ export interface ThemePreset {
 
 export interface MaqolasSettings {
   themePresetId: ThemePresetId;
+  borderRadiusPresetId: RadiusPresetId;
   customAccentColor: string;
   notificationSoundId: NotificationSoundId;
   aiAssistEnabled: boolean;
@@ -49,6 +57,7 @@ export interface MaqolasSettings {
 
 export const DEFAULT_SETTINGS: MaqolasSettings = {
   themePresetId: "indigo",
+  borderRadiusPresetId: "default",
   customAccentColor: "#4f46e5",
   notificationSoundId: "ding",
   aiAssistEnabled: true,

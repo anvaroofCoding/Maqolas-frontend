@@ -2,13 +2,17 @@
 
 import {
   BellIcon,
+  CheckIcon,
+  ChevronDownIcon,
   CloudSunIcon,
   PaletteIcon,
   RotateCcwIcon,
   SparklesIcon,
+  SquareRoundCornerIcon,
   Volume2Icon,
 } from "lucide-react";
 import { useTheme } from "next-themes";
+import { useEffect, useRef, useState } from "react";
 import {
   Dialog,
   DialogContent,
@@ -21,17 +25,41 @@ import { Label } from "@/components/ui/label";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { useSettings } from "@/components/providers/settings-provider";
 import { THEME_PRESETS } from "@/lib/settings/theme-presets";
+import { RADIUS_PRESETS, getRadiusPreset } from "@/lib/settings/radius-presets";
 import {
   NOTIFICATION_SOUNDS,
   playNotificationSound,
 } from "@/lib/settings/notification-sounds";
-import type { ThemePresetId } from "@/lib/settings/types";
+import type { RadiusPresetId, ThemePresetId } from "@/lib/settings/types";
 import { cn } from "@/lib/utils";
 
 export function SettingsModal() {
   const { settingsOpen, setSettingsOpen, settings, updateSettings, resetSettings } =
     useSettings();
   const { theme, setTheme } = useTheme();
+  const [radiusMenuOpen, setRadiusMenuOpen] = useState(false);
+  const radiusMenuRef = useRef<HTMLDivElement>(null);
+  const activeRadiusPreset =
+    getRadiusPreset(settings.borderRadiusPresetId) ?? RADIUS_PRESETS[0];
+
+  useEffect(() => {
+    if (!radiusMenuOpen) return;
+
+    function handlePointerDown(event: MouseEvent) {
+      if (!radiusMenuRef.current?.contains(event.target as Node)) {
+        setRadiusMenuOpen(false);
+      }
+    }
+
+    document.addEventListener("pointerdown", handlePointerDown);
+    return () => document.removeEventListener("pointerdown", handlePointerDown);
+  }, [radiusMenuOpen]);
+
+  useEffect(() => {
+    if (!settingsOpen) {
+      setRadiusMenuOpen(false);
+    }
+  }, [settingsOpen]);
 
   return (
     <Dialog open={settingsOpen} onOpenChange={setSettingsOpen}>
@@ -90,6 +118,87 @@ export function SettingsModal() {
                     {option.label}
                   </Button>
                 ))}
+              </div>
+            </section>
+
+            <section className="space-y-3">
+              <div>
+                <p className="text-sm font-medium">Burchak radiusi</p>
+                <p className="text-xs text-muted-foreground">
+                  Kartalar, tugmalar va boshqa elementlarning yumaloqligi.
+                </p>
+              </div>
+              <div ref={radiusMenuRef} className="relative">
+                <button
+                  type="button"
+                  aria-expanded={radiusMenuOpen}
+                  aria-haspopup="listbox"
+                  onClick={() => setRadiusMenuOpen((open) => !open)}
+                  className="flex w-full items-center justify-between gap-3 rounded-xl border border-border bg-muted/30 px-3.5 py-3 text-left transition-colors hover:bg-muted/60"
+                >
+                  <div className="flex min-w-0 items-center gap-3">
+                    <span
+                      className="flex size-9 shrink-0 items-center justify-center border border-border bg-background"
+                      style={{
+                        borderRadius: activeRadiusPreset.previewRadius,
+                      }}
+                      aria-hidden
+                    >
+                      <SquareRoundCornerIcon className="size-4 text-muted-foreground" />
+                    </span>
+                    <span className="text-sm font-medium">
+                      {activeRadiusPreset.name}
+                    </span>
+                  </div>
+                  <ChevronDownIcon
+                    className={cn(
+                      "size-4 shrink-0 text-muted-foreground transition-transform",
+                      radiusMenuOpen && "rotate-180",
+                    )}
+                  />
+                </button>
+                {radiusMenuOpen ? (
+                  <div
+                    role="listbox"
+                    aria-label="Burchak radiusi"
+                    className="absolute left-0 right-0 z-10 mt-1 overflow-hidden rounded-xl border border-border bg-popover p-1 shadow-md"
+                  >
+                    {RADIUS_PRESETS.map((preset) => {
+                      const isActive =
+                        settings.borderRadiusPresetId === preset.id;
+                      return (
+                        <button
+                          key={preset.id}
+                          type="button"
+                          role="option"
+                          aria-selected={isActive}
+                          onClick={() => {
+                            updateSettings({
+                              borderRadiusPresetId: preset.id as RadiusPresetId,
+                            });
+                            setRadiusMenuOpen(false);
+                          }}
+                          className={cn(
+                            "flex w-full items-center gap-2.5 rounded-lg px-2.5 py-2 text-sm transition-colors",
+                            isActive
+                              ? "bg-accent text-accent-foreground"
+                              : "hover:bg-muted/60",
+                          )}
+                        >
+                          <span
+                            className="size-4 shrink-0 border border-border bg-background"
+                            style={{ borderRadius: preset.previewRadius }}
+                            aria-hidden
+                          />
+                          <span className="flex-1 text-left">{preset.name}</span>
+                          {isActive ? (
+                            <CheckIcon className="size-4 shrink-0" />
+                          ) : null}
+                        </button>
+                      );
+                    })}
+                  </div>
+                ) : null}
               </div>
             </section>
 

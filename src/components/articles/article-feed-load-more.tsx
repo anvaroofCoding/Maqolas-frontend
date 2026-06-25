@@ -10,6 +10,7 @@ import {
 import type { ArticleSummary } from "@/features/articles/types";
 import { useLazyGetUserArticlesQuery } from "@/features/users/api/users-api";
 import { ARTICLE_FEED_PAGE_SIZE } from "@/lib/articles/constants";
+import { articleFeedGridClassName } from "@/lib/layout";
 import { cn } from "@/lib/utils";
 
 type FeedVariant = "feed" | "saved" | "user";
@@ -138,8 +139,8 @@ export function ArticleFeedLoadMore({
     <>
       <div
         className={cn(
-          "flex flex-col gap-4",
-          compact ? "pt-0 pb-2" : "pb-4 md:gap-5 md:pb-6",
+          articleFeedGridClassName,
+          compact ? "pt-0 pb-2" : "pb-4 md:pb-6",
         )}
       >
         {articles.map((article) => (

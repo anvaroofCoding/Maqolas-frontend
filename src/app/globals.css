@@ -60,9 +60,9 @@ html::-webkit-scrollbar {
   --nav-active: rgb(79, 70, 229);
   --nav-active-hover: rgb(67, 56, 202);
   --nav-active-foreground: #ffffff;
-  --navbar: rgb(243 244 246 / 88%);
-  --navbar-border: oklch(0.922 0 0 / 50%);
-  --navbar-shadow: oklch(0 0 0 / 8%);
+  --navbar: rgb(243 244 246 / 58%);
+  --navbar-border: oklch(0.922 0 0 / 55%);
+  --navbar-shadow: oklch(0 0 0 / 10%);
   --article-code-bg: oklch(0.91 0.012 286);
   --article-inline-code-bg: oklch(0.94 0.008 286);
   --article-code-border: oklch(0.84 0.014 286);
@@ -105,9 +105,9 @@ html.dark {
   --nav-active: rgb(99, 102, 241);
   --nav-active-hover: rgb(79, 70, 229);
   --nav-active-foreground: #ffffff;
-  --navbar: oklch(0.21 0.006 286 / 88%);
-  --navbar-border: oklch(1 0 0 / 12%);
-  --navbar-shadow: oklch(1 0 0 / 6%);
+  --navbar: oklch(0.21 0.006 286 / 58%);
+  --navbar-border: oklch(1 0 0 / 14%);
+  --navbar-shadow: oklch(0 0 0 / 28%);
   --toast-bg-color: oklch(0.26 0.008 286);
   --toast-text-color: oklch(0.985 0 0);
   --toast-close-color: oklch(0.985 0 0);
@@ -179,6 +179,11 @@ html:not(.dark) {
   --radius-2xl: calc(var(--radius) * 1.8);
   --radius-3xl: calc(var(--radius) * 2.2);
   --radius-4xl: calc(var(--radius) * 2.6);
+  --radius-card-sm: calc(var(--radius) * 1.84);
+  --radius-card-md: calc(var(--radius) * 2);
+  --radius-card-lg: calc(var(--radius) * 2.4);
+  --radius-card-xl: calc(var(--radius) * 2.56);
+  --radius-card-2xl: calc(var(--radius) * 2.88);
 }
 
 @layer base {
@@ -193,6 +198,23 @@ html:not(.dark) {
   body {
     @apply min-h-screen antialiased bg-background text-foreground;
     font-family: var(--font-sans), ui-sans-serif, system-ui, sans-serif;
+  }
+}
+
+.site-navbar {
+  background-color: var(--navbar);
+  box-shadow: 0 1px 0 var(--navbar-border), 0 8px 24px -12px var(--navbar-shadow);
+  -webkit-backdrop-filter: blur(20px) saturate(180%);
+  backdrop-filter: blur(20px) saturate(180%);
+}
+
+@supports ((-webkit-backdrop-filter: blur(1px)) or (backdrop-filter: blur(1px))) {
+  .site-navbar {
+    background-color: color-mix(in oklch, var(--background) 62%, transparent);
+  }
+
+  html.dark .site-navbar {
+    background-color: color-mix(in oklch, var(--background) 55%, transparent);
   }
 }
 

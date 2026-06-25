@@ -1,4 +1,5 @@
 import { ArticleCardSkeleton } from "@/components/articles/article-card-skeleton";
+import { articleFeedGridClassName } from "@/lib/layout";
 import { cn } from "@/lib/utils";
 
 type ArticleFeedSkeletonProps = {
@@ -23,9 +24,9 @@ export function ArticleFeedSkeleton({
       <span className="sr-only">Maqolalar yuklanmoqda</span>
       <div
         className={cn(
-          "flex flex-col gap-4",
+          articleFeedGridClassName,
           !inline && "min-h-[40vh]",
-          compact ? "pt-0 pb-2" : "pb-4 pt-2 md:gap-5 md:pb-6 md:pt-0",
+          compact ? "pt-0 pb-2" : "pb-4 pt-2 md:pb-6 md:pt-0",
         )}
       >
         {Array.from({ length: count }, (_, index) => (

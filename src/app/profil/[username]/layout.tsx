@@ -31,6 +31,9 @@ export async function generateMetadata({
   return buildPageMetadata({
     title: profile.displayName,
     titleFormat: "profile",
+    type: "profile",
+    profileUsername: profile.username,
+    profileBio: profile.bio,
     description: buildProfileDescription(
       profile.displayName,
       profile.bio,
@@ -40,6 +43,7 @@ export async function generateMetadata({
     ),
     path: `/profil/${profile.username}`,
     image: profile.avatarUrl,
+    modifiedTime: profile.updatedAt,
     keywords: buildProfileKeywords(
       profile.displayName,
       profile.username,

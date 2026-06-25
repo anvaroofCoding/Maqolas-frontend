@@ -8,9 +8,21 @@ export const containerClassName =
 export const articleSurfaceClassName =
   "w-full min-w-0 max-w-full px-4 py-6 sm:px-6 sm:py-8 lg:px-8";
 
+/** Maqola yozish — ixchamroq, tepada ortiqcha bo'shliq yo'q */
+export const writeSurfaceClassName =
+  "w-full min-w-0 max-w-full px-3 py-1 sm:px-5 sm:py-2 md:px-6";
+
+/** Yozish ustuni — feed paddingisiz */
+export const writeColumnAlignClassName =
+  "flex h-full min-h-0 flex-col pb-2 md:pb-3";
+
 /** Maqola feed sahifalari — sidebarlar yonida */
 export const feedMainClassName =
   "w-full min-w-0 max-w-full px-3 py-0 md:px-4 lg:px-5";
+
+/** Maqola kartalari — mobil/planshet 1 ustun, keng ekranda 2 ustun */
+export const articleFeedGridClassName =
+  "grid grid-cols-1 gap-4 sm:gap-5 xl:grid-cols-2";
 
 /** Feed sahifalarida ustunlar bir xil balandlikda boshlanadi */
 export const feedColumnTopPaddingClass = "md:pt-6 md:pb-6";
@@ -20,7 +32,7 @@ export const feedColumnAlignClassName = "flex flex-col md:pt-6 md:pb-6";
 
 /** Feed ustunlari — mustaqil scroll, yashirin scrollbar */
 export const feedColumnScrollClassName =
-  "scrollbar-hidden min-w-0 md:h-full md:overflow-y-auto md:overscroll-contain";
+  "scrollbar-hidden min-w-0 pt-14 md:h-full md:overflow-y-auto md:overscroll-contain";
 
 export const sidebarWidthClass = "w-56";
 export const rightSidebarWidthClass = "w-72";

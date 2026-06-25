@@ -221,7 +221,7 @@
 .navbar-weather__tooltip {
   position: relative;
   overflow: hidden;
-  border-radius: 1rem;
+  border-radius: var(--radius-xl);
   border: 1px solid color-mix(in oklch, var(--border) 80%, transparent);
   background: color-mix(in oklch, var(--popover) 92%, transparent);
   padding: 0.9rem;
@@ -323,7 +323,7 @@
   flex-shrink: 0;
   align-items: center;
   justify-content: center;
-  border-radius: 0.8rem;
+  border-radius: var(--radius-lg);
   background: color-mix(in oklch, var(--background) 55%, transparent);
   border: 1px solid color-mix(in oklch, var(--border) 70%, transparent);
 }

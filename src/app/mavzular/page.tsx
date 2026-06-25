@@ -1,5 +1,7 @@
 import { TopicSuggestionsPage } from "@/components/topics/topic-suggestions-page";
+import { JsonLdScript } from "@/components/seo/json-ld-script";
 import { feedMainClassName } from "@/lib/layout";
+import { buildMavzularPageJsonLd } from "@/lib/seo/json-ld";
 import { buildPageMetadata } from "@/lib/seo/metadata";
 
 export const metadata = buildPageMetadata({
@@ -22,6 +24,7 @@ export const metadata = buildPageMetadata({
 export default function TopicSuggestionsRoutePage() {
   return (
     <main className={feedMainClassName}>
+      <JsonLdScript data={buildMavzularPageJsonLd()} />
       <TopicSuggestionsPage />
     </main>
   );

@@ -47,36 +47,15 @@ export function useNavbarWeather(enabled: boolean) {
       }
     }
 
-    function startRefresh(
-      latitude: number,
-      longitude: number,
-      isDeviceLocation: boolean,
-    ) {
-      void load(latitude, longitude, isDeviceLocation);
+    function startRefresh(latitude: number, longitude: number) {
+      void load(latitude, longitude, false);
       refreshTimer = setInterval(() => {
-        void load(latitude, longitude, isDeviceLocation);
+        void load(latitude, longitude, false);
       }, REFRESH_MS);
     }
 
-    if (typeof navigator !== "undefined" && navigator.geolocation) {
-      navigator.geolocation.getCurrentPosition(
-        (position) => {
-          startRefresh(
-            position.coords.latitude,
-            position.coords.longitude,
-            true,
-          );
-        },
-        () => {
-          const fallback = getDefaultCoordinates();
-          startRefresh(fallback.latitude, fallback.longitude, false);
-        },
-        { maximumAge: REFRESH_MS, timeout: 8000 },
-      );
-    } else {
-      const fallback = getDefaultCoordinates();
-      startRefresh(fallback.latitude, fallback.longitude, false);
-    }
+    const fallback = getDefaultCoordinates();
+    startRefresh(fallback.latitude, fallback.longitude);
 
     return () => {
       cancelled = true;

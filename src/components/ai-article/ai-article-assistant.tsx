@@ -16,6 +16,7 @@ import {
   AiPromptGuideDialog,
 } from "@/components/ai-article/ai-prompt-guide-dialog";
 import { AuthLoginModal } from "@/components/auth/auth-login-modal";
+import { useWriteChrome } from "@/components/editor/write-chrome-context";
 import { AiIcon } from "@/components/icons/ai-icon";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -69,6 +70,7 @@ export function AiArticleAssistant() {
   const dispatch = useAppDispatch();
   const router = useRouter();
   const pathname = usePathname();
+  const { chromeHidden, focusMode } = useWriteChrome();
   const accessToken = useAppSelector((state) => state.auth.accessToken);
   const isAuthenticated = useAppSelector((state) => state.auth.isAuthenticated);
 
@@ -97,6 +99,8 @@ export function AiArticleAssistant() {
 
   const quota = quotaData ?? { limit: 2, used: 0, remaining: 2 };
   const isProcessing = isJobActive(activeJob);
+  const hideFloatingAssistant =
+    pathname?.startsWith("/yozish") && (chromeHidden || focusMode);
 
   const handleCompleted = useCallback(
     (job: AiArticleJob) => {
@@ -234,7 +238,12 @@ export function AiArticleAssistant() {
       <AuthLoginModal open={loginOpen} onOpenChange={setLoginOpen} />
       <AiPromptGuideDialog open={guideOpen} onOpenChange={setGuideOpen} />
 
-      <div className="pointer-events-none fixed bottom-5 right-5 z-50 flex flex-col items-end gap-3 sm:bottom-6 sm:right-6">
+      <div
+        className={cn(
+          "pointer-events-none fixed bottom-5 right-5 z-50 flex flex-col items-end gap-3 sm:bottom-6 sm:right-6",
+          hideFloatingAssistant && "hidden",
+        )}
+      >
         {showFloatingStatus && isProcessing && !open ? (
           <div className="pointer-events-auto w-[min(100vw-2.5rem,20rem)] rounded-xl border bg-popover p-3 shadow-lg ring-1 ring-foreground/10">
             <div className="mb-2 flex items-center justify-between gap-2">

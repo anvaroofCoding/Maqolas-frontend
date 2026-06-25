@@ -1,7 +1,7 @@
 .navbar-tip-portal__card,
 .delayed-hover-tip__card {
   position: relative;
-  border-radius: 0.65rem;
+  border-radius: var(--radius-md);
   border: 1px solid color-mix(in oklch, var(--border) 85%, transparent);
   background: color-mix(in oklch, var(--popover) 94%, transparent);
   padding: 0.4rem 0.65rem;

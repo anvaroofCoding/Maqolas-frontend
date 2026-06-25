@@ -15,7 +15,7 @@ export function SiteMobileNav() {
 
   const isTopicActive = (href: string) => {
     if (href === allTopicsHref) {
-      return pathname === "/" || pathname === "/yangi" || pathname === "/lenta";
+      return pathname === "/" || pathname === "/yangi" || pathname === "/lenta" || pathname === "/maqolalar";
     }
     return pathname === href || pathname.startsWith(`${href}/`);
   };
