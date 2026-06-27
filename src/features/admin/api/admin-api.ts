@@ -75,7 +75,7 @@ export const adminApi = baseApi.injectEndpoints({
       }),
       invalidatesTags: [{ type: "Admin", id: "REPORTS" }],
     }),
-    getPlatformStats: builder.query<PlatformStats, void>({
+    getAdminPlatformStats: builder.query<PlatformStats, void>({
       query: () => "/admin/stats",
       providesTags: [{ type: "Admin", id: "STATS" }],
     }),
@@ -135,11 +135,12 @@ export const adminApi = baseApi.injectEndpoints({
     }),
     getPublishedArticles: builder.query<
       PublishedArticlesResponse,
-      { page?: number } | void
+      { page?: number; limit?: number } | void
     >({
       query: (params) => {
         const searchParams = new URLSearchParams();
         searchParams.set("page", String(params?.page ?? 1));
+        searchParams.set("limit", String(params?.limit ?? 50));
         return `/admin/articles/published?${searchParams.toString()}`;
       },
       providesTags: [{ type: "Admin", id: "PUBLISHED" }],
@@ -354,7 +355,7 @@ export const {
   useRejectArticleMutation,
   useListReportsQuery,
   useDismissReportMutation,
-  useGetPlatformStatsQuery,
+  useGetAdminPlatformStatsQuery,
   useListUsersQuery,
   useBanUserMutation,
   useUnbanUserMutation,

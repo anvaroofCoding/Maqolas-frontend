@@ -56,20 +56,73 @@ export function buildSoftwareApplicationJsonLd() {
   };
 }
 
+const siteOrigin = siteConfig.url.replace(/\/$/, "");
+const organizationId = `${siteOrigin}/#organization`;
+const websiteId = `${siteOrigin}/#website`;
+
+/** Google Search "site name" uchun Organization + WebSite bir @graph da. */
+export function buildSiteIdentityJsonLd() {
+  const creator = buildCreatorPerson();
+  const homeUrl = `${siteOrigin}/`;
+
+  return {
+    "@context": "https://schema.org",
+    "@graph": [
+      {
+        "@type": "Organization",
+        "@id": organizationId,
+        name: siteConfig.name,
+        alternateName: ["Maqolalar", "O'zbekcha maqolalar", siteConfig.host],
+        url: homeUrl,
+        founder: creator,
+        logo: {
+          "@type": "ImageObject",
+          url: publisherLogo,
+          width: 180,
+          height: 180,
+        },
+        image: publisherLogo,
+        description: siteConfig.description,
+        sameAs: [siteConfig.creator.telegramUrl],
+      },
+      {
+        "@type": "WebSite",
+        "@id": websiteId,
+        name: siteConfig.name,
+        alternateName: [
+          "Maqolalar",
+          "Maqola",
+          "O'zbekcha maqolalar",
+          siteConfig.host,
+        ],
+        url: homeUrl,
+        description: siteConfig.description,
+        inLanguage: siteConfig.htmlLang,
+        image: publisherLogo,
+        publisher: { "@id": organizationId },
+        potentialAction: {
+          "@type": "SearchAction",
+          target: {
+            "@type": "EntryPoint",
+            urlTemplate: `${siteOrigin}/maqolalar?q={search_term_string}`,
+          },
+          "query-input": "required name=search_term_string",
+        },
+      },
+    ],
+  };
+}
+
 export function buildOrganizationJsonLd() {
   const creator = buildCreatorPerson();
 
   return {
     "@context": "https://schema.org",
     "@type": "Organization",
+    "@id": organizationId,
     name: siteConfig.name,
-    alternateName: [
-      "Maqolalar",
-      "O'zbekcha maqolalar",
-      siteConfig.name,
-      siteConfig.host,
-    ],
-    url: siteConfig.url,
+    alternateName: ["Maqolalar", "O'zbekcha maqolalar", siteConfig.host],
+    url: `${siteOrigin}/`,
     founder: creator,
     logo: {
       "@type": "ImageObject",
@@ -82,8 +135,6 @@ export function buildOrganizationJsonLd() {
     sameAs: [siteConfig.creator.telegramUrl],
   };
 }
-
-const websiteId = `${siteConfig.url.replace(/\/$/, "")}/#website`;
 
 export function buildSiteNavigationJsonLd() {
   return {
@@ -102,45 +153,7 @@ export function buildSiteNavigationJsonLd() {
 }
 
 export function buildWebSiteJsonLd() {
-  const creator = buildCreatorPerson();
-
-  return {
-    "@context": "https://schema.org",
-    "@type": "WebSite",
-    "@id": websiteId,
-    name: siteConfig.name,
-    alternateName: [
-      "Maqolalar",
-      "Maqola",
-      "O'zbekcha maqolalar",
-      "Uzbek maqolalar",
-      siteConfig.name,
-      siteConfig.host,
-    ],
-    url: siteConfig.url,
-    description: siteConfig.description,
-    inLanguage: siteConfig.htmlLang,
-    author: creator,
-    publisher: {
-      "@type": "Organization",
-      name: siteConfig.name,
-      founder: creator,
-      logo: {
-        "@type": "ImageObject",
-        url: publisherLogo,
-        width: 180,
-        height: 180,
-      },
-    },
-    potentialAction: {
-      "@type": "SearchAction",
-      target: {
-        "@type": "EntryPoint",
-        urlTemplate: `${siteConfig.url.replace(/\/$/, "")}/maqolalar?q={search_term_string}`,
-      },
-      "query-input": "required name=search_term_string",
-    },
-  };
+  return buildSiteIdentityJsonLd();
 }
 
 export function jsonLdScript(data: Record<string, unknown> | Record<string, unknown>[]) {

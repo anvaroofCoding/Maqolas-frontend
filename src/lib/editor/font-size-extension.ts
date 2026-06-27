@@ -1,0 +1,66 @@
+import { Extension } from "@tiptap/core";
+
+export type FontSizeOption = {
+  label: string;
+  value: string;
+};
+
+export const FONT_SIZE_OPTIONS: FontSizeOption[] = [
+  { label: "Kichik (12px)", value: "12px" },
+  { label: "Standart (16px)", value: "16px" },
+  { label: "O'rta (18px)", value: "18px" },
+  { label: "Katta (20px)", value: "20px" },
+  { label: "Sarlavha (24px)", value: "24px" },
+  { label: "Katta sarlavha (32px)", value: "32px" },
+];
+
+declare module "@tiptap/core" {
+  interface Commands<ReturnType> {
+    fontSize: {
+      setFontSize: (size: string) => ReturnType;
+      unsetFontSize: () => ReturnType;
+    };
+  }
+}
+
+export const FontSize = Extension.create({
+  name: "fontSize",
+
+  addOptions() {
+    return {
+      types: ["textStyle"],
+    };
+  },
+
+  addGlobalAttributes() {
+    return [
+      {
+        types: this.options.types,
+        attributes: {
+          fontSize: {
+            default: null,
+            parseHTML: (element) =>
+              element.style.fontSize?.replace(/['"]+/g, "") || null,
+            renderHTML: (attributes) => {
+              if (!attributes.fontSize) return {};
+              return { style: `font-size: ${attributes.fontSize}` };
+            },
+          },
+        },
+      },
+    ];
+  },
+
+  addCommands() {
+    return {
+      setFontSize:
+        (fontSize: string) =>
+        ({ chain }) =>
+          chain().setMark("textStyle", { fontSize }).run(),
+      unsetFontSize:
+        () =>
+        ({ chain }) =>
+          chain().setMark("textStyle", { fontSize: null }).removeEmptyTextStyle().run(),
+    };
+  },
+});

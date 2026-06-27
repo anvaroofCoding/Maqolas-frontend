@@ -8,6 +8,7 @@ import { HomepageArticleMedia } from "@/components/articles/homepage-article-med
 import { HomepageHeroMedia } from "@/components/articles/homepage-hero-media";
 import type { ArticleSummary, HomepageLayout } from "@/features/articles/types";
 import { isHomepageLayoutEmpty } from "@/lib/articles/homepage-layout";
+import { getPrimaryArticleImageUrl } from "@/lib/articles/images";
 import { formatArticleExcerpt, hasArticleExcerpt, truncateToWords } from "@/lib/articles/excerpt";
 import { htmlToPlainText } from "@/lib/articles/plain-text";
 import { formatCount, formatRelativeTime } from "@/lib/format";
@@ -101,6 +102,42 @@ function HomepageCompactCardMobileMeta({
 
 const CROWD_CHOICE_PREVIEW_WORDS = 40;
 const CENTER_CARD_COUNT = 5;
+const URGENT_GRID_COUNT = 4;
+const SHOWCASE_COUNT = 4;
+
+function hasCoverImage(article: ArticleSummary) {
+  return Boolean(getPrimaryArticleImageUrl(article));
+}
+
+function supplementCoverSection(
+  section: ArticleSummary[],
+  pool: ArticleSummary[],
+  count: number,
+  excludeIds: Set<string> = new Set(),
+): ArticleSummary[] {
+  if (section.length >= count) return section;
+
+  const picked = [...section];
+  const pickedIds = new Set(picked.map((article) => article.id));
+
+  const tryPick = (allowReuse: boolean) => {
+    for (const article of pool) {
+      if (picked.length >= count) break;
+      if (!hasCoverImage(article)) continue;
+      if (excludeIds.has(article.id)) continue;
+      if (!allowReuse && pickedIds.has(article.id)) continue;
+      if (allowReuse && picked.some((item) => item.id === article.id)) continue;
+
+      picked.push(article);
+      pickedIds.add(article.id);
+    }
+  };
+
+  tryPick(false);
+  tryPick(true);
+
+  return picked.slice(0, count);
+}
 
 function crowdChoiceBody(article: ArticleSummary) {
   const text =
@@ -139,10 +176,30 @@ export function HomepageFeed({
     editorChoice: crowdChoice,
     latest: layoutLatest,
     urgentLead,
-    urgentGrid,
-    showcase,
+    urgentGrid: layoutUrgentGrid,
+    showcase: layoutShowcase,
     lowerGrid,
   } = layout;
+
+  const coverPool = uniqueArticlesById([
+    ...(fallbackArticles ?? []),
+    ...(latestArticles ?? []),
+    ...layoutLatest,
+  ]);
+  const urgentExcludeIds = new Set(
+    urgentLead ? [urgentLead.id] : [],
+  );
+  const urgentGrid = supplementCoverSection(
+    layoutUrgentGrid,
+    coverPool,
+    URGENT_GRID_COUNT,
+    urgentExcludeIds,
+  );
+  const showcase = supplementCoverSection(
+    layoutShowcase,
+    coverPool,
+    SHOWCASE_COUNT,
+  );
 
   const crowdChoiceText = crowdChoice ? crowdChoiceBody(crowdChoice) : "";
   const centerArticles = uniqueArticlesById([

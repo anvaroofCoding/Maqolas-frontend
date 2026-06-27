@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { CodeBlockShell } from "@/components/articles/code-block-shell";
 import { stripArticleLeadFromHtml, stripLeadImageFromHtml } from "@/lib/articles/content";
 import {
@@ -73,8 +73,29 @@ export function ArticleContent({
     [displayHtml],
   );
 
+  const containerRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    const container = containerRef.current;
+    if (!container) return;
+
+    const handleClick = (event: MouseEvent) => {
+      const target = event.target as HTMLElement | null;
+      const spoiler = target?.closest("[data-spoiler]");
+      if (!spoiler) return;
+      spoiler.classList.toggle("is-revealed");
+    };
+
+    container.addEventListener("click", handleClick);
+    return () => container.removeEventListener("click", handleClick);
+  }, [displayHtml]);
+
   return (
-    <div className={cn("article-editor-content", className)} itemProp={itemProp}>
+    <div
+      ref={containerRef}
+      className={cn("article-editor-content", className)}
+      itemProp={itemProp}
+    >
       {parts.map((part, index) =>
         part.type === "pre" ? (
           <CodeBlockShell key={`pre-${index}`} html={part.content} />

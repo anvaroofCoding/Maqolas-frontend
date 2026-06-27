@@ -9,6 +9,7 @@ type ArticleFeedWithPaginationProps = {
   title: string;
   emptyMessage: string;
   compact?: boolean;
+  hoverPreview?: boolean;
 };
 
 export function ArticleFeedWithPagination({
@@ -18,6 +19,7 @@ export function ArticleFeedWithPagination({
   title,
   emptyMessage,
   compact = false,
+  hoverPreview = false,
 }: ArticleFeedWithPaginationProps) {
   const hasMore = feed.pagination.page < feed.pagination.totalPages;
 
@@ -28,6 +30,7 @@ export function ArticleFeedWithPagination({
         title={title}
         emptyMessage={emptyMessage}
         compact={compact}
+        hoverPreview={hoverPreview}
       />
       {feed.articles.length > 0 && hasMore ? (
         <ArticleFeedLoadMore
@@ -37,6 +40,7 @@ export function ArticleFeedWithPagination({
           hasMore={hasMore}
           existingIds={feed.articles.map((article) => article.id)}
           compact={compact}
+          hoverPreview={hoverPreview}
         />
       ) : null}
     </>

@@ -2,7 +2,7 @@
 
 import { usePathname } from "next/navigation";
 import { useTopicNavItems } from "@/components/layout/use-topic-nav-items";
-import { FeedTab, TopicPill } from "@/components/layout/nav-menu-styles";
+import { FastNavPill, FastNavTab } from "@/components/layout/sidebar-nav-link";
 import { isMainNavActive, mainNavItems } from "@/config/navigation";
 import { Skeleton } from "@/components/ui/skeleton";
 import { cn } from "@/lib/utils";
@@ -33,7 +33,7 @@ export function SiteMobileNav() {
           "[-ms-overflow-style:none] [scrollbar-width:none] [&::-webkit-scrollbar]:hidden",
         )}
       >
-        <TopicPill
+        <FastNavPill
           href={allTopicsHref}
           label="Barchasi"
           isActive={isTopicActive(allTopicsHref)}
@@ -44,7 +44,7 @@ export function SiteMobileNav() {
           ))
         ) : (
           topicNavItems.map((item) => (
-            <TopicPill
+            <FastNavPill
               key={item.href}
               href={item.href}
               label={item.label}
@@ -54,9 +54,14 @@ export function SiteMobileNav() {
         )}
       </div>
 
-      <div className="flex gap-5 px-4 pb-3">
+      <div
+        className={cn(
+          "flex gap-5 overflow-x-auto px-4 pb-3",
+          "[-ms-overflow-style:none] [scrollbar-width:none] [&::-webkit-scrollbar]:hidden",
+        )}
+      >
         {mainNavItems.map((item) => (
-          <FeedTab
+          <FastNavTab
             key={item.href}
             href={item.href}
             label={item.label}

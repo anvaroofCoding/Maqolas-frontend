@@ -37,9 +37,9 @@ export function articleImageProps(
   const priority = options.priority ?? false;
   const unoptimized =
     normalizedSrc.startsWith("/uploads/") ||
-    normalizedSrc.startsWith("/")
-      ? false
-      : !canOptimizeRemoteImage(normalizedSrc);
+    normalizedSrc.startsWith("blob:") ||
+    normalizedSrc.startsWith("data:") ||
+    !canOptimizeRemoteImage(normalizedSrc);
 
   if (priority) {
     return {

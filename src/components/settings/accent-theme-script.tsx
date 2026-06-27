@@ -83,13 +83,13 @@ function buildAccentThemeInitScript() {
       );
     }
 
-    function buildCustomAccent(hex, isDark) {
+    function buildCustomAccent(hex) {
       var rgb = hexToRgb(hex);
-      var fallback = presets.indigo[isDark ? "dark" : "light"];
+      var fallback = presets.indigo.light;
       if (!rgb) return fallback;
 
       var navActive = "rgb(" + rgb[0] + ", " + rgb[1] + ", " + rgb[2] + ")";
-      var navActiveHover = darkenRgb(rgb, isDark ? 0.1 : 0.18);
+      var navActiveHover = darkenRgb(rgb, 0.18);
 
       return {
         primary: navActive,
@@ -98,13 +98,6 @@ function buildAccentThemeInitScript() {
         navActiveHover: navActiveHover,
         sidebarPrimary: navActive,
       };
-    }
-
-    function isDarkMode() {
-      var theme = localStorage.getItem("theme");
-      if (theme === "dark") return true;
-      if (theme === "light") return false;
-      return window.matchMedia("(prefers-color-scheme: dark)").matches;
     }
 
     function isValidHexColor(value) {
@@ -143,15 +136,14 @@ function buildAccentThemeInitScript() {
 
     if (presetId === "indigo") return;
 
-    var isDark = isDarkMode();
     var colors;
 
     if (presetId === "custom") {
-      colors = buildCustomAccent(customColor, isDark);
+      colors = buildCustomAccent(customColor);
     } else {
       var preset = presets[presetId];
       if (!preset) return;
-      colors = isDark ? preset.dark : preset.light;
+      colors = preset.light;
     }
 
     root.style.setProperty("--primary", colors.primary);

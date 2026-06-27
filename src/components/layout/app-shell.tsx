@@ -7,10 +7,12 @@ import { SiteMobileNav } from "@/components/layout/site-mobile-nav";
 import { SiteRightSidebar } from "@/components/layout/site-right-sidebar";
 import { SiteSidebar } from "@/components/layout/site-sidebar";
 import {
-  appShellGridClassName,
   appShellGridStyle,
-  feedColumnAlignClassName,
+  appShellGridTwoColClassName,
+  appShellGridWithRightSidebarClassName,
   feedColumnScrollClassName,
+  feedMainColumnClassName,
+  feedSidebarColumnClassName,
   rightSidebarWidthClass,
   sidebarWidthClass,
   writeColumnAlignClassName,
@@ -25,6 +27,7 @@ function shouldShowSeoFooter(pathname: string | null) {
   return (
     pathname === "/" ||
     pathname === "/maqolalar" ||
+    pathname === "/rasmlar" ||
     pathname === "/yangi" ||
     pathname === "/mavzular" ||
     pathname.startsWith("/mavzu/") ||
@@ -41,6 +44,11 @@ function isLegalInfoRoute(pathname: string | null) {
   );
 }
 
+function isPinRoute(pathname: string | null) {
+  if (!pathname) return false;
+  return pathname === "/rasmlar" || pathname.startsWith("/rasm/");
+}
+
 function shouldShowMobileNav(pathname: string | null) {
   if (!pathname) return false;
   return (
@@ -48,6 +56,7 @@ function shouldShowMobileNav(pathname: string | null) {
     !pathname.startsWith("/admin") &&
     !pathname.startsWith("/profil") &&
     !pathname.startsWith("/maqola") &&
+    !isPinRoute(pathname) &&
     !pathname.startsWith("/auth") &&
     !isLegalInfoRoute(pathname)
   );
@@ -63,6 +72,7 @@ function shouldShowRightSidebar(pathname: string | null) {
   return (
     pathname === "/" ||
     pathname === "/maqolalar" ||
+    pathname === "/rasmlar" ||
     pathname === "/yangi" ||
     pathname === "/lenta" ||
     pathname === "/mavzular" ||
@@ -81,10 +91,21 @@ export function AppShell({ children }: { children: React.ReactNode }) {
   const showRightSidebar = shouldShowRightSidebar(pathname);
   const showLeftSidebar = !isWriting;
   const useWriteLayout = isWriting;
-  const isFeedLayout = showMobileNav;
-  const useFeedTopPadding = isFeedLayout || isLegalInfoRoute(pathname);
   const writeTopOffset =
     isWriting && chromeHidden ? "pt-2" : "pt-14";
+  const centerScrollClassName = isWriting
+    ? cn(
+        "scrollbar-hidden min-w-0 md:h-full md:overflow-y-auto md:overscroll-contain",
+        writeTopOffset,
+      )
+    : feedColumnScrollClassName;
+  const centerInnerClassName = isWriting
+    ? writeColumnAlignClassName
+    : feedMainColumnClassName;
+
+  const appShellGridClassName = showRightSidebar
+    ? appShellGridWithRightSidebarClassName
+    : appShellGridTwoColClassName;
 
   if (isAdminRoute) {
     return (
@@ -99,9 +120,7 @@ export function AppShell({ children }: { children: React.ReactNode }) {
       <div
         className={cn(
           "grid min-h-screen min-w-0 items-start overflow-x-hidden bg-background md:h-screen md:overflow-hidden",
-          useWriteLayout || showRightSidebar
-            ? appShellGridClassName
-            : "md:grid-cols-[var(--sidebar-width)_minmax(0,1fr)]",
+          useWriteLayout ? appShellGridWithRightSidebarClassName : appShellGridClassName,
         )}
         style={appShellGridStyle}
       >
@@ -113,7 +132,7 @@ export function AppShell({ children }: { children: React.ReactNode }) {
               sidebarWidthClass,
             )}
           >
-            <div className={feedColumnAlignClassName}>
+            <div className={feedSidebarColumnClassName}>
               <SiteSidebar />
             </div>
           </div>
@@ -121,19 +140,8 @@ export function AppShell({ children }: { children: React.ReactNode }) {
           <WriteLayoutSpacer side="left" />
         ) : null}
 
-        <div
-          className={cn(
-            "scrollbar-hidden min-w-0 md:h-full md:overflow-y-auto md:overscroll-contain",
-            writeTopOffset,
-            isWriting && "md:h-full",
-          )}
-        >
-          <div
-            className={cn(
-              useFeedTopPadding && feedColumnAlignClassName,
-              isWriting && writeColumnAlignClassName,
-            )}
-          >
+        <div className={cn(centerScrollClassName, isWriting && "md:h-full")}>
+          <div className={centerInnerClassName}>
             {showMobileNav ? (
               <div className="md:hidden">
                 <SiteMobileNav />
@@ -152,7 +160,7 @@ export function AppShell({ children }: { children: React.ReactNode }) {
               rightSidebarWidthClass,
             )}
           >
-            <div className={feedColumnAlignClassName}>
+            <div className={feedSidebarColumnClassName}>
               <SiteRightSidebar />
             </div>
           </div>

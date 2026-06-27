@@ -16,6 +16,8 @@ export const baseApi = createApi({
     "Notification",
     "WelcomePromo",
     "WelcomePromoComment",
+    "Pin",
+    "PinComment",
     "AiArticle",
     "AuthUser",
   ],

@@ -6,6 +6,7 @@ import {
 } from "@reduxjs/toolkit/query/react";
 import { env } from "@/config/env";
 import { isTokenExpired } from "@/lib/auth/token";
+import { refreshSessionTokens } from "@/lib/auth/refresh-session";
 import {
   clearCredentials,
   getAccessToken,
@@ -14,11 +15,6 @@ import {
   setBan,
 } from "@/features/auth/slice/auth-slice";
 import type { BanInfo } from "@/features/auth/types";
-
-type AuthTokensPayload = {
-  accessToken: string;
-  refreshToken: string;
-};
 
 const rawBaseQuery = fetchBaseQuery({
   baseUrl: env.NEXT_PUBLIC_API_URL,
@@ -32,34 +28,10 @@ const rawBaseQuery = fetchBaseQuery({
   },
 });
 
-let refreshPromise: Promise<AuthTokensPayload | null> | null = null;
-
-async function requestTokenRefresh(): Promise<AuthTokensPayload | null> {
-  const refreshToken = getRefreshToken();
-  if (!refreshToken) return null;
-
-  const response = await fetch(`${env.NEXT_PUBLIC_API_URL}/auth/refresh`, {
-    method: "POST",
-    credentials: "include",
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({ refreshToken }),
-  });
-
-  if (!response.ok) return null;
-
-  return (await response.json()) as AuthTokensPayload;
-}
-
 async function refreshSession(
   api: Parameters<BaseQueryFn>[1],
 ): Promise<boolean> {
-  if (!refreshPromise) {
-    refreshPromise = requestTokenRefresh().finally(() => {
-      refreshPromise = null;
-    });
-  }
-
-  const tokens = await refreshPromise;
+  const tokens = await refreshSessionTokens();
   if (!tokens) {
     api.dispatch(clearCredentials());
     return false;
@@ -103,15 +75,7 @@ export const baseQueryWithReauth: BaseQueryFn<
     requestUrl.includes("/auth/google");
 
   if (!isAuthEndpoint && getAccessToken()) {
-    const hasValidToken = await ensureFreshAccessToken(api);
-    if (!hasValidToken && !getAccessToken()) {
-      return {
-        error: {
-          status: 401,
-          data: { message: "Sessiya tugagan" },
-        },
-      };
-    }
+    await ensureFreshAccessToken(api);
   }
 
   let result = await rawBaseQuery(args, api, extraOptions);

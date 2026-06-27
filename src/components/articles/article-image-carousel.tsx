@@ -191,7 +191,7 @@ export function ArticleImageCarousel({
   }
 
   if (uniqueImages.length === 1) {
-    const src = uniqueImages[0];
+    const imageSrc = normalizeArticleImageSrc(uniqueImages[0]);
 
     return (
       <div
@@ -199,12 +199,12 @@ export function ArticleImageCarousel({
         className={cn("relative h-full w-full overflow-hidden", className)}
       >
         <Image
-          src={src}
+          src={imageSrc}
           alt={alt}
           fill
           sizes={sizes}
           className={cn("object-cover", imageClassName)}
-          {...articleImageProps(src, { priority })}
+          {...articleImageProps(imageSrc, { priority })}
         />
       </div>
     );

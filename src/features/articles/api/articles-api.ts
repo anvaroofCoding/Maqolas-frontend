@@ -119,10 +119,12 @@ export const articlesApi = baseApi.injectEndpoints({
         return `/articles/feed?${searchParams.toString()}`;
       },
       providesTags: [{ type: "Article", id: "LIST" }],
+      keepUnusedDataFor: 300,
     }),
     getHomepageLayout: builder.query<HomepageLayoutResponse, void>({
       query: () => "/articles/homepage",
       providesTags: [{ type: "Article", id: "HOMEPAGE" }],
+      keepUnusedDataFor: 120,
     }),
     searchArticles: builder.query<
       ArticleSearchResponse,

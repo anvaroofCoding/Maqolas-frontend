@@ -3,8 +3,10 @@
 import type { Editor } from "@tiptap/react";
 import {
   AlertTriangleIcon,
-  Columns2Icon,
+  ChevronDownIcon,
   CodeIcon,
+  Columns2Icon,
+  EyeOffIcon,
   Heading1Icon,
   Heading2Icon,
   Heading3Icon,
@@ -173,6 +175,24 @@ function buildCommands(
       keywords: ["muhim", "important"],
       icon: <StarIcon className="size-4" />,
       run: (editor) => insertCallout(editor, "important"),
+    },
+    {
+      id: "spoiler",
+      label: "Yashirin matn (spoiler)",
+      keywords: ["spoiler", "yashirin", "telegram"],
+      icon: <EyeOffIcon className="size-4" />,
+      run: (editor) => editor.chain().focus().toggleSpoiler().run(),
+    },
+    {
+      id: "collapsible",
+      label: "Yig'iladigan bo'lim",
+      keywords: ["collapsible", "yig'iladigan", "details", "bo'lim"],
+      icon: <ChevronDownIcon className="size-4" />,
+      run: (editor) => {
+        const summary = window.prompt("Bo'lim sarlavhasi", "Ko'proq o'qish");
+        if (summary === null) return;
+        editor.chain().focus().setCollapsible(summary.trim() || "Ko'proq o'qish").run();
+      },
     },
     {
       id: "youtube",

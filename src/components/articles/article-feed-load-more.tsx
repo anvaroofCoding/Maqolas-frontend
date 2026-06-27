@@ -2,6 +2,7 @@
 
 import { useCallback, useEffect, useRef, useState } from "react";
 import { ArticleCard } from "@/components/articles/article-card";
+import { ArticleCardWithHoverPreview } from "@/components/articles/article-card-with-hover-preview";
 import { ArticleFeedSkeleton } from "@/components/articles/article-feed-skeleton";
 import {
   useLazyListArticlesQuery,
@@ -24,6 +25,7 @@ type ArticleFeedLoadMoreProps = {
   hasMore: boolean;
   existingIds: string[];
   compact?: boolean;
+  hoverPreview?: boolean;
 };
 
 function mergeArticles(
@@ -45,6 +47,7 @@ export function ArticleFeedLoadMore({
   hasMore: initialHasMore,
   existingIds,
   compact = false,
+  hoverPreview = false,
 }: ArticleFeedLoadMoreProps) {
   const [articles, setArticles] = useState<ArticleSummary[]>([]);
   const [page, setPage] = useState(startPage - 1);
@@ -143,9 +146,13 @@ export function ArticleFeedLoadMore({
           compact ? "pt-0 pb-2" : "pb-4 md:pb-6",
         )}
       >
-        {articles.map((article) => (
-          <ArticleCard key={article.id} article={article} />
-        ))}
+        {articles.map((article) =>
+          hoverPreview ? (
+            <ArticleCardWithHoverPreview key={article.id} article={article} />
+          ) : (
+            <ArticleCard key={article.id} article={article} />
+          ),
+        )}
       </div>
 
       {loading ? (

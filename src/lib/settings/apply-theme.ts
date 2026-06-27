@@ -30,15 +30,15 @@ function darkenRgb([r, g, b]: [number, number, number], amount = 0.15) {
   return `rgb(${Math.round(r * factor)}, ${Math.round(g * factor)}, ${Math.round(b * factor)})`;
 }
 
-function buildCustomAccent(hex: string, isDark: boolean): AccentColors {
+function buildCustomAccent(hex: string): AccentColors {
   const rgb = hexToRgb(hex);
   if (!rgb) {
     const fallback = getThemePreset("indigo");
-    return isDark ? fallback!.dark : fallback!.light;
+    return fallback!.light;
   }
 
   const navActive = `rgb(${rgb[0]}, ${rgb[1]}, ${rgb[2]})`;
-  const navActiveHover = darkenRgb(rgb, isDark ? 0.1 : 0.18);
+  const navActiveHover = darkenRgb(rgb, 0.18);
 
   return {
     primary: navActive,
@@ -65,14 +65,14 @@ export function clearAccentTheme() {
   }
 }
 
-export function applyAccentTheme(settings: MaqolasSettings, isDark: boolean) {
+export function applyAccentTheme(settings: MaqolasSettings, _isDark = false) {
   if (settings.themePresetId === "indigo") {
     clearAccentTheme();
     return;
   }
 
   if (settings.themePresetId === "custom") {
-    applyAccentColors(buildCustomAccent(settings.customAccentColor, isDark));
+    applyAccentColors(buildCustomAccent(settings.customAccentColor));
     return;
   }
 
@@ -82,5 +82,5 @@ export function applyAccentTheme(settings: MaqolasSettings, isDark: boolean) {
     return;
   }
 
-  applyAccentColors(isDark ? preset.dark : preset.light);
+  applyAccentColors(preset.light);
 }

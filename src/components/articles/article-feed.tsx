@@ -1,5 +1,6 @@
 import { Newspaper } from "lucide-react";
 import { ArticleCard } from "@/components/articles/article-card";
+import { ArticleCardWithHoverPreview } from "@/components/articles/article-card-with-hover-preview";
 import type { ArticleSummary } from "@/features/articles/types";
 import { articleFeedGridClassName } from "@/lib/layout";
 import { cn } from "@/lib/utils";
@@ -9,6 +10,7 @@ type ArticleFeedProps = {
   title?: string;
   emptyMessage?: string;
   compact?: boolean;
+  hoverPreview?: boolean;
 };
 
 export function ArticleFeed({
@@ -16,6 +18,7 @@ export function ArticleFeed({
   title,
   emptyMessage = "Hozircha nashr etilgan maqolalar yo'q.",
   compact = false,
+  hoverPreview = false,
 }: ArticleFeedProps) {
   if (articles.length === 0) {
     return (
@@ -37,9 +40,13 @@ export function ArticleFeed({
           compact ? "pt-0 pb-2" : "pb-4 pt-0",
         )}
       >
-        {articles.map((article) => (
-          <ArticleCard key={article.id} article={article} />
-        ))}
+        {articles.map((article) =>
+          hoverPreview ? (
+            <ArticleCardWithHoverPreview key={article.id} article={article} />
+          ) : (
+            <ArticleCard key={article.id} article={article} />
+          ),
+        )}
       </div>
     </section>
   );

@@ -13,7 +13,7 @@ import {
 } from "@/components/ui/dialog";
 import { Skeleton } from "@/components/ui/skeleton";
 import { siteConfig } from "@/config/site";
-import { useGetPlatformStatsQuery } from "@/features/admin/api/admin-api";
+import { useGetAdminPlatformStatsQuery } from "@/features/admin/api/admin-api";
 import type { PlatformStats } from "@/features/admin/types";
 import { exportPlatformStatsImage } from "@/lib/admin/export-platform-stats-image";
 import { formatCount } from "@/lib/format";
@@ -120,7 +120,7 @@ function ShareStatsPreview({ stats }: { stats: PlatformStats }) {
 }
 
 export function PlatformStatsDashboard() {
-  const { data, isLoading, isFetching } = useGetPlatformStatsQuery();
+  const { data, isLoading, isFetching } = useGetAdminPlatformStatsQuery();
   const [templateOpen, setTemplateOpen] = useState(false);
   const [downloading, setDownloading] = useState(false);
 

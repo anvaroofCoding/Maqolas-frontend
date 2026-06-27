@@ -23,6 +23,7 @@ import { getUserInitials } from "@/lib/user";
 type ArticleSearchDialogProps = {
   open: boolean;
   onOpenChange: (open: boolean) => void;
+  initialQuery?: string;
 };
 
 const MIN_QUERY_LENGTH = 2;
@@ -83,6 +84,7 @@ function SearchSkeletonList() {
 export function ArticleSearchDialog({
   open,
   onOpenChange,
+  initialQuery = "",
 }: ArticleSearchDialogProps) {
   const router = useRouter();
   const [query, setQuery] = useState("");
@@ -101,6 +103,15 @@ export function ArticleSearchDialog({
       setDebouncedQuery("");
       return;
     }
+
+    if (initialQuery.trim()) {
+      setQuery(initialQuery.trim());
+      setDebouncedQuery(initialQuery.trim());
+    }
+  }, [initialQuery, open]);
+
+  useEffect(() => {
+    if (!open) return;
 
     const timer = window.setTimeout(() => {
       setDebouncedQuery(query.trim());

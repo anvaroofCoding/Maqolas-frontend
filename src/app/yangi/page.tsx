@@ -1,9 +1,6 @@
-import { connection } from "next/server";
-import { ArticleFeedWithPagination } from "@/components/articles/article-feed-with-pagination";
-import { JsonLdScript } from "@/components/seo/json-ld-script";
-import { feedMainClassName } from "@/lib/layout";
-import { fetchArticleFeed } from "@/lib/articles/server";
-import { buildItemListJsonLd, buildYangiPageJsonLd } from "@/lib/seo/json-ld";
+import { Suspense } from "react";
+import { ArticleFeedPageClient } from "@/components/articles/article-feed-page-client";
+import { YangiFeedJsonLd } from "@/components/seo/yangi-feed-json-ld";
 import { buildPageMetadata } from "@/lib/seo/metadata";
 
 export const metadata = buildPageMetadata({
@@ -20,24 +17,17 @@ export const metadata = buildPageMetadata({
   ],
 });
 
-export default async function NewArticlesPage() {
-  await connection();
-  const feed = await fetchArticleFeed({ sort: "newest" });
-
+export default function NewArticlesPage() {
   return (
-    <main className={feedMainClassName}>
-      <JsonLdScript
-        data={[
-          buildYangiPageJsonLd(),
-          buildItemListJsonLd("Yangi maqolalar", "/yangi", feed.articles),
-        ]}
-      />
-      <ArticleFeedWithPagination
-        feed={feed}
+    <>
+      <Suspense fallback={null}>
+        <YangiFeedJsonLd />
+      </Suspense>
+      <ArticleFeedPageClient
         sort="newest"
         title="Yangi maqolalar"
         emptyMessage="Hozircha yangi maqolalar yo'q."
       />
-    </main>
+    </>
   );
 }

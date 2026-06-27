@@ -4,6 +4,7 @@ import type { ArticleFeedResponse } from "@/features/articles/types";
 import type {
   FollowersResponse,
   FollowResponse,
+  PlatformPublicStats,
   PublicProfileResponse,
 } from "@/features/users/types";
 
@@ -13,6 +14,9 @@ function normalizeUsername(username: string) {
 
 export const usersApi = baseApi.injectEndpoints({
   endpoints: (builder) => ({
+    getPublicPlatformStats: builder.query<PlatformPublicStats, void>({
+      query: () => "/users/platform-stats",
+    }),
     getPublicProfile: builder.query<PublicProfileResponse, string>({
       query: (username) =>
         `/users/${encodeURIComponent(normalizeUsername(username))}`,
@@ -91,6 +95,7 @@ export const usersApi = baseApi.injectEndpoints({
 });
 
 export const {
+  useGetPublicPlatformStatsQuery,
   useGetPublicProfileQuery,
   useGetUserArticlesQuery,
   useLazyGetUserArticlesQuery,

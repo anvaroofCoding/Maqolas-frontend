@@ -7,8 +7,11 @@ import {
   AlignLeftIcon,
   AlignRightIcon,
   BoldIcon,
+  ChevronDownIcon,
   CodeIcon,
+  Columns2Icon,
   EraserIcon,
+  EyeOffIcon,
   Heading1Icon,
   Heading2Icon,
   Heading3Icon,
@@ -34,6 +37,7 @@ import {
   YoutubeIcon,
 } from "lucide-react";
 import { EditorCommandMenu } from "@/components/editor/editor-command-menu";
+import { EditorFindReplace } from "@/components/editor/editor-find-replace";
 import { EditorImageToolbarActions } from "@/components/editor/editor-image-toolbar-actions";
 import { EditorKeyboardShortcuts } from "@/components/editor/editor-keyboard-shortcuts";
 import {
@@ -43,6 +47,7 @@ import {
 import { EditorWritingStats } from "@/components/editor/editor-writing-stats";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import type { CalloutVariant } from "@/lib/editor/callout-extension";
+import { FONT_SIZE_OPTIONS } from "@/lib/editor/font-size-extension";
 import { insertTableOfContents } from "@/lib/editor/insert-table-of-contents";
 import { toast } from "@/lib/toast";
 import { cn } from "@/lib/utils";
@@ -149,6 +154,52 @@ export function EditorToolbar({ editor }: EditorToolbarProps) {
           disabled={!editor.can().chain().focus().redo().run()}
         >
           <Redo2Icon />
+        </EditorToolbarButton>
+
+        <EditorToolbarDivider />
+
+        <Popover>
+          <PopoverTrigger asChild>
+            <button
+              type="button"
+              aria-label="Shrift o'lchami"
+              title="Shrift o'lchami"
+              onMouseDown={(event) => event.preventDefault()}
+              className={cn(
+                "inline-flex h-8 shrink-0 items-center gap-1 rounded-md px-2 text-xs text-muted-foreground hover:bg-muted hover:text-foreground",
+              )}
+            >
+              <span>Aa</span>
+              <ChevronDownIcon className="size-3" />
+            </button>
+          </PopoverTrigger>
+          <PopoverContent className="w-44 p-1" align="start">
+            {FONT_SIZE_OPTIONS.map((option) => (
+              <button
+                key={option.value}
+                type="button"
+                className="flex w-full rounded-md px-2 py-1.5 text-left text-sm hover:bg-muted"
+                style={{ fontSize: option.value }}
+                onClick={() => {
+                  if (option.value === "16px") {
+                    editor.chain().focus().unsetFontSize().run();
+                  } else {
+                    editor.chain().focus().setFontSize(option.value).run();
+                  }
+                }}
+              >
+                {option.label}
+              </button>
+            ))}
+          </PopoverContent>
+        </Popover>
+
+        <EditorToolbarButton
+          label="Yashirin matn (spoiler)"
+          isActive={editor.isActive("spoiler")}
+          onClick={() => editor.chain().focus().toggleSpoiler().run()}
+        >
+          <EyeOffIcon />
         </EditorToolbarButton>
 
         <EditorToolbarDivider />
@@ -436,7 +487,10 @@ export function EditorToolbar({ editor }: EditorToolbarProps) {
 
       <div className="flex flex-wrap items-center justify-between gap-2 border-t border-border/40 px-3 py-1.5">
         <EditorWritingStats editor={editor} />
-        <EditorKeyboardShortcuts />
+        <div className="flex items-center gap-1">
+          <EditorFindReplace editor={editor} />
+          <EditorKeyboardShortcuts />
+        </div>
       </div>
     </div>
   );

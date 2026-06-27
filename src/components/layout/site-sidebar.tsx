@@ -1,52 +1,13 @@
 "use client";
 
 import type { LucideIcon } from "lucide-react";
-import Link from "next/link";
-import { usePathname } from "next/navigation";
 import { useTopicNavItems } from "@/components/layout/use-topic-nav-items";
+import { SidebarNavLink } from "@/components/layout/sidebar-nav-link";
 import { isMainNavActive, mainNavItems } from "@/config/navigation";
-import { Button } from "@/components/ui/button";
 import { Skeleton } from "@/components/ui/skeleton";
 import { sidebarWidthClass } from "@/lib/layout";
 import { cn } from "@/lib/utils";
-
-function SidebarNavItem({
-  href,
-  label,
-  icon: Icon,
-  isActive,
-}: {
-  href: string;
-  label: string;
-  icon: LucideIcon;
-  isActive: boolean;
-}) {
-  return (
-    <Button
-      variant="ghost"
-      size="sm"
-      className={cn(
-        "group h-10 w-full justify-start gap-3 rounded-lg px-3 font-normal",
-        isActive
-          ? "bg-nav-active text-nav-active-foreground shadow-sm hover:bg-nav-active-hover hover:text-nav-active-foreground"
-          : "text-muted-foreground hover:bg-muted/70 hover:text-foreground dark:hover:bg-white/8",
-      )}
-      asChild
-    >
-      <Link href={href}>
-        <Icon
-          className={cn(
-            "size-[18px] shrink-0 transition-colors",
-            isActive
-              ? "text-nav-active-foreground"
-              : "text-muted-foreground group-hover:text-foreground",
-          )}
-        />
-        <span className="truncate">{label}</span>
-      </Link>
-    </Button>
-  );
-}
+import { usePathname } from "next/navigation";
 
 export function SiteSidebar() {
   const pathname = usePathname();
@@ -66,9 +27,11 @@ export function SiteSidebar() {
     >
       <nav className="flex flex-col gap-1 pb-4 pr-2 pt-0">
         {mainNavItems.map((item) => (
-          <SidebarNavItem
+          <SidebarNavLink
             key={item.href}
-            {...item}
+            href={item.href}
+            label={item.label}
+            icon={item.icon}
             isActive={isActive(item.href)}
           />
         ))}
@@ -87,9 +50,11 @@ export function SiteSidebar() {
           </p>
         ) : (
           topicNavItems.map((item) => (
-            <SidebarNavItem
+            <SidebarNavLink
               key={item.href}
-              {...item}
+              href={item.href}
+              label={item.label}
+              icon={item.icon}
               isActive={isActive(item.href)}
             />
           ))

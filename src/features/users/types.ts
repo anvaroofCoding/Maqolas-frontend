@@ -37,3 +37,8 @@ export interface FollowResponse {
   following: boolean;
   followersCount: number;
 }
+
+export interface PlatformPublicStats {
+  totalUsers: number;
+  onlineNow: number;
+}

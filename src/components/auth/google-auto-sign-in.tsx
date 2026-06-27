@@ -9,6 +9,7 @@ import { clearManualLogout } from "@/lib/auth/logout-client";
 import { shouldAttemptAutoGoogleAuth } from "@/lib/auth/google-silent-auth";
 import {
   isGoogleGisOriginAllowed,
+  logGoogleGisSetupHint,
   showGoogleOneTap,
   type GoogleOneTapDismissReason,
 } from "@/lib/auth/google-gis-origins";
@@ -44,6 +45,9 @@ export function GoogleAutoSignIn() {
     }
 
     if (!clientId || !oneTapEnabled || !isGoogleGisOriginAllowed()) {
+      if (clientId && oneTapEnabled && !isGoogleGisOriginAllowed()) {
+        logGoogleGisSetupHint("origin_mismatch");
+      }
       dispatch(setSilentAuthAttempted());
       return;
     }
@@ -57,7 +61,15 @@ export function GoogleAutoSignIn() {
     };
 
     const scheduleRetry = (reason: GoogleOneTapDismissReason) => {
-      if (cancelled || reason !== "unregistered_origin") {
+      if (cancelled) return;
+
+      if (reason === "unregistered_origin") {
+        logGoogleGisSetupHint("origin_mismatch");
+        finish();
+        return;
+      }
+
+      if (reason === "dismissed" || reason === "skipped" || reason === "script_error") {
         finish();
         return;
       }

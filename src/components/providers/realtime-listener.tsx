@@ -2,8 +2,12 @@
 
 import { useEffect } from "react";
 import { io } from "socket.io-client";
+import { usersApi } from "@/features/users/api/users-api";
 import { getRealtimeSocketOrigin } from "@/lib/realtime/socket-url";
-import type { RealtimeInvalidatePayload } from "@/lib/realtime/types";
+import type {
+  PlatformStatsPayload,
+  RealtimeInvalidatePayload,
+} from "@/lib/realtime/types";
 import { baseApi } from "@/lib/store/api/base-api";
 import { useAppDispatch, useAppSelector } from "@/lib/store/hooks";
 
@@ -29,10 +33,29 @@ export function RealtimeListener() {
       );
     };
 
+    const handlePlatformStats = (payload: PlatformStatsPayload) => {
+      if (
+        typeof payload?.onlineNow !== "number" ||
+        typeof payload?.totalUsers !== "number"
+      ) {
+        return;
+      }
+
+      dispatch(
+        usersApi.util.updateQueryData(
+          "getPublicPlatformStats",
+          undefined,
+          () => payload,
+        ),
+      );
+    };
+
     socket.on("invalidate", handleInvalidate);
+    socket.on("platform-stats", handlePlatformStats);
 
     return () => {
       socket.off("invalidate", handleInvalidate);
+      socket.off("platform-stats", handlePlatformStats);
       socket.disconnect();
     };
   }, [accessToken, dispatch]);

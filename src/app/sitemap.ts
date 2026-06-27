@@ -5,6 +5,7 @@ import {
   fetchProfileSitemapEntries,
   fetchSitemapEntries,
 } from "@/lib/articles/server";
+import { fetchPinSitemapEntries } from "@/lib/pins/server";
 
 const STATIC_ROUTES: Array<{
   path: string;
@@ -13,6 +14,7 @@ const STATIC_ROUTES: Array<{
 }> = [
   { path: "/", changeFrequency: "hourly", priority: 1 },
   { path: "/maqolalar", changeFrequency: "hourly", priority: 0.95 },
+  { path: "/rasmlar", changeFrequency: "hourly", priority: 0.9 },
   { path: "/yangi", changeFrequency: "hourly", priority: 0.9 },
   { path: "/mavzular", changeFrequency: "weekly", priority: 0.7 },
   { path: "/dastur-haqida", changeFrequency: "monthly", priority: 0.5 },
@@ -23,10 +25,12 @@ const STATIC_ROUTES: Array<{
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   const base = siteConfig.url.replace(/\/$/, "");
   const now = new Date();
-  const [articleEntries, profileEntries, categories] = await Promise.all([
+  const [articleEntries, profileEntries, categories, pinEntries] =
+    await Promise.all([
     fetchSitemapEntries(),
     fetchProfileSitemapEntries(),
     fetchCategories(),
+    fetchPinSitemapEntries(),
   ]);
 
   const staticPages: MetadataRoute.Sitemap = STATIC_ROUTES.map((route) => ({
@@ -57,5 +61,12 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     priority: 0.8,
   }));
 
-  return [...staticPages, ...topicPages, ...articlePages, ...profilePages];
+  const pinPages: MetadataRoute.Sitemap = pinEntries.map((entry) => ({
+    url: `${base}/rasm/${entry.slug}`,
+    lastModified: new Date(entry.updatedAt),
+    changeFrequency: "weekly",
+    priority: 0.75,
+  }));
+
+  return [...staticPages, ...topicPages, ...articlePages, ...profilePages, ...pinPages];
 }

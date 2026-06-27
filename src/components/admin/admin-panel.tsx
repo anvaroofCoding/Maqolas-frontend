@@ -610,7 +610,11 @@ function CategoriesPanel() {
 }
 
 function PublishedArticlesPanel() {
-  const { data, isLoading, isFetching } = useGetPublishedArticlesQuery();
+  const [page, setPage] = useState(1);
+  const { data, isLoading, isFetching } = useGetPublishedArticlesQuery({
+    page,
+    limit: 50,
+  });
   const [togglePin] = useTogglePinArticleMutation();
   const [deleteArticle, { isLoading: isDeleting }] =
     useDeletePublishedArticleMutation();
@@ -618,6 +622,8 @@ function PublishedArticlesPanel() {
   const [pendingDeleteId, setPendingDeleteId] = useState<string | null>(null);
 
   const articles = data?.articles ?? [];
+  const total = data?.pagination?.total ?? 0;
+  const totalPages = data?.pagination?.totalPages ?? 1;
 
   async function handleTogglePin(articleId: string, isPinned: boolean) {
     setPinningId(articleId);
@@ -650,13 +656,16 @@ function PublishedArticlesPanel() {
     );
   }
 
-  if (articles.length === 0) {
+  if (total === 0) {
     return (
       <Card>
         <CardContent className="flex flex-col items-center gap-3 py-12 text-center">
           <Pin className="size-10 text-muted-foreground/50" />
           <p className="text-sm text-muted-foreground">
             Nashr etilgan maqolalar yo&apos;q.
+          </p>
+          <p className="text-sm font-medium text-muted-foreground">
+            Jami: 0 ta
           </p>
         </CardContent>
       </Card>
@@ -665,10 +674,15 @@ function PublishedArticlesPanel() {
 
   return (
     <div className="space-y-4">
-      <p className="text-sm text-muted-foreground">
-        Qadalgan maqolalar lentada yuqorida ko&apos;rinadi. Faqat nashr etilgan
-        maqolalarni qadash mumkin.
-      </p>
+      <div className="flex flex-wrap items-center justify-between gap-3">
+        <p className="text-sm text-muted-foreground">
+          Qadalgan maqolalar lentada yuqorida ko&apos;rinadi. Faqat nashr
+          etilgan maqolalarni qadash mumkin.
+        </p>
+        <span className="text-sm font-medium text-muted-foreground">
+          Jami: {total} ta nashr etilgan maqola
+        </span>
+      </div>
 
       {articles.map((article) => (
         <Card
@@ -744,6 +758,32 @@ function PublishedArticlesPanel() {
           </CardContent>
         </Card>
       ))}
+
+      {totalPages > 1 ? (
+        <div className="flex items-center justify-center gap-2 pt-2">
+          <Button
+            size="sm"
+            variant="outline"
+            disabled={page <= 1 || isFetching}
+            onClick={() => setPage((current) => Math.max(1, current - 1))}
+          >
+            Oldingi
+          </Button>
+          <span className="text-sm text-muted-foreground">
+            {page} / {totalPages} ({articles.length} ta ko&apos;rsatilmoqda)
+          </span>
+          <Button
+            size="sm"
+            variant="outline"
+            disabled={page >= totalPages || isFetching}
+            onClick={() =>
+              setPage((current) => Math.min(totalPages, current + 1))
+            }
+          >
+            Keyingi
+          </Button>
+        </div>
+      ) : null}
 
       {isFetching && !isLoading ? (
         <p className="text-center text-xs text-muted-foreground">
@@ -2020,9 +2060,14 @@ export function AdminPanel() {
   const { data: meData, isLoading, isError } = useGetMeQuery(undefined, {
     skip: !mounted || !accessToken,
   });
+  const { data: publishedSummary } = useGetPublishedArticlesQuery(
+    { page: 1, limit: 1 },
+    { skip: !mounted || !accessToken },
+  );
 
   const activeUser = meData?.user ?? user;
   const isSuperAdmin = activeUser?.role === "super_admin";
+  const publishedCount = publishedSummary?.pagination?.total;
   const tabParam = searchParams.get("tab");
   const activeTab: AdminTab = isAdminTab(tabParam) ? tabParam : "review";
 
@@ -2090,6 +2135,11 @@ export function AdminPanel() {
           <TabsTrigger value="published" className="gap-2">
             <Pin className="size-4" />
             Nashr etilgan
+            {publishedCount !== undefined ? (
+              <Badge variant="secondary" className="px-1.5 py-0 text-xs">
+                {publishedCount}
+              </Badge>
+            ) : null}
           </TabsTrigger>
           <TabsTrigger value="categories" className="gap-2">
             <FolderOpen className="size-4" />

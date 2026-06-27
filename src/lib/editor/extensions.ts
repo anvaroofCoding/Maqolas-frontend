@@ -18,9 +18,13 @@ import Youtube from "@tiptap/extension-youtube";
 import StarterKit from "@tiptap/starter-kit";
 import { AiAutocompleteExtension } from "@/lib/editor/ai-autocomplete-extension";
 import { Callout } from "@/lib/editor/callout-extension";
+import { Collapsible } from "@/lib/editor/collapsible-extension";
+import { FontSize } from "@/lib/editor/font-size-extension";
 import { HeadingWithId } from "@/lib/editor/heading-with-id";
 import { ImageRow } from "@/lib/editor/image-row-extension";
+import { MarkdownShortcuts } from "@/lib/editor/markdown-shortcuts-extension";
 import { ResizableImage } from "@/lib/editor/resizable-image-extension";
+import { Spoiler } from "@/lib/editor/spoiler-extension";
 
 export interface EditorExtensionOptions {
   aiAutocomplete?: {
@@ -43,10 +47,12 @@ export function createEditorExtensions(
     HeadingWithId,
     Underline,
     TextStyle,
+    FontSize,
     Color,
     Highlight.configure({ multicolor: true }),
     Superscript,
     Subscript,
+    Spoiler,
     TextAlign.configure({ types: ["heading", "paragraph"] }),
     Link.configure({
       openOnClick: false,
@@ -61,6 +67,7 @@ export function createEditorExtensions(
     TableHeader,
     TableCell,
     Callout,
+    Collapsible,
     Youtube.configure({
       inline: false,
       width: 640,
@@ -70,6 +77,7 @@ export function createEditorExtensions(
     Placeholder.configure({
       placeholder: "Yozing...",
     }),
+    MarkdownShortcuts,
   ];
 
   if (options?.aiAutocomplete) {

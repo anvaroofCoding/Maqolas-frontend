@@ -7,6 +7,8 @@ import { usePathname, useRouter } from "next/navigation";
 import { useCallback, useEffect, useRef, useState } from "react";
 import { useSettings } from "@/components/providers/settings-provider";
 import { EditorToolbar } from "@/components/editor/editor-toolbar";
+import { EditorBubbleMenu } from "@/components/editor/editor-bubble-menu";
+import { EditorTableMenu } from "@/components/editor/editor-table-menu";
 import { EditorContextMenu } from "@/components/editor/editor-context-menu";
 import { useWriteChrome } from "@/components/editor/write-chrome-context";
 import { Button } from "@/components/ui/button";
@@ -15,9 +17,15 @@ import {
   useCreateArticleMutation,
   useSubmitArticleMutation,
   useUpdateArticleMutation,
+  useUploadArticleImageMutation,
 } from "@/features/articles/api/articles-api";
 import { syncFigureLayoutInHtml } from "@/lib/articles/sync-figure-layout-html";
 import { createEditorExtensions } from "@/lib/editor/extensions";
+import {
+  buildEditorImageHandlerProps,
+  insertUploadedImages,
+} from "@/lib/editor/editor-image-handlers";
+import { uploadEditorImageFiles } from "@/lib/editor/editor-image-upload";
 import { extractTitleFromJson } from "@/lib/editor/extract-title";
 import { fetchAiSuggestion } from "@/lib/editor/fetch-ai-suggestion";
 import {
@@ -64,11 +72,13 @@ export function ArticleEditor({
   const saveTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
   const submittedRef = useRef(false);
   const articleIdRef = useRef<string | undefined>(initialArticleId);
+  const editorRef = useRef<Editor | null>(null);
 
   const [createArticle] = useCreateArticleMutation();
   const [updateArticle] = useUpdateArticleMutation();
   const [submitArticle] = useSubmitArticleMutation();
   const [updateAdminArticle] = useUpdateAdminArticleMutation();
+  const [uploadArticleImage] = useUploadArticleImageMutation();
   const isAdminMode = mode === "admin";
   const { settings } = useSettings();
   const accessToken = useAppSelector((state) => state.auth.accessToken);
@@ -129,6 +139,21 @@ export function ArticleEditor({
     [createArticle, isAdminMode, updateAdminArticle, updateArticle],
   );
 
+  const uploadAndInsertImages = useCallback(
+    async (files: File[]) => {
+      const ed = editorRef.current;
+      if (!ed) return;
+      const urls = await uploadEditorImageFiles(files, (formData) =>
+        uploadArticleImage(formData).unwrap(),
+      );
+      insertUploadedImages(ed, urls);
+    },
+    [uploadArticleImage],
+  );
+
+  const imageHandlersRef = useRef(buildEditorImageHandlerProps(uploadAndInsertImages));
+  imageHandlersRef.current = buildEditorImageHandlerProps(uploadAndInsertImages);
+
   const editor = useEditor({
     extensions: createEditorExtensions({
       aiAutocomplete: {
@@ -143,6 +168,10 @@ export function ArticleEditor({
         class:
           "article-editor-content min-h-[50vh] px-4 py-4 focus:outline-none sm:px-8 sm:py-5",
       },
+      handlePaste: (view, event, slice) =>
+        imageHandlersRef.current.handlePaste(view, event, slice),
+      handleDrop: (view, event, slice, moved) =>
+        imageHandlersRef.current.handleDrop(view, event, slice, moved),
     },
     onCreate: ({ editor: ed }) => {
       updateSubmitReadiness(ed);
@@ -156,6 +185,10 @@ export function ArticleEditor({
       }, 1500);
     },
   }, [editorResetKey]);
+
+  useEffect(() => {
+    editorRef.current = editor ?? null;
+  }, [editor]);
 
   useEffect(() => {
     aiEnabledRef.current = settings.aiAssistEnabled;
@@ -359,6 +392,8 @@ export function ArticleEditor({
           )}
         >
           <EditorContent editor={editor} />
+          <EditorBubbleMenu editor={editor} />
+          <EditorTableMenu editor={editor} />
           <EditorContextMenu editor={editor} />
         </div>
       </div>

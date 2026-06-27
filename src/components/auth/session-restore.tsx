@@ -1,12 +1,13 @@
 "use client";
 
 import { useEffect, useRef } from "react";
-import { env } from "@/config/env";
 import {
+  clearCredentials,
   getAccessToken,
   getRefreshToken,
   setSessionTokens,
 } from "@/features/auth/slice/auth-slice";
+import { refreshSessionTokens } from "@/lib/auth/refresh-session";
 import { isTokenExpired } from "@/lib/auth/token";
 import { useAppDispatch } from "@/lib/store/hooks";
 
@@ -24,19 +25,11 @@ async function restoreSessionFromRefreshToken(
     return;
   }
 
-  const response = await fetch(`${env.NEXT_PUBLIC_API_URL}/auth/refresh`, {
-    method: "POST",
-    credentials: "include",
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({ refreshToken }),
-  });
-
-  if (!response.ok) return;
-
-  const tokens = (await response.json()) as {
-    accessToken: string;
-    refreshToken: string;
-  };
+  const tokens = await refreshSessionTokens();
+  if (!tokens) {
+    dispatch(clearCredentials());
+    return;
+  }
 
   dispatch(setSessionTokens(tokens));
 }

@@ -2,15 +2,15 @@ import type { Metadata, Viewport } from "next";
 import { Poppins } from "next/font/google";
 import { AppProviders } from "@/components/providers/app-providers";
 import { AccentThemeScript } from "@/components/settings/accent-theme-script";
+import { ThemeInitScript } from "@/components/settings/theme-init-script";
 import { JsonLdScript } from "@/components/seo/json-ld-script";
 import { siteConfig } from "@/config/site";
 import { defaultMetadata } from "@/lib/seo/metadata";
 import {
   buildCreatorJsonLd,
-  buildOrganizationJsonLd,
+  buildSiteIdentityJsonLd,
   buildSiteNavigationJsonLd,
   buildSoftwareApplicationJsonLd,
-  buildWebSiteJsonLd,
 } from "@/lib/seo/json-ld";
 import { cn } from "@/lib/utils";
 import "./globals.css";
@@ -45,6 +45,7 @@ export default function RootLayout({
       className={cn("bg-background font-sans text-foreground", poppins.variable)}
     >
       <head>
+        <ThemeInitScript />
         <AccentThemeScript />
       </head>
       <body
@@ -53,8 +54,7 @@ export default function RootLayout({
       >
         <JsonLdScript
           data={[
-            buildOrganizationJsonLd(),
-            buildWebSiteJsonLd(),
+            buildSiteIdentityJsonLd(),
             buildSiteNavigationJsonLd(),
             buildCreatorJsonLd(),
             buildSoftwareApplicationJsonLd(),

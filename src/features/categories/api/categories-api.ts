@@ -6,6 +6,7 @@ export const categoriesApi = baseApi.injectEndpoints({
     listCategories: builder.query<CategoriesResponse, void>({
       query: () => "/categories",
       providesTags: [{ type: "Category", id: "LIST" }],
+      keepUnusedDataFor: 300,
     }),
   }),
 });

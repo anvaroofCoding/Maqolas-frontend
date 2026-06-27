@@ -1,10 +1,20 @@
 import { getApiOrigin } from "@/lib/api";
 
+/** Maqola HTML dan kelgan &amp; kabi entitylarni tozalash */
+export function sanitizeImageUrl(url: string): string {
+  return url
+    .replace(/&amp;/gi, "&")
+    .replace(/&#0*38;/gi, "&")
+    .replace(/&quot;/gi, '"')
+    .replace(/&#0*39;/gi, "'")
+    .trim();
+}
+
 /** Nisbiy yoki to'liq media URL ni canvas/fetch uchun normalizatsiya qilish */
 export function resolveMediaUrl(url?: string | null): string | null {
   if (!url?.trim()) return null;
 
-  const trimmed = url.trim();
+  const trimmed = sanitizeImageUrl(url);
   if (trimmed.startsWith("blob:") || trimmed.startsWith("data:")) {
     return trimmed;
   }
@@ -23,7 +33,7 @@ export function resolveMediaUrl(url?: string | null): string | null {
 export function resolveUploadUrl(url?: string | null): string | null {
   if (!url?.trim()) return null;
 
-  const trimmed = url.trim();
+  const trimmed = sanitizeImageUrl(url);
   if (trimmed.startsWith("blob:") || trimmed.startsWith("data:")) {
     return trimmed;
   }

@@ -7,6 +7,8 @@ import { AiArticleAssistant } from "@/components/ai-article/ai-article-assistant
 import { SettingsModal } from "@/components/settings/settings-modal";
 import { WelcomePromoModal } from "@/components/welcome-promo/welcome-promo-modal";
 import { AuthProvider } from "@/components/providers/auth-provider";
+import { NavigationPrefetcher } from "@/components/layout/navigation-prefetcher";
+import { SiteContextMenu } from "@/components/layout/site-context-menu";
 import { RealtimeListener } from "@/components/providers/realtime-listener";
 import { SettingsProvider } from "@/components/providers/settings-provider";
 import { StoreProvider } from "@/components/providers/store-provider";
@@ -22,6 +24,8 @@ export function AppProviders({ children }: { children: React.ReactNode }) {
           <StoreProvider>
             <ToastProvider>
               <AuthProvider>
+                <NavigationPrefetcher />
+                <SiteContextMenu />
                 <RealtimeListener />
                 <NotificationSoundListener />
                 <SettingsModal />

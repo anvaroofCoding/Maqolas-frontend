@@ -1,7 +1,14 @@
 import { z } from "zod";
 
 const envSchema = z.object({
-  NEXT_PUBLIC_APP_URL: z.string().url().default("http://localhost:3000"),
+  NEXT_PUBLIC_APP_URL: z
+    .string()
+    .url()
+    .default(
+      process.env.NODE_ENV === "production"
+        ? "https://maqolas.tm2.uz"
+        : "http://localhost:3000",
+    ),
   NEXT_PUBLIC_API_URL: z.string().url().default("http://localhost:8000/api"),
   NEXT_PUBLIC_GOOGLE_CLIENT_ID: z.string().optional().default(""),
   NEXT_PUBLIC_GOOGLE_GIS_ORIGINS: z.string().optional().default(""),

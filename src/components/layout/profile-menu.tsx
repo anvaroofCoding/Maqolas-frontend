@@ -65,7 +65,7 @@ const ProfileAvatarTrigger = forwardRef<
     >
       <Avatar size="sm">
         <AvatarImage src={avatarUrl} alt={displayName ?? "Profil"} />
-        <AvatarFallback className="bg-nav-active/15 text-xs font-medium text-nav-active dark:bg-nav-active/25 dark:text-nav-active-foreground">
+        <AvatarFallback className="bg-nav-active/15 text-xs font-medium text-nav-active">
           {initials}
         </AvatarFallback>
       </Avatar>
