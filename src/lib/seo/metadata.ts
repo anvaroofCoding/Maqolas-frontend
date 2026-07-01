@@ -169,6 +169,9 @@ export function buildPageMetadata(input: PageMetadataInput = {}): Metadata {
           },
         },
     ...(Object.keys(verification).length > 0 ? { verification } : {}),
+    other: {
+      google: "notranslate",
+    },
   };
 }
 

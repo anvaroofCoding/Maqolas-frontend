@@ -3,6 +3,8 @@ import { notFound } from "next/navigation";
 import { ArticleDetailBody } from "@/components/articles/article-detail-body";
 import { ArticleDetailHeader } from "@/components/articles/article-detail-header";
 import { ArticleEngagement } from "@/components/articles/article-engagement";
+import { ArticleHashtags } from "@/components/articles/article-hashtags";
+import { ArticlePhraseShell } from "@/components/saved-phrases/article-phrase-shell";
 import { PromoAutoScrollActivator } from "@/components/promo-reader/promo-auto-scroll-activator";
 import { JsonLdScript } from "@/components/seo/json-ld-script";
 import { stripArticleLeadFromHtml } from "@/lib/articles/content";
@@ -117,6 +119,11 @@ export default async function ArticleDetailPage({ params }: ArticlePageProps) {
       />
 
       <article itemScope itemType="https://schema.org/Article">
+        <ArticlePhraseShell
+          articleId={article.id}
+          articleSlug={article.slug}
+          articleTitle={article.title}
+        >
         <ArticleDetailHeader
           title={article.title}
           contentHtml={article.contentHtml ?? ""}
@@ -130,6 +137,7 @@ export default async function ArticleDetailPage({ params }: ArticlePageProps) {
         />
 
         <ArticleDetailBody
+          articleId={article.id}
           slug={article.slug}
           coverImageUrl={article.coverImageUrl}
           title={article.title}
@@ -143,7 +151,9 @@ export default async function ArticleDetailPage({ params }: ArticlePageProps) {
           itemProp="articleBody"
         />
 
-        <footer className="mt-8">
+        <ArticleHashtags hashtags={article.hashtags} className="mt-6 maqolas-no-native-select" />
+
+        <footer className="mt-8" data-site-chrome>
           <ArticleEngagement
             articleId={article.id}
             storyData={{
@@ -160,6 +170,7 @@ export default async function ArticleDetailPage({ params }: ArticlePageProps) {
             initialCommentCount={article.commentCount}
           />
         </footer>
+        </ArticlePhraseShell>
       </article>
     </main>
     </>

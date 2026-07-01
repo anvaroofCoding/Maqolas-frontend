@@ -41,11 +41,11 @@ export function EditorWritingStats({ editor, className }: EditorWritingStatsProp
         <TypeIcon className="size-3" />
         {stats.words} so&apos;z
       </span>
-      <span className="inline-flex items-center gap-1" title="Belgilar">
+      <span className="hidden items-center gap-1 sm:inline-flex" title="Belgilar">
         <HashIcon className="size-3" />
         {stats.characters}
       </span>
-      <span className="inline-flex items-center gap-1" title="Taxminiy o'qish vaqti">
+      <span className="hidden items-center gap-1 sm:inline-flex" title="Taxminiy o'qish vaqti">
         <ClockIcon className="size-3" />
         ~{stats.readingMinutes} daq
       </span>

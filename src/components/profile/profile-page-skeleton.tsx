@@ -73,19 +73,19 @@ type ProfileTabsSkeletonProps = {
 export function ProfileTabsSkeleton({ variant = "own" }: ProfileTabsSkeletonProps) {
   return (
     <div className="flex flex-col gap-2" aria-hidden>
-      <div className="-mx-4 overflow-x-auto px-4 [-ms-overflow-style:none] [scrollbar-width:none] sm:mx-0 sm:px-0 [&::-webkit-scrollbar]:hidden">
-        <div className="inline-flex h-10 w-max min-w-full items-center gap-1 rounded-xl bg-muted/80 p-1 sm:min-w-0">
+      <div className="-mx-4 overflow-x-auto px-4 scrollbar-hidden touch-pan-x sm:mx-0 sm:overflow-visible sm:px-0">
+        <div className="inline-flex h-10 w-max max-w-none flex-nowrap items-center gap-1 rounded-xl bg-muted/80 p-1 sm:max-w-full">
           {variant === "own" ? (
             <>
-              <Skeleton className="h-8 w-[5.75rem] shrink-0 rounded-lg" />
+              <Skeleton className="h-8 w-[4.5rem] shrink-0 rounded-lg" />
               <Skeleton className="h-8 w-[5.5rem] shrink-0 rounded-lg sm:w-[10.5rem]" />
-              <Skeleton className="h-8 w-[5.75rem] shrink-0 rounded-lg" />
+              <Skeleton className="h-8 w-[4.5rem] shrink-0 rounded-lg" />
             </>
           ) : (
             <>
               <Skeleton className="h-8 w-[5.5rem] shrink-0 rounded-lg" />
               <Skeleton className="h-8 w-[5.5rem] shrink-0 rounded-lg sm:w-[10.5rem]" />
-              <Skeleton className="h-8 w-[5.75rem] shrink-0 rounded-lg" />
+              <Skeleton className="h-8 w-[4.5rem] shrink-0 rounded-lg" />
             </>
           )}
         </div>

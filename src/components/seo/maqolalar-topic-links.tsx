@@ -1,33 +1,49 @@
-import Link from "next/link";
+"use client";
+
+import { usePathname } from "next/navigation";
+import { FastNavPill } from "@/components/layout/sidebar-nav-link";
 import type { ArticleCategory } from "@/features/articles/types";
+import { cn } from "@/lib/utils";
 
 type MaqolalarTopicLinksProps = {
   categories: ArticleCategory[];
 };
 
 export function MaqolalarTopicLinks({ categories }: MaqolalarTopicLinksProps) {
+  const pathname = usePathname();
+
   if (categories.length === 0) return null;
 
   return (
     <nav
-      aria-label="Maqola mavzulari"
-      className="mb-6 rounded-xl border border-border/50 bg-muted/20 p-4 md:p-5"
+      aria-label="Mavzu bo'yicha maqolalar"
+      className="mb-4 pt-2 md:mb-5 md:pt-3"
     >
-      <h2 className="text-sm font-semibold text-foreground sm:text-base">
+      <p className="mb-2.5 text-xs font-semibold tracking-wide text-muted-foreground">
         Mavzu bo&apos;yicha maqolalar
-      </h2>
-      <ul className="mt-3 flex flex-wrap gap-2">
-        {categories.map((category) => (
-          <li key={category.slug}>
-            <Link
-              href={`/mavzu/${category.slug}`}
-              className="inline-flex rounded-full border border-border/60 bg-background px-3 py-1.5 text-sm text-foreground transition-colors hover:border-primary/40 hover:bg-primary/5"
-            >
-              {category.name} maqolalari
-            </Link>
-          </li>
-        ))}
-      </ul>
+      </p>
+
+      <div
+        className={cn(
+          "flex gap-2 overflow-x-auto pb-1",
+          "[-ms-overflow-style:none] [scrollbar-width:none] [&::-webkit-scrollbar]:hidden",
+        )}
+      >
+        {categories.map((category) => {
+          const href = `/mavzu/${category.slug}`;
+          const isActive =
+            pathname === href || pathname.startsWith(`${href}/`);
+
+          return (
+            <FastNavPill
+              key={category.slug}
+              href={href}
+              label={category.name}
+              isActive={isActive}
+            />
+          );
+        })}
+      </div>
     </nav>
   );
 }

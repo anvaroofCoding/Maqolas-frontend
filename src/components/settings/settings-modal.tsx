@@ -5,6 +5,7 @@ import {
   CheckIcon,
   ChevronDownIcon,
   CloudSunIcon,
+  MousePointerClickIcon,
   PaletteIcon,
   RotateCcwIcon,
   SparklesIcon,
@@ -22,6 +23,13 @@ import {
 } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 import { Label } from "@/components/ui/label";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { useSettings } from "@/components/providers/settings-provider";
 import { THEME_PRESETS } from "@/lib/settings/theme-presets";
@@ -30,6 +38,9 @@ import {
   NOTIFICATION_SOUNDS,
   playNotificationSound,
 } from "@/lib/settings/notification-sounds";
+import type { ClickSparkleStyleId } from "@/lib/effects/click-sparkle-styles";
+import { CLICK_SPARKLE_STYLES } from "@/lib/effects/click-sparkle-styles";
+import { spawnClickSparkles } from "@/lib/effects/click-sparkles";
 import type { RadiusPresetId, ThemePresetId } from "@/lib/settings/types";
 import { cn } from "@/lib/utils";
 
@@ -38,9 +49,25 @@ export function SettingsModal() {
     useSettings();
   const { theme, setTheme } = useTheme();
   const [radiusMenuOpen, setRadiusMenuOpen] = useState(false);
+  const [mounted, setMounted] = useState(false);
   const radiusMenuRef = useRef<HTMLDivElement>(null);
   const activeRadiusPreset =
     getRadiusPreset(settings.borderRadiusPresetId) ?? RADIUS_PRESETS[0];
+
+  function handleClickSparkleStyleChange(clickSparkleStyleId: ClickSparkleStyleId) {
+    updateSettings({ clickSparkleStyleId });
+    if (settings.clickSparklesEnabled) {
+      spawnClickSparkles(
+        window.innerWidth / 2,
+        window.innerHeight * 0.42,
+        clickSparkleStyleId,
+      );
+    }
+  }
+
+  useEffect(() => {
+    setMounted(true);
+  }, []);
 
   useEffect(() => {
     if (!radiusMenuOpen) return;
@@ -60,6 +87,10 @@ export function SettingsModal() {
       setRadiusMenuOpen(false);
     }
   }, [settingsOpen]);
+
+  if (!mounted) {
+    return null;
+  }
 
   return (
     <Dialog open={settingsOpen} onOpenChange={setSettingsOpen}>
@@ -277,6 +308,92 @@ export function SettingsModal() {
                     )}
                   />
                 </button>
+              </div>
+            </section>
+
+            <section className="rounded-xl border p-4">
+              <div className="flex items-start justify-between gap-4">
+                <div className="space-y-1">
+                  <Label
+                    htmlFor="click-sparkles"
+                    className="inline-flex items-center gap-1.5 text-sm font-medium"
+                  >
+                    <MousePointerClickIcon className="size-3.5" />
+                    Bosish animatsiyasi
+                  </Label>
+                  <p className="text-xs text-muted-foreground">
+                    Bosganda kursor atrofida mavzu ranglarida kichik
+                    zarrachalar sepiladi.
+                  </p>
+                </div>
+                <button
+                  id="click-sparkles"
+                  type="button"
+                  role="switch"
+                  aria-checked={settings.clickSparklesEnabled}
+                  onClick={() =>
+                    updateSettings({
+                      clickSparklesEnabled: !settings.clickSparklesEnabled,
+                    })
+                  }
+                  className={cn(
+                    "relative inline-flex h-6 w-11 shrink-0 cursor-pointer rounded-full border-2 border-transparent transition-colors",
+                    settings.clickSparklesEnabled ? "bg-nav-active" : "bg-muted",
+                  )}
+                >
+                  <span
+                    className={cn(
+                      "pointer-events-none block size-5 rounded-full bg-background shadow-sm transition-transform",
+                      settings.clickSparklesEnabled
+                        ? "translate-x-5"
+                        : "translate-x-0",
+                    )}
+                  />
+                </button>
+              </div>
+
+              <div
+                className={cn(
+                  "space-y-2 border-t border-border/60 pt-4",
+                  !settings.clickSparklesEnabled &&
+                    "pointer-events-none opacity-50",
+                )}
+              >
+                <Label htmlFor="click-sparkle-style" className="text-sm font-medium">
+                  Animatsiya turi
+                </Label>
+                <Select
+                  value={settings.clickSparkleStyleId}
+                  onValueChange={(value) =>
+                    handleClickSparkleStyleChange(value as ClickSparkleStyleId)
+                  }
+                  disabled={!settings.clickSparklesEnabled}
+                >
+                  <SelectTrigger
+                    id="click-sparkle-style"
+                    data-no-click-sparkles
+                    className="h-11 w-full justify-between rounded-xl border-border bg-muted/30 px-3.5 text-left hover:bg-muted/60 [&_[data-slot=select-value]]:line-clamp-1"
+                  >
+                    <SelectValue placeholder="Animatsiya turini tanlang" />
+                  </SelectTrigger>
+                  <SelectContent
+                    position="popper"
+                    align="start"
+                    sideOffset={6}
+                    className="max-h-72 w-[var(--radix-select-trigger-width)]"
+                  >
+                    {CLICK_SPARKLE_STYLES.map((style) => (
+                      <SelectItem
+                        key={style.id}
+                        value={style.id}
+                        textValue={style.label}
+                        description={style.description}
+                      >
+                        {style.label}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
               </div>
             </section>
 

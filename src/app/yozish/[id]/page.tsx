@@ -64,6 +64,7 @@ export default function EditArticlePage() {
       articleId={article.id}
       initialHtml={article.contentHtml}
       initialJson={article.contentJson}
+      initialHashtags={article.hashtags}
       reviewNote={article.reviewNote}
     />
   );

@@ -1,8 +1,11 @@
 "use client";
 
 import {
+  BookmarkIcon,
   FileTextIcon,
+  GraduationCapIcon,
   InfoIcon,
+  KeyboardIcon,
   LogOutIcon,
   ScrollTextIcon,
   SettingsIcon,
@@ -13,6 +16,7 @@ import {
 import { useRouter } from "next/navigation";
 import { forwardRef, useEffect, useState } from "react";
 import { AuthLoginModal } from "@/components/auth/auth-login-modal";
+import { useKeyboardShortcuts } from "@/components/keyboard-shortcuts/keyboard-shortcuts-provider";
 import { NavbarTooltip } from "@/components/layout/navbar-tooltip";
 import { useSettings } from "@/components/providers/settings-provider";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
@@ -24,6 +28,7 @@ import {
 import { useAppSelector } from "@/lib/store/hooks";
 import { navIconButtonClass } from "@/lib/layout";
 import { getUserInitials } from "@/lib/user";
+import { requestOnboardingRestart } from "@/lib/onboarding/storage";
 import { toast } from "@/lib/toast";
 import { cn } from "@/lib/utils";
 import {
@@ -89,6 +94,7 @@ export function ProfileMenu() {
   });
   const [logout, { isLoading: isLoggingOut }] = useLogoutMutation();
   const { openSettings } = useSettings();
+  const { openSheet: openShortcutsSheet } = useKeyboardShortcuts();
 
   const activeUser = meData?.user ?? user;
 
@@ -102,6 +108,11 @@ export function ProfileMenu() {
       router.replace("/");
       router.refresh();
     }
+  };
+
+  const handleRestartOnboarding = () => {
+    setMenuOpen(false);
+    requestOnboardingRestart();
   };
 
   useEffect(() => setMounted(true), []);
@@ -135,6 +146,7 @@ export function ProfileMenu() {
             size="sm"
             className={cn("gap-2 px-2.5", navIconButtonClass)}
             aria-label="Kirish"
+            data-tour="profile-menu"
             onClick={() => setLoginOpen(true)}
           >
             <span className="text-sm font-medium text-foreground">Kirish</span>
@@ -156,6 +168,7 @@ export function ProfileMenu() {
           <ProfileAvatarTrigger
             avatarUrl={activeUser?.avatarUrl}
             displayName={activeUser?.displayName}
+            data-tour="profile-menu"
           />
         </DropdownMenuTrigger>
       </NavbarTooltip>
@@ -183,6 +196,13 @@ export function ProfileMenu() {
           <FileTextIcon />
           Maqolalarim
         </DropdownMenuItem>
+        <DropdownMenuItem
+          className="cursor-pointer"
+          onSelect={() => router.push("/saqlangan-sozlar")}
+        >
+          <BookmarkIcon />
+          Saqlangan so&apos;zlar
+        </DropdownMenuItem>
         {activeUser?.role === "super_admin" ? (
           <DropdownMenuItem
             className="cursor-pointer"
@@ -201,6 +221,27 @@ export function ProfileMenu() {
         >
           <SettingsIcon />
           Sozlamalar
+        </DropdownMenuItem>
+        <DropdownMenuItem
+          className="cursor-pointer"
+          onSelect={(event) => {
+            event.preventDefault();
+            handleRestartOnboarding();
+          }}
+        >
+          <GraduationCapIcon />
+          O&apos;rgatish
+        </DropdownMenuItem>
+        <DropdownMenuItem
+          className="cursor-pointer"
+          onSelect={(event) => {
+            event.preventDefault();
+            setMenuOpen(false);
+            openShortcutsSheet();
+          }}
+        >
+          <KeyboardIcon />
+          Klaviatura tugmalari
         </DropdownMenuItem>
         <DropdownMenuSeparator />
         <DropdownMenuItem

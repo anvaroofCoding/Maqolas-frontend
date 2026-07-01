@@ -8,6 +8,7 @@ type HomepageHoverTitleProps = {
   hint?: string;
   className?: string;
   children: React.ReactNode;
+  "data-tour"?: string;
 };
 
 export function HomepageHoverTitle({
@@ -15,6 +16,7 @@ export function HomepageHoverTitle({
   hint,
   className,
   children,
+  "data-tour": dataTour,
 }: HomepageHoverTitleProps) {
   return (
     <DelayedHoverTooltip
@@ -22,6 +24,7 @@ export function HomepageHoverTitle({
       hint={hint}
       delayMs={2000}
       className={className}
+      data-tour={dataTour}
     >
       {children}
     </DelayedHoverTooltip>

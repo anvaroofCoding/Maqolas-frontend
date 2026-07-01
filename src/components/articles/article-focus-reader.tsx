@@ -6,7 +6,7 @@ import { useEffect, useMemo } from "react";
 import { ArticleContent } from "@/components/articles/article-content";
 import { Button } from "@/components/ui/button";
 import { stripArticleLeadForFocus } from "@/lib/articles/content";
-import { articleSurfaceClassName } from "@/lib/layout";
+import { articleFocusReaderClassName } from "@/lib/layout";
 import { cn } from "@/lib/utils";
 
 type ArticleFocusReaderProps = {
@@ -67,8 +67,8 @@ export function ArticleFocusReader({
       </Button>
 
       <div className="flex-1 overflow-y-auto">
-        <article className={cn(articleSurfaceClassName, "py-10 sm:py-14")}>
-          <h1 className="text-3xl font-bold tracking-tight text-foreground sm:text-4xl md:text-5xl md:leading-tight">
+        <article className={cn(articleFocusReaderClassName, "py-10 sm:py-14")}>
+          <h1 className="maqolas-no-native-select text-3xl font-bold tracking-tight text-foreground sm:text-4xl md:text-5xl md:leading-tight" translate="no">
             {title}
           </h1>
 
@@ -90,7 +90,7 @@ export function ArticleFocusReader({
             contentJson={contentJson}
             stripLead
             stripLeadImage={Boolean(coverImageUrl)}
-            className={coverImageUrl ? "article-focus-content mt-8" : "article-focus-content mt-8 sm:mt-10"}
+            className={coverImageUrl ? "article-focus-content maqolas-phrase-selectable notranslate mt-8" : "article-focus-content maqolas-phrase-selectable notranslate mt-8 sm:mt-10"}
           />
         </article>
       </div>

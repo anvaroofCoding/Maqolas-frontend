@@ -1,5 +1,6 @@
 import { Eye, Heart, MessageSquare } from "lucide-react";
 import Link from "next/link";
+import { HomepageLeftLeadRotator } from "@/components/articles/homepage-left-lead-rotator";
 import {
   HomepageArticleLink,
   HomepageHoverTitle,
@@ -76,7 +77,7 @@ function HomepageCompactCardMobileMeta({
         <Eye className="size-3 shrink-0" aria-hidden />
         <span>{formatCount(article.viewCount ?? 0)}</span>
       </span>
-      <span className="inline-flex items-center gap-1" aria-label="Yoqtirishlar">
+      <span className="inline-flex items-center gap-1" aria-label="Yoqtirishlar" data-tour="article-like">
         <Heart
           className={cn(
             "size-3 shrink-0",
@@ -212,37 +213,30 @@ export function HomepageFeed({
     fallbackArticles,
   );
 
+  const leftLeadRotationPool = uniqueArticlesById([
+    ...(fallbackArticles ?? []),
+    ...(latestArticles ?? []),
+    ...layoutLatest,
+    ...centerList,
+    ...centerFill,
+    ...lowerGrid,
+    ...layoutUrgentGrid,
+    ...(urgentLead ? [urgentLead] : []),
+    ...layoutShowcase,
+    ...(hero ? [hero] : []),
+    ...(crowdChoice ? [crowdChoice] : []),
+    ...leftLead,
+  ]);
+
   return (
     <section aria-label={title} className="space-y-5 md:space-y-6 2xl:space-y-10">
       <div className="grid gap-3 sm:gap-4 lg:grid-cols-1 lg:gap-4 xl:grid-cols-[minmax(0,1fr)_minmax(200px,0.34fr)] 2xl:grid-cols-[minmax(200px,0.95fr)_minmax(0,1.3fr)_minmax(200px,0.82fr)] 2xl:items-stretch 2xl:gap-5">
         <div className="grid min-w-0 grid-cols-1 gap-3 sm:gap-4 lg:grid-cols-[minmax(0,0.38fr)_minmax(0,1fr)] lg:gap-3.5 lg:col-span-1 xl:gap-4 2xl:contents 2xl:gap-5">
         <div className="flex min-w-0 flex-col border-b border-border/70 pb-3 sm:pb-4 lg:border-b-0 lg:border-r lg:border-border/70 lg:pb-0 lg:pr-3 xl:pr-4 2xl:col-start-1 2xl:h-full 2xl:border-r-0 2xl:border-t 2xl:pt-4 2xl:pr-0">
-          <div className="flex flex-col gap-3 sm:gap-4 2xl:gap-5">
-            {leftLead.map((article, index) => (
-              <HomepageArticleLink
-                key={article.id}
-                href={articleHref(article.slug)}
-                title={article.title}
-                hint={articleHoverHint(article)}
-                className={cn(
-                  "group block min-w-0 border-border/70 py-0.5 transition-colors",
-                  index < leftLead.length - 1 && "border-b pb-3 sm:pb-4",
-                )}
-              >
-              <p className="text-xs font-medium text-primary/85">
-                {article.categories?.[0]?.name ?? "Maqola"}
-              </p>
-              <h2 className="mt-1 break-words text-base font-bold leading-snug tracking-tight text-foreground group-hover:text-primary sm:mt-1.5 sm:text-lg lg:text-[1.05rem] lg:leading-[1.2] xl:text-[1.2rem] 2xl:mt-2 2xl:text-[1.7rem] 2xl:leading-[1.14]">
-                {article.title}
-              </h2>
-              {hasArticleExcerpt(article.title, article.excerpt) ? (
-                <p className="mt-1.5 line-clamp-2 break-words text-xs leading-relaxed text-muted-foreground [overflow-wrap:anywhere] sm:mt-2 sm:line-clamp-3 sm:text-sm sm:leading-6 2xl:text-[15px]">
-                  {formatArticleExcerpt(article.title, article.excerpt)}
-                </p>
-              ) : null}
-            </HomepageArticleLink>
-            ))}
-          </div>
+          <HomepageLeftLeadRotator
+            initialArticles={leftLead}
+            articlePool={leftLeadRotationPool}
+          />
         </div>
 
         <div className="flex min-w-0 flex-col gap-2.5 sm:gap-3 2xl:col-start-2 2xl:h-full 2xl:gap-4">
@@ -261,11 +255,12 @@ export function HomepageFeed({
             </HomepageHoverTitle>
           ) : null}
 
-          <div className="grid min-h-0 flex-1 grid-cols-1 gap-2.5 sm:gap-3 md:grid-cols-2 md:items-stretch lg:grid-cols-1 xl:grid-cols-2 2xl:grid-cols-[minmax(0,0.92fr)_minmax(0,1.08fr)]">
+          <div className="grid min-h-0 grid-cols-1 gap-2.5 sm:gap-3 md:grid-cols-2 md:items-stretch lg:grid-cols-1 xl:grid-cols-2 2xl:grid-cols-[minmax(0,0.92fr)_minmax(0,1.08fr)] 2xl:flex-1">
             <div className="flex min-w-0 flex-col gap-2 sm:gap-2.5">
-              {centerArticles.map((article) => (
+              {centerArticles.map((article, index) => (
                 <HomepageHoverTitle
                   key={article.id}
+                  data-tour={index === 0 ? "homepage-article" : undefined}
                   title={article.title}
                   hint={articleHoverHint(article)}
                   className="group grid min-w-0 w-full grid-cols-[48px_minmax(0,1fr)] items-start gap-2 rounded-2xl border bg-card p-2.5 shadow-sm transition-colors hover:bg-muted/30 sm:grid-cols-[56px_minmax(0,1fr)] sm:gap-2.5 md:grid-cols-[52px_minmax(0,1fr)] 2xl:grid-cols-[68px_minmax(0,1fr)] 2xl:gap-3 2xl:p-3"
@@ -319,7 +314,7 @@ export function HomepageFeed({
                       <Eye className="size-4 shrink-0" aria-hidden />
                       <span>{formatCount(crowdChoice.viewCount ?? 0)}</span>
                     </span>
-                    <span className="inline-flex items-center gap-1.5" aria-label="Yoqtirishlar">
+                    <span className="inline-flex items-center gap-1.5" aria-label="Yoqtirishlar" data-tour="article-like">
                       <Heart
                         className={cn(
                           "size-4 shrink-0",

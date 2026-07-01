@@ -1,3 +1,8 @@
+import {
+  DEFAULT_CLICK_SPARKLE_STYLE,
+  type ClickSparkleStyleId,
+} from "@/lib/effects/click-sparkle-styles";
+
 export type NotificationSoundId =
   | "ding"
   | "chime"
@@ -53,6 +58,8 @@ export interface MaqolasSettings {
   notificationSoundId: NotificationSoundId;
   aiAssistEnabled: boolean;
   navbarWeatherEnabled: boolean;
+  clickSparklesEnabled: boolean;
+  clickSparkleStyleId: ClickSparkleStyleId;
 }
 
 export const DEFAULT_SETTINGS: MaqolasSettings = {
@@ -62,6 +69,8 @@ export const DEFAULT_SETTINGS: MaqolasSettings = {
   notificationSoundId: "ding",
   aiAssistEnabled: true,
   navbarWeatherEnabled: true,
+  clickSparklesEnabled: true,
+  clickSparkleStyleId: DEFAULT_CLICK_SPARKLE_STYLE,
 };
 
 export const SETTINGS_STORAGE_KEY = "maqolas_settings";

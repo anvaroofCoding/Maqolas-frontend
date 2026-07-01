@@ -15,8 +15,8 @@ export function WriteLayoutSpacer({ side }: WriteLayoutSpacerProps) {
       className={cn(
         feedColumnScrollClassName,
         side === "left"
-          ? cn("hidden md:block", sidebarWidthClass)
-          : cn("hidden lg:block", rightSidebarWidthClass),
+          ? cn("hidden xl:block", sidebarWidthClass)
+          : cn("hidden xl:block", rightSidebarWidthClass),
       )}
       aria-hidden
     />

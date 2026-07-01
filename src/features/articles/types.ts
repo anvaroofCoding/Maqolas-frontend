@@ -30,6 +30,7 @@ export interface Article {
   isPinned?: boolean;
   isNew?: boolean;
   categories?: ArticleCategory[];
+  hashtags?: string[];
   publishedAt?: string;
   submittedAt?: string;
   reviewNote?: string;
@@ -51,6 +52,7 @@ export interface MyArticle {
   likeCount?: number;
   commentCount?: number;
   reviewNote?: string;
+  hashtags?: string[];
   submittedAt?: string;
   publishedAt?: string;
   createdAt?: string;
@@ -172,5 +174,6 @@ export interface SaveArticlePayload {
   title?: string;
   contentHtml: string;
   contentJson?: Record<string, unknown>;
+  hashtags?: string[];
   status?: ArticleStatus;
 }

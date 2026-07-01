@@ -20,6 +20,7 @@ export const baseApi = createApi({
     "PinComment",
     "AiArticle",
     "AuthUser",
+    "SavedPhrase",
   ],
   endpoints: () => ({}),
 });

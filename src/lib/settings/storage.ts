@@ -1,4 +1,8 @@
 import {
+  DEFAULT_CLICK_SPARKLE_STYLE,
+  VALID_CLICK_SPARKLE_STYLE_IDS,
+} from "@/lib/effects/click-sparkle-styles";
+import {
   DEFAULT_SETTINGS,
   SETTINGS_STORAGE_KEY,
   type MaqolasSettings,
@@ -80,6 +84,15 @@ export function loadSettings(): MaqolasSettings {
         typeof parsed.navbarWeatherEnabled === "boolean"
           ? parsed.navbarWeatherEnabled
           : DEFAULT_SETTINGS.navbarWeatherEnabled,
+      clickSparklesEnabled:
+        typeof parsed.clickSparklesEnabled === "boolean"
+          ? parsed.clickSparklesEnabled
+          : DEFAULT_SETTINGS.clickSparklesEnabled,
+      clickSparkleStyleId:
+        parsed.clickSparkleStyleId &&
+        VALID_CLICK_SPARKLE_STYLE_IDS.has(parsed.clickSparkleStyleId)
+          ? parsed.clickSparkleStyleId
+          : DEFAULT_SETTINGS.clickSparkleStyleId,
     };
   } catch {
     return DEFAULT_SETTINGS;

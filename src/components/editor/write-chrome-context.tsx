@@ -30,6 +30,11 @@ export function WriteChromeProvider({ children }: { children: ReactNode }) {
     if (!pathname?.startsWith("/yozish")) {
       setChromeHidden(false);
       setFocusMode(false);
+      return;
+    }
+
+    if (window.matchMedia("(max-width: 767px)").matches) {
+      setChromeHidden(true);
     }
   }, [pathname]);
 

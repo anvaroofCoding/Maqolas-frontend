@@ -1,4 +1,4 @@
-import { FileTextIcon, LayoutGridIcon, ShieldIcon } from "lucide-react";
+import { LayoutGridIcon } from "lucide-react";
 import Link from "next/link";
 import { FooterPlatformStats } from "@/components/seo/footer-platform-stats";
 import { primarySeoNavLinks } from "@/config/seo-navigation";
@@ -8,20 +8,20 @@ import { cn } from "@/lib/utils";
 
 export function SiteSeoFooter() {
   return (
-    <footer className="mt-10 border-t border-border/60 bg-muted/15">
-      <div
-        className={cn(
-          "w-full py-10 sm:py-12",
-          feedContentInsetClassName,
-        )}
-      >
-        <nav aria-label="Sayt bo'limlari" className="space-y-5">
+    <footer
+      className={cn(
+        "mt-4 border-t border-border bg-card pb-[calc(4.5rem+env(safe-area-inset-bottom))] md:mt-6 md:pb-0",
+      )}
+      data-site-chrome
+    >
+      <div className={cn("w-full py-6 sm:py-8", feedContentInsetClassName)}>
+        <nav aria-label="Sayt bo'limlari" className="space-y-4">
           <p className="inline-flex items-center gap-2 text-sm font-semibold text-foreground">
             <LayoutGridIcon className="size-4 text-primary" aria-hidden />
             {siteConfig.name} bo&apos;limlari
           </p>
 
-          <ul className="grid grid-cols-1 gap-1 sm:grid-cols-2 sm:gap-x-6 lg:grid-cols-3 lg:gap-x-8 lg:gap-y-1">
+          <ul className="grid grid-cols-2 gap-2 sm:grid-cols-3 lg:grid-cols-6">
             {primarySeoNavLinks.map((link) => {
               const Icon = link.icon;
 
@@ -29,18 +29,13 @@ export function SiteSeoFooter() {
                 <li key={link.href} className="min-w-0">
                   <Link
                     href={link.href}
-                    className="group flex w-full items-start gap-3 rounded-xl px-2 py-2.5 outline-none ring-offset-background transition-colors hover:bg-muted/40 focus-visible:ring-3 focus-visible:ring-ring/50 sm:px-3"
+                    className="group flex items-center gap-2.5 rounded-xl border border-transparent bg-background px-3 py-2.5 text-sm font-medium text-foreground outline-none transition-colors hover:border-border hover:bg-muted/40 focus-visible:ring-3 focus-visible:ring-ring/50"
                   >
-                    <span className="flex size-9 shrink-0 items-center justify-center rounded-lg bg-primary/10 text-primary transition-colors group-hover:bg-primary/15">
+                    <span className="flex size-8 shrink-0 items-center justify-center rounded-lg bg-primary/10 text-primary transition-colors group-hover:bg-primary/15">
                       <Icon className="size-4" aria-hidden />
                     </span>
-                    <span className="min-w-0 flex-1">
-                      <span className="block text-sm font-medium text-foreground group-hover:text-primary">
-                        {link.label}
-                      </span>
-                      <span className="mt-0.5 block text-xs leading-relaxed text-muted-foreground">
-                        {link.description}
-                      </span>
+                    <span className="truncate group-hover:text-primary">
+                      {link.label}
                     </span>
                   </Link>
                 </li>
@@ -51,27 +46,24 @@ export function SiteSeoFooter() {
 
         <FooterPlatformStats />
 
-        <div className="mt-8 flex flex-col gap-4 border-t border-border/50 pt-6 sm:mt-10 sm:flex-row sm:items-center sm:justify-between sm:gap-6 sm:pt-7">
-          <div className="flex flex-wrap items-center gap-x-5 gap-y-2 text-xs text-muted-foreground">
+        <div className="mt-6 flex flex-col gap-3 border-t border-border pt-5 text-xs text-muted-foreground sm:flex-row sm:items-center sm:justify-between sm:gap-6">
+          <div className="flex flex-wrap items-center gap-x-4 gap-y-2">
             <Link
               href="/foydalanish-shartlari"
-              className="inline-flex items-center gap-1.5 transition-colors hover:text-foreground"
+              className="transition-colors hover:text-foreground"
             >
-              <FileTextIcon className="size-3.5 shrink-0" aria-hidden />
               Foydalanish shartlari
             </Link>
             <Link
               href="/maxfiylik-siyosati"
-              className="inline-flex items-center gap-1.5 transition-colors hover:text-foreground"
+              className="transition-colors hover:text-foreground"
             >
-              <ShieldIcon className="size-3.5 shrink-0" aria-hidden />
               Maxfiylik siyosati
             </Link>
           </div>
 
-          <p className="shrink-0 text-xs text-muted-foreground sm:text-right">
-            © {new Date().getFullYear()} {siteConfig.name}. O&apos;zbekcha maqolalar
-            platformasi.
+          <p className="shrink-0 sm:text-right">
+            © {new Date().getFullYear()} {siteConfig.name}
           </p>
         </div>
       </div>

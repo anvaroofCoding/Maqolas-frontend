@@ -362,7 +362,11 @@ export const articlesApi = baseApi.injectEndpoints({
         body,
       }),
     }),
+    getHashtagSuggestions: builder.query<{ hashtags: string[] }, void>({
+      query: () => "/articles/mine/hashtag-suggestions",
+    }),
   }),
+  overrideExisting: true,
 });
 
 export const {
@@ -391,3 +395,6 @@ export const {
   useDeleteArticleCommentMutation,
   useUploadArticleImageMutation,
 } = articlesApi;
+
+export const useGetHashtagSuggestionsQuery =
+  articlesApi.useGetHashtagSuggestionsQuery;

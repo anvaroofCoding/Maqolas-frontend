@@ -5,6 +5,7 @@ import "@/features/banners/api/banners-api";
 import "@/features/article-requests/api/article-requests-api";
 import "@/features/articles/api/articles-api";
 import "@/features/categories/api/categories-api";
+import "@/features/saved-phrases/api/saved-phrases-api";
 import "@/features/users/api/users-api";
 import "@/features/pins/api/pins-api";
 import { authApi } from "@/features/auth/api/auth-api";

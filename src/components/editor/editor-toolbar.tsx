@@ -23,6 +23,7 @@ import {
   ListIcon,
   ListOrderedIcon,
   MinusIcon,
+  MoreHorizontalIcon,
   PaletteIcon,
   QuoteIcon,
   Redo2Icon,
@@ -45,7 +46,15 @@ import {
   EditorToolbarDivider,
 } from "@/components/editor/editor-toolbar-button";
 import { EditorWritingStats } from "@/components/editor/editor-writing-stats";
+import { Button } from "@/components/ui/button";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
+import {
+  Sheet,
+  SheetContent,
+  SheetHeader,
+  SheetTitle,
+  SheetTrigger,
+} from "@/components/ui/sheet";
 import type { CalloutVariant } from "@/lib/editor/callout-extension";
 import { FONT_SIZE_OPTIONS } from "@/lib/editor/font-size-extension";
 import { insertTableOfContents } from "@/lib/editor/insert-table-of-contents";
@@ -85,9 +94,16 @@ function insertCallout(editor: Editor, variant: CalloutVariant) {
     .run();
 }
 
-export function EditorToolbar({ editor }: EditorToolbarProps) {
-  if (!editor) return null;
+type ToolbarActions = {
+  setLink: () => void;
+  addImage: () => void;
+  addImageRow: () => void;
+  addYoutube: () => void;
+  insertToc: () => void;
+  clearFormatting: () => void;
+};
 
+function createToolbarActions(editor: Editor): ToolbarActions {
   const setLink = () => {
     const { from, to, empty } = editor.state.selection;
     if (empty) return;
@@ -130,8 +146,360 @@ export function EditorToolbar({ editor }: EditorToolbarProps) {
     editor.chain().focus().unsetAllMarks().clearNodes().run();
   };
 
+  return { setLink, addImage, addImageRow, addYoutube, insertToc, clearFormatting };
+}
+
+function EditorToolbarMobile({
+  editor,
+  actions,
+}: {
+  editor: Editor;
+  actions: ToolbarActions;
+}) {
+  const mobileBtnClass = "size-9 shrink-0";
+
+  return (
+    <div className="flex items-center gap-0.5 overflow-x-auto px-2 py-1.5 scrollbar-hidden touch-pan-x">
+      <EditorToolbarButton
+        label="Bekor qilish"
+        className={mobileBtnClass}
+        onClick={() => editor.chain().focus().undo().run()}
+        disabled={!editor.can().chain().focus().undo().run()}
+      >
+        <Undo2Icon />
+      </EditorToolbarButton>
+      <EditorToolbarButton
+        label="Qaytarish"
+        className={mobileBtnClass}
+        onClick={() => editor.chain().focus().redo().run()}
+        disabled={!editor.can().chain().focus().redo().run()}
+      >
+        <Redo2Icon />
+      </EditorToolbarButton>
+
+      <EditorToolbarDivider />
+
+      <EditorToolbarButton
+        label="Qalin"
+        className={mobileBtnClass}
+        isActive={editor.isActive("bold")}
+        onClick={() => editor.chain().focus().toggleBold().run()}
+      >
+        <BoldIcon />
+      </EditorToolbarButton>
+      <EditorToolbarButton
+        label="Kursiv"
+        className={mobileBtnClass}
+        isActive={editor.isActive("italic")}
+        onClick={() => editor.chain().focus().toggleItalic().run()}
+      >
+        <ItalicIcon />
+      </EditorToolbarButton>
+      <EditorToolbarButton
+        label="Tag chiziq"
+        className={mobileBtnClass}
+        isActive={editor.isActive("underline")}
+        onClick={() => editor.chain().focus().toggleUnderline().run()}
+      >
+        <UnderlineIcon />
+      </EditorToolbarButton>
+
+      <EditorToolbarDivider />
+
+      <EditorToolbarButton
+        label="Sarlavha 2"
+        className={mobileBtnClass}
+        isActive={editor.isActive("heading", { level: 2 })}
+        onClick={() => editor.chain().focus().toggleHeading({ level: 2 }).run()}
+      >
+        <Heading2Icon />
+      </EditorToolbarButton>
+      <EditorToolbarButton
+        label="Ro'yxat"
+        className={mobileBtnClass}
+        isActive={editor.isActive("bulletList")}
+        onClick={() => editor.chain().focus().toggleBulletList().run()}
+      >
+        <ListIcon />
+      </EditorToolbarButton>
+      <EditorToolbarButton
+        label="Havola"
+        className={mobileBtnClass}
+        isActive={editor.isActive("link")}
+        onClick={actions.setLink}
+      >
+        <LinkIcon />
+      </EditorToolbarButton>
+      <EditorImageToolbarActions editor={editor} />
+
+      <EditorToolbarDivider />
+
+      <Sheet>
+        <SheetTrigger asChild>
+          <Button
+            type="button"
+            variant="ghost"
+            size="icon-sm"
+            className={cn(mobileBtnClass, "text-muted-foreground hover:text-foreground")}
+            aria-label="Barcha formatlash"
+          >
+            <MoreHorizontalIcon className="size-4" />
+          </Button>
+        </SheetTrigger>
+        <SheetContent side="bottom" className="max-h-[75dvh] overflow-y-auto rounded-t-2xl px-4 pb-6">
+          <SheetHeader className="px-0">
+            <SheetTitle>Formatlash</SheetTitle>
+          </SheetHeader>
+          <div className="mt-3 space-y-4">
+            <EditorCommandMenu
+              editor={editor}
+              onImageClick={actions.addImage}
+              onImageRowClick={actions.addImageRow}
+            />
+
+            <div>
+              <p className="mb-2 text-xs font-medium text-muted-foreground">Sarlavhalar</p>
+              <div className="flex flex-wrap gap-1">
+                <EditorToolbarButton
+                  label="Sarlavha 1"
+                  className={mobileBtnClass}
+                  isActive={editor.isActive("heading", { level: 1 })}
+                  onClick={() => editor.chain().focus().toggleHeading({ level: 1 }).run()}
+                >
+                  <Heading1Icon />
+                </EditorToolbarButton>
+                <EditorToolbarButton
+                  label="Sarlavha 2"
+                  className={mobileBtnClass}
+                  isActive={editor.isActive("heading", { level: 2 })}
+                  onClick={() => editor.chain().focus().toggleHeading({ level: 2 }).run()}
+                >
+                  <Heading2Icon />
+                </EditorToolbarButton>
+                <EditorToolbarButton
+                  label="Sarlavha 3"
+                  className={mobileBtnClass}
+                  isActive={editor.isActive("heading", { level: 3 })}
+                  onClick={() => editor.chain().focus().toggleHeading({ level: 3 }).run()}
+                >
+                  <Heading3Icon />
+                </EditorToolbarButton>
+              </div>
+            </div>
+
+            <div>
+              <p className="mb-2 text-xs font-medium text-muted-foreground">Matn</p>
+              <div className="flex flex-wrap gap-1">
+                <EditorToolbarButton
+                  label="Chizilgan"
+                  className={mobileBtnClass}
+                  isActive={editor.isActive("strike")}
+                  onClick={() => editor.chain().focus().toggleStrike().run()}
+                >
+                  <StrikethroughIcon />
+                </EditorToolbarButton>
+                <EditorToolbarButton
+                  label="Kod"
+                  className={mobileBtnClass}
+                  isActive={editor.isActive("code")}
+                  onClick={() => editor.chain().focus().toggleCode().run()}
+                >
+                  <CodeIcon />
+                </EditorToolbarButton>
+                <EditorToolbarButton
+                  label="Yashirin matn"
+                  className={mobileBtnClass}
+                  isActive={editor.isActive("spoiler")}
+                  onClick={() => editor.chain().focus().toggleSpoiler().run()}
+                >
+                  <EyeOffIcon />
+                </EditorToolbarButton>
+                <EditorToolbarButton
+                  label="Formatni tozalash"
+                  className={mobileBtnClass}
+                  onClick={actions.clearFormatting}
+                >
+                  <EraserIcon />
+                </EditorToolbarButton>
+              </div>
+            </div>
+
+            <div>
+              <p className="mb-2 text-xs font-medium text-muted-foreground">Joylash</p>
+              <div className="flex flex-wrap gap-1">
+                <EditorToolbarButton
+                  label="Chapga"
+                  className={mobileBtnClass}
+                  isActive={editor.isActive({ textAlign: "left" })}
+                  onClick={() => editor.chain().focus().setTextAlign("left").run()}
+                >
+                  <AlignLeftIcon />
+                </EditorToolbarButton>
+                <EditorToolbarButton
+                  label="Markaz"
+                  className={mobileBtnClass}
+                  isActive={editor.isActive({ textAlign: "center" })}
+                  onClick={() => editor.chain().focus().setTextAlign("center").run()}
+                >
+                  <AlignCenterIcon />
+                </EditorToolbarButton>
+                <EditorToolbarButton
+                  label="O'ngga"
+                  className={mobileBtnClass}
+                  isActive={editor.isActive({ textAlign: "right" })}
+                  onClick={() => editor.chain().focus().setTextAlign("right").run()}
+                >
+                  <AlignRightIcon />
+                </EditorToolbarButton>
+              </div>
+            </div>
+
+            <div>
+              <p className="mb-2 text-xs font-medium text-muted-foreground">Bloklar</p>
+              <div className="flex flex-wrap gap-1">
+                <EditorToolbarButton
+                  label="Raqamli ro'yxat"
+                  className={mobileBtnClass}
+                  isActive={editor.isActive("orderedList")}
+                  onClick={() => editor.chain().focus().toggleOrderedList().run()}
+                >
+                  <ListOrderedIcon />
+                </EditorToolbarButton>
+                <EditorToolbarButton
+                  label="Vazifa ro'yxati"
+                  className={mobileBtnClass}
+                  isActive={editor.isActive("taskList")}
+                  onClick={() => editor.chain().focus().toggleTaskList().run()}
+                >
+                  <ListChecksIcon />
+                </EditorToolbarButton>
+                <EditorToolbarButton
+                  label="Iqtibos"
+                  className={mobileBtnClass}
+                  isActive={editor.isActive("blockquote")}
+                  onClick={() => editor.chain().focus().toggleBlockquote().run()}
+                >
+                  <QuoteIcon />
+                </EditorToolbarButton>
+                <EditorToolbarButton
+                  label="Kod bloki"
+                  className={mobileBtnClass}
+                  isActive={editor.isActive("codeBlock")}
+                  onClick={() => editor.chain().focus().toggleCodeBlock().run()}
+                >
+                  <CodeIcon />
+                </EditorToolbarButton>
+                <EditorToolbarButton
+                  label="Gorizontal chiziq"
+                  className={mobileBtnClass}
+                  onClick={() => editor.chain().focus().setHorizontalRule().run()}
+                >
+                  <MinusIcon />
+                </EditorToolbarButton>
+              </div>
+            </div>
+
+            <div>
+              <p className="mb-2 text-xs font-medium text-muted-foreground">Media va boshqalar</p>
+              <div className="flex flex-wrap gap-1">
+                <EditorToolbarButton
+                  label="YouTube video"
+                  className={mobileBtnClass}
+                  onClick={actions.addYoutube}
+                >
+                  <YoutubeIcon />
+                </EditorToolbarButton>
+                <EditorToolbarButton
+                  label="Jadval"
+                  className={mobileBtnClass}
+                  isActive={editor.isActive("table")}
+                  onClick={() =>
+                    editor
+                      .chain()
+                      .focus()
+                      .insertTable({ rows: 3, cols: 3, withHeaderRow: true })
+                      .run()
+                  }
+                >
+                  <TableIcon />
+                </EditorToolbarButton>
+                <EditorToolbarButton
+                  label="Avtomatik mundarija"
+                  className={mobileBtnClass}
+                  onClick={actions.insertToc}
+                >
+                  <SparklesIcon />
+                </EditorToolbarButton>
+                <EditorToolbarButton
+                  label="Maslahat bloki"
+                  className={mobileBtnClass}
+                  isActive={editor.isActive("callout", { variant: "tip" })}
+                  onClick={() => insertCallout(editor, "tip")}
+                >
+                  <LightbulbIcon />
+                </EditorToolbarButton>
+                <EditorToolbarButton
+                  label="Ogohlantirish bloki"
+                  className={mobileBtnClass}
+                  isActive={editor.isActive("callout", { variant: "warning" })}
+                  onClick={() => insertCallout(editor, "warning")}
+                >
+                  <AlertTriangleIcon />
+                </EditorToolbarButton>
+                <EditorToolbarButton
+                  label="Muhim bloki"
+                  className={mobileBtnClass}
+                  isActive={editor.isActive("callout", { variant: "important" })}
+                  onClick={() => insertCallout(editor, "important")}
+                >
+                  <StarIcon />
+                </EditorToolbarButton>
+              </div>
+            </div>
+          </div>
+        </SheetContent>
+      </Sheet>
+    </div>
+  );
+}
+
+export function EditorToolbar({ editor }: EditorToolbarProps) {
+  if (!editor) return null;
+
+  const actions = createToolbarActions(editor);
+
   return (
     <div className="border-t border-border/60">
+      <div className="md:hidden">
+        <EditorToolbarMobile editor={editor} actions={actions} />
+      </div>
+
+      <div className="hidden md:block">
+        <EditorToolbarDesktop editor={editor} actions={actions} />
+      </div>
+
+      <div className="flex items-center justify-between gap-2 border-t border-border/40 px-3 py-1.5">
+        <EditorWritingStats editor={editor} className="min-w-0" />
+        <div className="flex shrink-0 items-center gap-1">
+          <EditorFindReplace editor={editor} />
+          <EditorKeyboardShortcuts />
+        </div>
+      </div>
+    </div>
+  );
+}
+
+function EditorToolbarDesktop({
+  editor,
+  actions,
+}: {
+  editor: Editor;
+  actions: ToolbarActions;
+}) {
+  const { setLink, addImage, addImageRow, addYoutube, insertToc, clearFormatting } = actions;
+
+  return (
+    <>
       <div className="flex flex-wrap items-center gap-0.5 px-3 py-2">
         <EditorCommandMenu
           editor={editor}
@@ -484,14 +852,6 @@ export function EditorToolbar({ editor }: EditorToolbarProps) {
           <StarIcon />
         </EditorToolbarButton>
       </div>
-
-      <div className="flex flex-wrap items-center justify-between gap-2 border-t border-border/40 px-3 py-1.5">
-        <EditorWritingStats editor={editor} />
-        <div className="flex items-center gap-1">
-          <EditorFindReplace editor={editor} />
-          <EditorKeyboardShortcuts />
-        </div>
-      </div>
-    </div>
+    </>
   );
 }

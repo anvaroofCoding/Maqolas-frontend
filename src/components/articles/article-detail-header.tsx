@@ -44,7 +44,7 @@ export function ArticleDetailHeader({
 
   return (
     <>
-      <header className="space-y-5">
+      <header className="space-y-5" data-site-chrome>
         <div className="flex flex-wrap items-start justify-between gap-4">
           <div className="flex min-w-0 items-center gap-3">
             {authorUsername ? (
@@ -155,8 +155,9 @@ export function ArticleDetailHeader({
         </div>
 
         <h1
-          className="text-3xl font-bold tracking-tight text-foreground sm:text-4xl"
+          className="maqolas-no-native-select text-3xl font-bold tracking-tight text-foreground sm:text-4xl"
           itemProp="headline"
+          translate="no"
         >
           {title}
         </h1>

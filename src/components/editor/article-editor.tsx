@@ -10,6 +10,7 @@ import { EditorToolbar } from "@/components/editor/editor-toolbar";
 import { EditorBubbleMenu } from "@/components/editor/editor-bubble-menu";
 import { EditorTableMenu } from "@/components/editor/editor-table-menu";
 import { EditorContextMenu } from "@/components/editor/editor-context-menu";
+import { ArticleHashtagInput } from "@/components/editor/article-hashtag-input";
 import { useWriteChrome } from "@/components/editor/write-chrome-context";
 import { Button } from "@/components/ui/button";
 import { useUpdateAdminArticleMutation } from "@/features/admin/api/admin-api";
@@ -36,6 +37,8 @@ import { getWritingStats } from "@/lib/editor/writing-stats";
 import { toast } from "@/lib/toast";
 import { useAppSelector } from "@/lib/store/hooks";
 import { articleSurfaceClassName, writeSurfaceClassName } from "@/lib/layout";
+import { normalizeHashtags } from "@/lib/hashtags/normalize-hashtag";
+import { rememberHashtags } from "@/lib/hashtags/recent-hashtags";
 import { cn } from "@/lib/utils";
 
 const writeButtonClass =
@@ -46,6 +49,7 @@ interface ArticleEditorProps {
   initialJson?: Record<string, unknown>;
   articleId?: string;
   reviewNote?: string;
+  initialHashtags?: string[];
   mode?: "author" | "admin";
 }
 
@@ -54,6 +58,7 @@ export function ArticleEditor({
   initialJson,
   articleId: initialArticleId,
   reviewNote,
+  initialHashtags = [],
   mode = "author",
 }: ArticleEditorProps) {
   const router = useRouter();
@@ -62,6 +67,10 @@ export function ArticleEditor({
     useWriteChrome();
   const isAuthorWritePage = mode === "author";
   const [articleId, setArticleId] = useState<string | undefined>(initialArticleId);
+  const [hashtags, setHashtags] = useState<string[]>(() =>
+    normalizeHashtags(initialHashtags),
+  );
+  const hashtagsRef = useRef<string[]>(normalizeHashtags(initialHashtags));
   const [editorResetKey, setEditorResetKey] = useState(0);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [submitted, setSubmitted] = useState(false);
@@ -94,6 +103,10 @@ export function ArticleEditor({
     articleIdRef.current = articleId;
   }, [articleId]);
 
+  useEffect(() => {
+    hashtagsRef.current = hashtags;
+  }, [hashtags]);
+
   const updateSubmitReadiness = useCallback((ed: Editor) => {
     const readiness = getSubmitReadiness(ed);
     setCanSubmit(readiness.canSubmit);
@@ -122,7 +135,13 @@ export function ArticleEditor({
           return;
         }
 
-        const body = { title, contentHtml, contentJson, status: "draft" as const };
+        const body = {
+          title,
+          contentHtml,
+          contentJson,
+          hashtags: hashtagsRef.current,
+          status: "draft" as const,
+        };
         const currentArticleId = articleIdRef.current;
 
         if (currentArticleId) {
@@ -166,7 +185,7 @@ export function ArticleEditor({
     editorProps: {
       attributes: {
         class:
-          "article-editor-content min-h-[50vh] px-4 py-4 focus:outline-none sm:px-8 sm:py-5",
+          "article-editor-content min-h-[50vh] px-3 py-3 focus:outline-none sm:px-8 sm:py-5",
       },
       handlePaste: (view, event, slice) =>
         imageHandlersRef.current.handlePaste(view, event, slice),
@@ -210,6 +229,14 @@ export function ArticleEditor({
   }, []);
 
   useEffect(() => {
+    if (!editor || submittedRef.current) return;
+    if (saveTimer.current) clearTimeout(saveTimer.current);
+    saveTimer.current = setTimeout(() => {
+      void persist(editor);
+    }, 800);
+  }, [editor, hashtags, persist]);
+
+  useEffect(() => {
     if (!focusMode) return;
     const prev = document.body.style.overflow;
     document.body.style.overflow = "hidden";
@@ -237,7 +264,12 @@ export function ArticleEditor({
     const contentJson = editor.getJSON() as Record<string, unknown>;
     const contentHtml = syncFigureLayoutInHtml(editor.getHTML(), contentJson);
     const title = extractTitleFromJson(editor.getJSON());
-    const body = { title, contentHtml, contentJson };
+    const body = {
+      title,
+      contentHtml,
+      contentJson,
+      hashtags: hashtagsRef.current,
+    };
 
     setIsSubmitting(true);
     try {
@@ -249,6 +281,9 @@ export function ArticleEditor({
         setArticleId(id);
       }
       await submitArticle({ id, body }).unwrap();
+      if (hashtagsRef.current.length) {
+        rememberHashtags(hashtagsRef.current);
+      }
       if (saveTimer.current) clearTimeout(saveTimer.current);
       submittedRef.current = true;
       setSubmitted(true);
@@ -270,6 +305,8 @@ export function ArticleEditor({
     setChromeHidden(false);
     setCanSubmit(false);
     setSubmitBlockReason("kamida 200 ta so'z va kamida 1 ta rasm");
+    setHashtags([]);
+    hashtagsRef.current = [];
     setEditorResetKey((key) => key + 1);
 
     if (pathname !== "/yozish") {
@@ -290,38 +327,42 @@ export function ArticleEditor({
       >
         <div
           className={cn(
-            "sticky z-40 -mx-4 border-b border-border bg-background/95 px-4 backdrop-blur supports-[backdrop-filter]:bg-background/80 sm:-mx-6 sm:px-6 top-0",
+            "sticky top-0 z-40 -mx-3 border-b border-border bg-background/95 px-3 backdrop-blur supports-[backdrop-filter]:bg-background/80 sm:-mx-5 sm:px-5 md:-mx-6 md:px-6",
           )}
         >
-          <div className="flex flex-wrap items-center justify-end gap-2 py-2 sm:gap-3">
-            <div className="flex flex-wrap items-center justify-end gap-2">
-              {!isAdminMode && !submitted && submitBlockReason ? (
-                <p className="text-xs text-muted-foreground">
-                  Ko&apos;rib chiqishga yuborish uchun {submitBlockReason} kerak
-                </p>
-              ) : null}
+          <div className="flex flex-col gap-2 py-2 sm:flex-row sm:items-center sm:justify-between sm:gap-3">
+            {!isAdminMode && !submitted && submitBlockReason ? (
+              <p className="text-[11px] leading-snug text-muted-foreground sm:text-xs">
+                Ko&apos;rib chiqishga yuborish uchun {submitBlockReason} kerak
+              </p>
+            ) : (
+              <span className="hidden sm:block" />
+            )}
+            <div className="flex items-center gap-1.5 sm:gap-2">
               {isAuthorWritePage ? (
                 <Button
                   type="button"
                   variant="outline"
                   size="sm"
-                  className="gap-1.5"
+                  className="size-9 shrink-0 gap-0 px-0 sm:size-auto sm:gap-1.5 sm:px-3"
                   onClick={toggleChromeHidden}
                   aria-pressed={chromeHidden}
+                  aria-label="Menyu"
+                  title="Menyu"
                 >
                   {chromeHidden ? (
                     <PanelTopOpenIcon className="size-4" />
                   ) : (
                     <PanelTopCloseIcon className="size-4" />
                   )}
-                  Menyu
+                  <span className="hidden sm:inline">Menyu</span>
                 </Button>
               ) : null}
               <Button
                 type="button"
                 variant="outline"
                 size="sm"
-                className="gap-1.5"
+                className="size-9 shrink-0 gap-0 px-0 sm:size-auto sm:gap-1.5 sm:px-3"
                 onClick={() => {
                   const next = !focusMode;
                   if (isAuthorWritePage) {
@@ -330,37 +371,42 @@ export function ArticleEditor({
                   setFocusMode(next);
                 }}
                 aria-pressed={focusMode}
+                aria-label="Fokus"
+                title="Fokus"
               >
                 {focusMode ? (
                   <Minimize2Icon className="size-4" />
                 ) : (
                   <Maximize2Icon className="size-4" />
                 )}
-                Fokus
+                <span className="hidden sm:inline">Fokus</span>
               </Button>
               {isAdminMode ? (
                 <Button
                   type="button"
                   size="sm"
                   variant="outline"
+                  className="ml-auto sm:ml-0"
                   onClick={() => router.push("/admin")}
                 >
-                  Admin panelga qaytish
+                  <span className="hidden sm:inline">Admin panelga qaytish</span>
+                  <span className="sm:hidden">Admin</span>
                 </Button>
               ) : submitted ? (
                 <Button
                   type="button"
                   size="sm"
-                  className={writeButtonClass}
+                  className={cn(writeButtonClass, "ml-auto flex-1 sm:ml-0 sm:flex-none")}
                   onClick={handleStartNewArticle}
                 >
-                  Yangi maqola yozish
+                  <span className="hidden sm:inline">Yangi maqola yozish</span>
+                  <span className="sm:hidden">Yangi maqola</span>
                 </Button>
               ) : (
                 <Button
                   type="button"
                   size="sm"
-                  className={writeButtonClass}
+                  className={cn(writeButtonClass, "ml-auto min-w-0 flex-1 sm:ml-0 sm:flex-none")}
                   disabled={isSubmitting || !canSubmit}
                   title={
                     submitBlockReason
@@ -369,7 +415,8 @@ export function ArticleEditor({
                   }
                   onClick={() => void handleSubmit()}
                 >
-                  Ko&apos;rib chiqishga yuborish
+                  <span className="hidden sm:inline">Ko&apos;rib chiqishga yuborish</span>
+                  <span className="truncate sm:hidden">Yuborish</span>
                 </Button>
               )}
             </div>
@@ -395,6 +442,19 @@ export function ArticleEditor({
           <EditorBubbleMenu editor={editor} />
           <EditorTableMenu editor={editor} />
           <EditorContextMenu editor={editor} />
+          {!isAdminMode ? (
+            <ArticleHashtagInput
+              value={hashtags}
+              onChange={(next) => {
+                const normalized = normalizeHashtags(next);
+                hashtagsRef.current = normalized;
+                setHashtags(normalized);
+                if (normalized.length) {
+                  rememberHashtags(normalized);
+                }
+              }}
+            />
+          ) : null}
         </div>
       </div>
     </div>

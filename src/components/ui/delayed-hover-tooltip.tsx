@@ -22,6 +22,7 @@ interface DelayedHoverTooltipProps {
   className?: string;
   children: ReactNode;
   disabled?: boolean;
+  "data-tour"?: string;
 }
 
 export function DelayedHoverTooltip({
@@ -32,6 +33,7 @@ export function DelayedHoverTooltip({
   className,
   children,
   disabled = false,
+  "data-tour": dataTour,
 }: DelayedHoverTooltipProps) {
   const wrapRef = useRef<HTMLDivElement>(null);
   const timerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
@@ -185,6 +187,7 @@ export function DelayedHoverTooltip({
     <div
       ref={wrapRef}
       className={cn(className)}
+      data-tour={dataTour}
       onMouseEnter={handleMouseEnter}
       onMouseMove={handleMouseMove}
       onMouseLeave={hide}

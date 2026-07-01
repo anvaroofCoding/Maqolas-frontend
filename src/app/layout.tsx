@@ -41,8 +41,12 @@ export default function RootLayout({
   return (
     <html
       lang={siteConfig.htmlLang}
+      translate="no"
       suppressHydrationWarning
-      className={cn("bg-background font-sans text-foreground", poppins.variable)}
+      className={cn(
+        "notranslate bg-background font-sans text-foreground",
+        poppins.variable,
+      )}
     >
       <head>
         <ThemeInitScript />

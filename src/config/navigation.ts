@@ -5,9 +5,8 @@ import {
   BookOpenIcon,
   BotIcon,
   BriefcaseIcon,
-  ClockIcon,
   CpuIcon,
-  ImagesIcon,
+  ClockIcon,
   LayersIcon,
   LibraryIcon,
   MegaphoneIcon,
@@ -17,11 +16,16 @@ import {
   TagIcon,
   ThumbsUpIcon,
 } from "lucide-react";
+import { PinterestIcon } from "@/components/icons/pinterest-icon";
+
+export type NavIcon = LucideIcon | typeof PinterestIcon;
 
 export type NavItem = {
   label: string;
   href: string;
-  icon: LucideIcon;
+  icon: NavIcon;
+  /** Logodagi "New" kabi kichik badge matni (masalan: pinterest) */
+  badgeText?: string;
 };
 
 export type TopicSource = {
@@ -40,7 +44,12 @@ export function isMainNavActive(pathname: string, href: string): boolean {
 export const mainNavItems: NavItem[] = [
   { label: "Siz uchun", href: "/", icon: ThumbsUpIcon },
   { label: "Maqolalar", href: "/maqolalar", icon: LibraryIcon },
-  { label: "Rasmlar", href: "/rasmlar", icon: ImagesIcon },
+  {
+    label: "Rasmlar",
+    href: "/rasmlar",
+    icon: PinterestIcon,
+    badgeText: "pinterest",
+  },
   { label: "Yangi", href: "/yangi", icon: ClockIcon },
   { label: "Mavzular", href: "/mavzular", icon: TagIcon },
   { label: "Mening maqolam", href: "/lenta", icon: NewspaperIcon },

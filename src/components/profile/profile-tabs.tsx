@@ -39,10 +39,15 @@ export function ProfileTabs({
 
   return (
     <Tabs key={defaultTab} defaultValue={defaultTab} className="gap-2">
-      <div className="-mx-4 overflow-x-auto px-4 [-ms-overflow-style:none] [scrollbar-width:none] sm:mx-0 sm:px-0 [&::-webkit-scrollbar]:hidden">
-        <TabsList className="w-max min-w-full sm:min-w-0">
+      <div className="-mx-4 overflow-x-auto px-4 scrollbar-hidden touch-pan-x sm:mx-0 sm:overflow-visible sm:px-0">
+        <TabsList className="w-max max-w-none flex-nowrap sm:max-w-full sm:w-fit">
           <TabsTrigger value={isOwnProfile ? "maqolalarim" : "articles"}>
-            {isOwnProfile ? "Maqolalarim" : "Maqolalar"}
+            <span className="sm:hidden">
+              {isOwnProfile ? "Mening" : "Maqolalar"}
+            </span>
+            <span className="hidden sm:inline">
+              {isOwnProfile ? "Maqolalarim" : "Maqolalar"}
+            </span>
           </TabsTrigger>
           <TabsTrigger value="requested">
             <span className="sm:hidden">So&apos;ralgan</span>
@@ -54,7 +59,10 @@ export function ProfileTabs({
               <span className="hidden sm:inline">AI arxiv</span>
             </TabsTrigger>
           ) : null}
-          <TabsTrigger value="followers">Obunachilar</TabsTrigger>
+          <TabsTrigger value="followers">
+            <span className="sm:hidden">Obuna</span>
+            <span className="hidden sm:inline">Obunachilar</span>
+          </TabsTrigger>
         </TabsList>
       </div>
 

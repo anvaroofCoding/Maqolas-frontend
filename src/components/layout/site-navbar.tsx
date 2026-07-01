@@ -6,14 +6,15 @@ import { usePathname } from "next/navigation";
 import { useWriteChrome } from "@/components/editor/write-chrome-context";
 import { NotificationPopover } from "@/components/notifications/notification-popover";
 import { ArticleSearchTrigger } from "@/components/layout/article-search-trigger";
-import { NavbarMobileMenu } from "@/components/layout/navbar-mobile-menu";
 import { ProfileMenu } from "@/components/layout/profile-menu";
 import { NavbarWeather } from "@/components/layout/navbar-weather";
 import { NavbarTooltip } from "@/components/layout/navbar-tooltip";
 import { PromoReaderTrigger } from "@/components/promo-reader/promo-reader-trigger";
 import { ThemeToggle } from "@/components/layout/theme-toggle";
+import { AiIcon } from "@/components/icons/ai-icon";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
+import { SiteFocusToggle } from "@/components/layout/site-focus-toggle";
 import { SiteContainer } from "@/components/layout/site-container";
 import { siteConfig } from "@/config/site";
 import { navIconButtonClass } from "@/lib/layout";
@@ -34,6 +35,7 @@ export function SiteNavbar() {
         "border-b border-navbar-border",
         hideOnWrite && "-translate-y-full pointer-events-none",
       )}
+      data-site-chrome
     >
       <SiteContainer className="flex h-14 w-full max-w-none items-center justify-between gap-3 px-4 md:gap-4 md:px-4 xl:px-6">
         <Link
@@ -59,6 +61,8 @@ export function SiteNavbar() {
             <PromoReaderTrigger />
             <ThemeToggle className={navIconButtonClass} />
 
+            <SiteFocusToggle />
+
             <ArticleSearchTrigger />
 
             <NavbarTooltip
@@ -72,7 +76,7 @@ export function SiteNavbar() {
                 className={writeButtonClass}
                 asChild
               >
-                <Link href="/yozish">
+                <Link href="/yozish" data-tour="write-button">
                   <PenLineIcon data-icon="inline-start" />
                   Yozish
                 </Link>
@@ -86,7 +90,7 @@ export function SiteNavbar() {
                 aria-label="Yozish"
                 asChild
               >
-                <Link href="/yozish">
+                <Link href="/yozish" data-tour="write-button">
                   <PenLineIcon />
                 </Link>
               </Button>
@@ -95,7 +99,22 @@ export function SiteNavbar() {
             <NotificationPopover />
           </div>
 
-          <NavbarMobileMenu className="md:hidden" />
+          <NavbarWeather className="md:hidden" />
+
+          <Button
+            variant="ghost"
+            size="icon"
+            className={cn(navIconButtonClass, "md:hidden")}
+            aria-label="AI maqola yordamchisi"
+            data-tour="ai-assistant"
+            asChild
+          >
+            <Link href="/ai">
+              <AiIcon className="size-5" />
+            </Link>
+          </Button>
+
+          <SiteFocusToggle className="md:hidden" />
 
           <ProfileMenu />
         </nav>

@@ -87,6 +87,7 @@ export function ArticleSearchDialog({
   initialQuery = "",
 }: ArticleSearchDialogProps) {
   const router = useRouter();
+  const [mounted, setMounted] = useState(false);
   const [query, setQuery] = useState("");
   const [debouncedQuery, setDebouncedQuery] = useState("");
   const { data: defaultArticlesData, isFetching: isDefaultFetching } =
@@ -96,6 +97,10 @@ export function ArticleSearchDialog({
     );
   const [searchArticles, { data: searchData, isFetching: isSearchFetching }] =
     useLazySearchArticlesQuery();
+
+  useEffect(() => {
+    setMounted(true);
+  }, []);
 
   useEffect(() => {
     if (!open) {
@@ -145,6 +150,10 @@ export function ArticleSearchDialog({
     : isDefaultFetching && defaultArticles.length === 0;
   const showEmpty =
     !showLoading && articles.length === 0;
+
+  if (!mounted) {
+    return null;
+  }
 
   return (
     <CommandDialog

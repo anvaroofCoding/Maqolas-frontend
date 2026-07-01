@@ -21,6 +21,7 @@ export function SiteRightSidebar() {
     <aside
       className={cn(rightSidebarWidthClass, "w-full shrink-0")}
       aria-label="Qo'shimcha ma'lumotlar"
+      data-site-chrome
     >
       <div className="space-y-4 lg:pr-2">
         <PopularCommentsWidget currentUserId={currentUser?.id} />

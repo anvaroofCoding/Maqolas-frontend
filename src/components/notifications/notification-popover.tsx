@@ -12,6 +12,7 @@ import {
   PopoverTrigger,
 } from "@/components/ui/popover";
 import { useGetUnreadNotificationCountQuery } from "@/features/notifications/api/notifications-api";
+import { OPEN_NOTIFICATIONS_EVENT } from "@/lib/keyboard-shortcuts/types";
 import { navIconButtonClass } from "@/lib/layout";
 import { cn } from "@/lib/utils";
 
@@ -21,6 +22,17 @@ export function NotificationPopover() {
   const accessToken = useAppSelector((state) => state.auth.accessToken);
 
   useEffect(() => setMounted(true), []);
+
+  useEffect(() => {
+    if (!mounted || !accessToken) return;
+
+    const handleOpen = () => {
+      if (!window.matchMedia("(min-width: 768px)").matches) return;
+      setOpen(true);
+    };
+    window.addEventListener(OPEN_NOTIFICATIONS_EVENT, handleOpen);
+    return () => window.removeEventListener(OPEN_NOTIFICATIONS_EVENT, handleOpen);
+  }, [accessToken, mounted]);
 
   const isActive = mounted && Boolean(accessToken);
 
@@ -40,6 +52,7 @@ export function NotificationPopover() {
           className={cn("relative", navIconButtonClass)}
           aria-label="Bildirishnomalar"
           disabled={!mounted}
+          data-tour="notifications"
         >
           <BellIcon />
         </Button>
@@ -65,6 +78,7 @@ export function NotificationPopover() {
             size="icon"
             className={cn("relative", navIconButtonClass)}
             aria-label="Bildirishnomalar"
+            data-tour="notifications"
           >
             <BellIcon />
             {unreadCount > 0 ? (

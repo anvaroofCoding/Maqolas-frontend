@@ -26,7 +26,7 @@ export function HomepageFeedWithPagination({
     algorithm === "forYou" ? "forYou" : sort;
 
   return (
-    <div className="relative space-y-6 pb-28 md:space-y-8 md:pb-32 2xl:space-y-10">
+    <div className="relative space-y-6 md:space-y-8 2xl:space-y-10">
       <HomepageFeed
         layout={layout}
         algorithm={algorithm}
@@ -36,14 +36,22 @@ export function HomepageFeedWithPagination({
         emptyMessage={emptyMessage}
       />
       {feed.articles.length > 0 && hasMore ? (
-        <ArticleFeedLoadMore
-          sort={feedSort}
-          category={category}
-          startPage={feed.pagination.page + 1}
-          hasMore={hasMore}
-          existingIds={feed.articles.map((article) => article.id)}
-          compact
-        />
+        <section
+          aria-label="Boshqa maqolalar"
+          className="space-y-4 border-t border-border pt-6 md:space-y-5 md:pt-8"
+        >
+          <h2 className="text-lg font-bold tracking-tight text-foreground sm:text-xl md:text-2xl">
+            Boshqa maqolalar
+          </h2>
+          <ArticleFeedLoadMore
+            sort={feedSort}
+            category={category}
+            startPage={feed.pagination.page + 1}
+            hasMore={hasMore}
+            existingIds={feed.articles.map((article) => article.id)}
+            compact
+          />
+        </section>
       ) : null}
       <HomepageWriteInviteBanner />
     </div>

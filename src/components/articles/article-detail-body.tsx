@@ -1,6 +1,7 @@
 "use client";
 
 import { useCallback, useEffect, useRef, useState } from "react";
+import { ArticlePhraseSaver } from "@/components/saved-phrases/article-phrase-saver";
 import { ArticleContent } from "@/components/articles/article-content";
 import {
   ImageLightbox,
@@ -8,6 +9,7 @@ import {
 } from "@/components/articles/image-lightbox";
 
 type ArticleDetailBodyProps = {
+  articleId: string;
   slug: string;
   coverImageUrl?: string;
   title: string;
@@ -22,6 +24,7 @@ type ArticleDetailBodyProps = {
 };
 
 export function ArticleDetailBody({
+  articleId,
   title,
   contentHtml,
   contentJson,
@@ -70,7 +73,17 @@ export function ArticleDetailBody({
 
   return (
     <>
-      <div ref={contentRef}>
+      <div
+        ref={contentRef}
+        className="maqolas-phrase-selectable notranslate"
+        translate="no"
+        lang="uz"
+        spellCheck={false}
+        data-gramm="false"
+        data-gramm_editor="false"
+        data-enable-grammarly="false"
+        data-no-click-sparkles
+      >
         <ArticleContent
           className={contentClassName}
           itemProp={itemProp}
@@ -84,6 +97,8 @@ export function ArticleDetailBody({
         image={lightboxImage}
         onClose={() => setLightboxImage(null)}
       />
+
+      <ArticlePhraseSaver articleId={articleId} containerRef={contentRef} />
     </>
   );
 }

@@ -29,10 +29,11 @@ export function PinGalleryClient({
             </p>
           </div>
 
-          <Button asChild size="sm" className="hidden rounded-full sm:inline-flex">
+          <Button asChild size="sm" className="shrink-0 rounded-full">
             <Link href="/rasm/yuklash">
               <PlusIcon className="size-4" aria-hidden />
-              Rasm yuklash
+              <span className="sm:hidden">Yuklash</span>
+              <span className="hidden sm:inline">Rasm yuklash</span>
             </Link>
           </Button>
         </div>
@@ -42,14 +43,6 @@ export function PinGalleryClient({
         initialPins={initialPins}
         initialPagination={initialPagination}
       />
-
-      <Link
-        href="/rasm/yuklash"
-        className="fixed bottom-[calc(1rem+env(safe-area-inset-bottom))] right-4 z-30 inline-flex size-14 items-center justify-center rounded-full bg-primary text-primary-foreground shadow-lg shadow-primary/25 transition-transform active:scale-95 sm:hidden"
-        aria-label="Rasm yuklash"
-      >
-        <PlusIcon className="size-6" aria-hidden />
-      </Link>
     </>
   );
 }

@@ -3,7 +3,9 @@
 import { usePathname } from "next/navigation";
 import { useTopicNavItems } from "@/components/layout/use-topic-nav-items";
 import { FastNavPill, FastNavTab } from "@/components/layout/sidebar-nav-link";
-import { isMainNavActive, mainNavItems } from "@/config/navigation";
+import { isMainNavActive } from "@/config/navigation";
+import { useMainNavOrder } from "@/hooks/use-sidebar-nav-order";
+import { feedMobileInsetClassName } from "@/lib/layout";
 import { Skeleton } from "@/components/ui/skeleton";
 import { cn } from "@/lib/utils";
 
@@ -12,6 +14,7 @@ const allTopicsHref = "/";
 export function SiteMobileNav() {
   const pathname = usePathname();
   const { topicNavItems, isLoading } = useTopicNavItems();
+  const { items: mainItems } = useMainNavOrder();
 
   const isTopicActive = (href: string) => {
     if (href === allTopicsHref) {
@@ -21,15 +24,18 @@ export function SiteMobileNav() {
   };
 
   const isFeedActive = (href: string) => isMainNavActive(pathname, href);
+  const hideTopicPills = pathname === "/maqolalar";
 
   return (
     <nav
       className="sticky top-14 z-30 space-y-2 bg-background pt-3 md:hidden"
       aria-label="Mobil navigatsiya"
     >
+      {!hideTopicPills ? (
       <div
         className={cn(
-          "flex gap-2 overflow-x-auto px-4",
+          "flex gap-2 overflow-x-auto",
+          feedMobileInsetClassName,
           "[-ms-overflow-style:none] [scrollbar-width:none] [&::-webkit-scrollbar]:hidden",
         )}
       >
@@ -53,14 +59,16 @@ export function SiteMobileNav() {
           ))
         )}
       </div>
+      ) : null}
 
       <div
         className={cn(
-          "flex gap-5 overflow-x-auto px-4 pb-3",
+          "flex gap-5 overflow-x-auto pb-3",
+          feedMobileInsetClassName,
           "[-ms-overflow-style:none] [scrollbar-width:none] [&::-webkit-scrollbar]:hidden",
         )}
       >
-        {mainNavItems.map((item) => (
+        {mainItems.map((item) => (
           <FastNavTab
             key={item.href}
             href={item.href}

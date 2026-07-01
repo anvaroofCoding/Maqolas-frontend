@@ -11,6 +11,10 @@ export const containerClassName =
 export const articleSurfaceClassName =
   "w-full min-w-0 max-w-full px-0 py-6 sm:py-8";
 
+/** Fokus o'qish rejimi — markazlashtirilgan kontent */
+export const articleFocusReaderClassName =
+  "mx-auto w-full max-w-3xl px-4 sm:px-6 lg:px-8";
+
 /** Maqola yozish — ixchamroq, tepada ortiqcha bo'shliq yo'q */
 export const writeSurfaceClassName =
   "w-full min-w-0 max-w-full px-3 py-1 sm:px-5 sm:py-2 md:px-6";
@@ -33,11 +37,14 @@ export const feedColumnScrollClassName =
 /** Yon panel ustunlari — sidebar / mashxur izohlar */
 export const feedSidebarColumnClassName = "flex w-full min-w-0 flex-col pb-6 md:pt-6";
 
+/** Mobil feed/tablar va kontent chap inset — bir xil bo'lishi kerak */
+export const feedMobileInsetClassName = "px-3";
+
 /**
  * Markaziy kontent ustuni — mobilda ekran cheti, desktopda sidebarlardan 10px (grid gap).
  */
 export const feedMainColumnClassName =
-  "flex w-full min-w-0 flex-col px-3 pb-6 pt-0 md:px-0 md:pt-6";
+  `flex w-full min-w-0 flex-col ${feedMobileInsetClassName} pb-6 pt-0 md:px-0 md:pt-6`;
 
 /** Footer va inset bloklar — devorga yopishmaslik uchun barqaror gorizontal padding */
 export const feedContentInsetClassName = "px-4 sm:px-5 md:px-4 lg:px-5";
@@ -55,6 +62,10 @@ export const appShellGridTwoColClassName =
 /** App shell — md: 2 ustun, lg: sidebar + kontent + mashxur izohlar */
 export const appShellGridWithRightSidebarClassName =
   "md:grid-cols-[var(--sidebar-width)_minmax(0,1fr)] md:gap-x-[10px] lg:grid-cols-[var(--sidebar-width)_minmax(0,1fr)_var(--right-sidebar-width)]";
+
+/** Yozish — mobil/planshetda to'liq kenglik; xl+ markazlashtirish uchun bo'sh ustunlar */
+export const appShellGridWriteClassName =
+  "md:min-h-screen md:h-screen md:overflow-hidden xl:grid-cols-[var(--sidebar-width)_minmax(0,1fr)_var(--right-sidebar-width)] xl:gap-x-[10px]";
 
 /** @deprecated appShellGridWithRightSidebarClassName */
 export const appShellGridThreeColClassName = appShellGridWithRightSidebarClassName;

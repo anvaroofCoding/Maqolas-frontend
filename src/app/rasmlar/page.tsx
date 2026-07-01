@@ -22,7 +22,7 @@ export default async function RasmlarPage() {
   const feed = await fetchPinFeed(1);
 
   return (
-    <main className={cn(feedMainClassName, "pb-24 sm:pb-10")}>
+    <main className={cn(feedMainClassName, "sm:pb-10")}>
       <PinGalleryClient
         initialPins={feed?.pins}
         initialPagination={feed?.pagination}

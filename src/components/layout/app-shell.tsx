@@ -9,6 +9,7 @@ import { SiteSidebar } from "@/components/layout/site-sidebar";
 import {
   appShellGridStyle,
   appShellGridTwoColClassName,
+  appShellGridWriteClassName,
   appShellGridWithRightSidebarClassName,
   feedColumnScrollClassName,
   feedMainColumnClassName,
@@ -18,9 +19,10 @@ import {
   writeColumnAlignClassName,
 } from "@/lib/layout";
 import { cn } from "@/lib/utils";
-import { WriteLayoutSpacer } from "@/components/layout/write-layout-spacer";
+import { shouldShowMobileDock } from "@/lib/mobile-dock";
 import { SiteSeoFooter } from "@/components/seo/site-seo-footer";
 import { useWriteChrome } from "@/components/editor/write-chrome-context";
+import { WriteLayoutSpacer } from "@/components/layout/write-layout-spacer";
 
 function shouldShowSeoFooter(pathname: string | null) {
   if (!pathname) return false;
@@ -88,6 +90,8 @@ export function AppShell({ children }: { children: React.ReactNode }) {
   const isAdminRoute = pathname?.startsWith("/admin");
   const isWriting = isWriteRoute(pathname);
   const showMobileNav = shouldShowMobileNav(pathname);
+  const showMobileDock = shouldShowMobileDock(pathname);
+  const isPinPage = isPinRoute(pathname);
   const showRightSidebar = shouldShowRightSidebar(pathname);
   const showLeftSidebar = !isWriting;
   const useWriteLayout = isWriting;
@@ -118,9 +122,10 @@ export function AppShell({ children }: { children: React.ReactNode }) {
   return (
     <SiteContainer>
       <div
+        data-site-shell
         className={cn(
-          "grid min-h-screen min-w-0 items-start overflow-x-hidden bg-background md:h-screen md:overflow-hidden",
-          useWriteLayout ? appShellGridWithRightSidebarClassName : appShellGridClassName,
+          "grid min-h-0 min-w-0 items-start overflow-x-hidden bg-background md:min-h-screen md:h-screen md:overflow-hidden",
+          useWriteLayout ? appShellGridWriteClassName : appShellGridClassName,
         )}
         style={appShellGridStyle}
       >
@@ -141,7 +146,15 @@ export function AppShell({ children }: { children: React.ReactNode }) {
         ) : null}
 
         <div className={cn(centerScrollClassName, isWriting && "md:h-full")}>
-          <div className={centerInnerClassName}>
+          <div
+            className={cn(
+              centerInnerClassName,
+              isPinPage && "max-md:pt-3",
+              showMobileDock &&
+                !showSeoFooter &&
+                "pb-[calc(4.5rem+env(safe-area-inset-bottom))] md:pb-6",
+            )}
+          >
             {showMobileNav ? (
               <div className="md:hidden">
                 <SiteMobileNav />

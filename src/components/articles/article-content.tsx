@@ -93,8 +93,17 @@ export function ArticleContent({
   return (
     <div
       ref={containerRef}
-      className={cn("article-editor-content", className)}
+      className={cn(
+        "article-editor-content maqolas-phrase-selectable notranslate",
+        className,
+      )}
       itemProp={itemProp}
+      translate="no"
+      lang="uz"
+      spellCheck={false}
+      data-gramm="false"
+      data-gramm_editor="false"
+      data-enable-grammarly="false"
     >
       {parts.map((part, index) =>
         part.type === "pre" ? (

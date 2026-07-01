@@ -140,7 +140,7 @@ export function PinCard({
                 </div>
               </div>
 
-              <span className="pointer-events-none inline-flex shrink-0 rounded-full bg-primary px-3 py-1.5 text-xs font-semibold text-primary-foreground shadow-sm sm:opacity-0 sm:transition-all sm:duration-200 sm:group-hover:opacity-100">
+              <span className="pointer-events-none hidden shrink-0 rounded-full bg-primary px-3 py-1.5 text-xs font-semibold text-primary-foreground shadow-sm sm:inline-flex sm:opacity-0 sm:transition-all sm:duration-200 sm:group-hover:opacity-100">
                 Ko&apos;rish
               </span>
             </div>

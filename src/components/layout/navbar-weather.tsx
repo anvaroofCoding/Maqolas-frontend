@@ -202,6 +202,10 @@ export function NavbarWeather({ className }: { className?: string }) {
             "focus-visible:ring-3 focus-visible:ring-ring/50",
           )}
           aria-label={ariaLabel}
+          onClick={() => {
+            updatePosition();
+            setOpen((prev) => !prev);
+          }}
           onMouseEnter={() => {
             updatePosition();
             setOpen(true);

@@ -4,6 +4,7 @@ import {
   ArrowLeftIcon,
   ArrowRightIcon,
   BookmarkIcon,
+  CodeXmlIcon,
   CopyIcon,
   ExternalLinkIcon,
   HomeIcon,
@@ -15,11 +16,15 @@ import {
   Share2Icon,
   SunIcon,
   TagIcon,
+  TerminalIcon,
 } from "lucide-react";
 import { usePathname, useRouter } from "next/navigation";
 import { useTheme } from "next-themes";
 import { useCallback, useEffect, useRef, useState } from "react";
 import { ArticleSearchDialog } from "@/components/layout/article-search-dialog";
+import { useArticlePhrase } from "@/components/saved-phrases/article-phrase-context";
+import { SaveSuccessTick } from "@/components/saved-phrases/save-success-tick";
+import { useSaveSelectedPhrase } from "@/components/saved-phrases/use-save-selected-phrase";
 import { useSettings } from "@/components/providers/settings-provider";
 import {
   ContextMenuItem,
@@ -27,6 +32,11 @@ import {
   ContextMenuSeparator,
 } from "@/components/ui/context-menu-panel";
 import { siteConfig } from "@/config/site";
+import {
+  devToolsShortcutHints,
+  inspectElement,
+  openBrowserConsole,
+} from "@/lib/devtools/open-browser-devtools";
 import { useAppSelector } from "@/lib/store/hooks";
 import { toast } from "@/lib/toast";
 
@@ -73,6 +83,8 @@ export function SiteContextMenu() {
   const { resolvedTheme, setTheme } = useTheme();
   const { openSettings } = useSettings();
   const isAuthenticated = useAppSelector((state) => state.auth.isAuthenticated);
+  const articlePhrase = useArticlePhrase();
+  const { savePhrase, showTick, dismissTick } = useSaveSelectedPhrase();
 
   const [open, setOpen] = useState(false);
   const [searchOpen, setSearchOpen] = useState(false);
@@ -84,6 +96,8 @@ export function SiteContextMenu() {
     imageUrl: null,
   });
   const menuRef = useRef<HTMLDivElement>(null);
+  const targetRef = useRef<Element | null>(null);
+  const devHints = devToolsShortcutHints();
 
   const close = useCallback(() => setOpen(false), []);
 
@@ -108,6 +122,7 @@ export function SiteContextMenu() {
       if (menuRef.current?.contains(event.target)) return;
 
       event.preventDefault();
+      targetRef.current = event.target;
       setMenuContext(readMenuContext(event.target));
       setPosition({ x: event.clientX, y: event.clientY });
       setOpen(true);
@@ -171,19 +186,10 @@ export function SiteContextMenu() {
     close();
   };
 
-  if (!open) {
-    return (
-      <ArticleSearchDialog
-        open={searchOpen}
-        onOpenChange={setSearchOpen}
-        initialQuery={searchQuery}
-      />
-    );
-  }
-
   return (
     <>
-      <ContextMenuPanel menuRef={menuRef} position={position}>
+      {open ? (
+        <ContextMenuPanel menuRef={menuRef} position={position}>
         {hasSelection ? (
           <>
             <ContextMenuItem
@@ -200,6 +206,20 @@ export function SiteContextMenu() {
               label="Tanlangan matn bo'yicha qidirish"
               onClick={() => openSearch(menuContext.selectedText)}
             />
+            {articlePhrase && isAuthenticated ? (
+              <ContextMenuItem
+                icon={<BookmarkIcon />}
+                label="Iborani saqlash"
+                onClick={() =>
+                  run(() => {
+                    void savePhrase(
+                      articlePhrase.articleId,
+                      menuContext.selectedText,
+                    );
+                  })
+                }
+              />
+            ) : null}
             <ContextMenuSeparator />
           </>
         ) : null}
@@ -340,6 +360,46 @@ export function SiteContextMenu() {
         <ContextMenuSeparator />
 
         <ContextMenuItem
+          icon={<TerminalIcon />}
+          label="Consoleni ko'rish"
+          hint={devHints.console}
+          onClick={() =>
+            run(() => {
+              const opened = openBrowserConsole();
+              if (!opened) {
+                toast.info(`Konsol: ${devHints.console} yoki F12`);
+              }
+            })
+          }
+        />
+        <ContextMenuItem
+          icon={<CodeXmlIcon />}
+          label="Inspect code"
+          hint={devHints.inspect}
+          onClick={() =>
+            run(() => {
+              const target = targetRef.current;
+              if (!(target instanceof Element)) {
+                toast.error("Element topilmadi");
+                return;
+              }
+
+              const { selector, devToolsOpen } = inspectElement(target);
+              openBrowserConsole();
+              if (!devToolsOpen) {
+                toast.info(
+                  `Inspect: ${devHints.inspect}. Element: ${selector}`,
+                );
+              } else {
+                toast.success(`Element konsolda: ${selector}`);
+              }
+            })
+          }
+        />
+
+        <ContextMenuSeparator />
+
+        <ContextMenuItem
           icon={<ArrowLeftIcon />}
           label="Orqaga"
           onClick={() =>
@@ -367,12 +427,14 @@ export function SiteContextMenu() {
           }
         />
       </ContextMenuPanel>
+      ) : null}
 
       <ArticleSearchDialog
         open={searchOpen}
         onOpenChange={setSearchOpen}
         initialQuery={searchQuery}
       />
+      {showTick ? <SaveSuccessTick onComplete={dismissTick} /> : null}
     </>
   );
 }
